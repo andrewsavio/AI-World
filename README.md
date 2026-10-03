@@ -148,9 +148,9 @@ ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma   # once
 python server.py
 ```
 
-> **No Ollama?** No problem. The simulation runs in pure JavaScript. Students still learn, still explore, still take exams — they just don't have a Professor.
+> **PyTorch is required.** The page has no brain of its own: if the Python server isn't running it pauses, shows a banner saying what to start, and reconnects by itself (even if Python restarts mid-run).
 >
-> **No PyTorch?** Students fall back to built-in JS brains. The 3D world, curriculum, and real-data experiments all still work.
+> **Ollama is optional.** Without it there is no Professor and no free-text learning, but the maths curriculum and the real-data experiments still work.
 
 ---
 
@@ -190,9 +190,9 @@ AI-World/
 
 ## 🌐 Netlify / Static Hosting
 
-The front end is a **single self-contained `index.html`** that loads three.js from a CDN. It works perfectly as a read-only demo on any static host.
+The front end is a **single self-contained `index.html`** that loads three.js from a CDN, so any static host can serve it.
 
-> **Note:** Without the Python `server.py` running locally, the PyTorch training endpoints (`/brain/*`, `/policy/*`) are unavailable. Students automatically fall back to pure-JS brains — all 3D, animation and curriculum features still work.
+> **Note:** the students' brains run in Python (PyTorch), so a static host on its own **cannot run the world**: the page shows an *OFFLINE* banner until it can reach `server.py`. To host it online you need somewhere that runs Python (for example Render, Railway, a VPS or a Hugging Face Space). Pointing a Netlify-hosted front end at a remote Python backend is not supported yet, which makes it a good first issue.
 
 **Deploy to Netlify in one click:**
 

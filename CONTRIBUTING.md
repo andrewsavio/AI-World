@@ -18,7 +18,7 @@ For the professor and student minds, install [Ollama](https://ollama.com) and ru
 
 - **`index.html`** holds the simulation and the 3D world. Search for the section banners (`// =====`) to jump around. State lives in plain objects (`agents`, `SKILLS`, `FEATURES`); there is no build step and no framework.
 - **`brain.py`** is the only place with PyTorch. The page talks to it through `handle(path, data)`; `server.py` just exposes that over HTTP.
-- The page falls back to small JavaScript brains when Python is unavailable. If you change learning behaviour, keep both engines sensible, or note the difference in your PR.
+- The page has no brain of its own: all learning goes through `brain.py`. If Python is unreachable the world pauses and reconnects by itself; the page remembers each brain's shape (sizes, senses) so a restarted Python can be rebuilt (`pySyncAll`).
 
 ## Ground rules
 
