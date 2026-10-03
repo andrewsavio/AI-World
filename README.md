@@ -35,7 +35,7 @@ They have **needs** — hunger, fun, friendships. They have **personalities** �
 
 Nobody tells them what to do.
 
-They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They invent new ways to sense the world. And they are mentored by a real local LLM — **Professor Gemma** — who keeps notes on what advice actually helped, just like a good teacher.
+They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They invent new ways to sense the world. And each one thinks with a real local LLM (Gemma 2 via Ollama): it picks what to learn next, writes notes in its own notebook, and is quizzed on them.
 
 Click on any student. Watch its neurons fire. Watch its weights shift. Watch it *think*.
 
@@ -48,8 +48,8 @@ Click on any student. Watch its neurons fire. Watch its weights shift. Watch it 
 | 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation right in your browser session |
 | 🎲 | **True free will** | Students have needs, personalities and learned preferences that drive every decision |
 | 🌐 | **Live internet access** | They search **Wikipedia**, test hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
-| 🎓 | **A real professor** | A local **Gemma 2 2B** LLM mentors stuck students, invents new input senses as math formulas |
-| 📜 | **A readable curriculum** | A fixed school syllabus **plus** an open curriculum that grows with whatever students freely choose |
+| 🧠 | **A real language mind** | A local **Gemma 2 2B** LLM lets each student choose topics, write notes and invent new input senses as math formulas |
+| 📜 | **A seven-level syllabus** | Students are **promoted** level by level, from straight lines to inventing new puzzles, plus an open curriculum of whatever they freely choose to learn ([details](docs/SYLLABUS.md)) |
 | 🌅 | **Gorgeous on integrated graphics** | Day/night cycle, atmosphere, real interior shadows, auto-resolution scaling for 60 fps on iGPUs |
 
 <div align="center">
@@ -80,7 +80,7 @@ Each student carries **two brains** built from scratch in PyTorch:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Professor Gemma** (Gemma 2 2B via Ollama) runs alongside them, reading Wikipedia in its free time, advising stuck students, and inventing new mathematical **input features** (validated by a tiny safe parser that never calls `eval`) that help students sense the world in new ways.
+**Gemma 2 2B** (via Ollama) is every student's shared mind: it reads Wikipedia, writes notes, sets quizzes, and invents new mathematical **input features** (validated by a tiny safe parser that never calls `eval`) that help students sense the world in new ways.
 
 ---
 
@@ -96,7 +96,7 @@ flowchart LR
         B["brain.py  ·  PyTorch<br/>skill brain · decision brain"]
         N["Notebooks  ·  JSON on disk"]
     end
-    O["🦙 Ollama · Gemma 2<br/>Professor + student minds"]
+    O["🦙 Ollama · Gemma 2<br/>Shared student minds"]
     I["🌐 Wikipedia · USGS · Open-Meteo<br/>(read-only GET)"]
 
     W <-->|"train · exam · act · reward"| B
@@ -110,7 +110,7 @@ flowchart LR
 |---|---|---|
 | **Skill brain** | PyTorch MLP · autograd · mini-batch SGD | Learns to separate blue / red dots; grows neurons; gains new senses |
 | **Decision brain** | PyTorch MLP · REINFORCE | Learns corrections to built-in instincts from world rewards |
-| **Professor / minds** | Gemma 2 2B via Ollama | Chooses topics · writes notes · sets exams · invents input formulas |
+| **Student minds** | Gemma 2 2B via Ollama | Chooses topics · writes notes · sets exams · invents input formulas |
 | **Memory** | JSON notebooks + keyword RAG | Per-student knowledge (60-note cap → natural forgetting) |
 | **3D World** | three.js · instancing · merged meshes · canvas textures | Low-poly town · avatars · day/night · atmosphere |
 | **Server** | Python `http.server` · keep-alive · Origin checks | Serves the page · hosts brains · saves notebooks |
@@ -150,7 +150,7 @@ python server.py
 
 > **PyTorch is required.** The page has no brain of its own: if the Python server isn't running it pauses, shows a banner saying what to start, and reconnects by itself (even if Python restarts mid-run).
 >
-> **Ollama is optional.** Without it there is no Professor and no free-text learning, but the maths curriculum and the real-data experiments still work.
+> **Ollama is optional.** Without it the students have no language mind and no free-text learning, but the maths syllabus and the real-data experiments still work.
 
 ---
 
@@ -199,6 +199,26 @@ The front end is a **single self-contained `index.html`** that loads three.js fr
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/andrewsavio/AI-World)
 
 Or drag-and-drop `index.html` into [app.netlify.com/drop](https://app.netlify.com/drop).
+
+**AI World is local-first.** The real world runs on your computer (`start-world.bat`). A hosted copy is only a *representation*: it shows an explanation instead of running. To make a hosted page talk to a Python server you run yourself, open it with `?api=https://your-server` and start that server with `AIWORLD_ORIGINS=https://your-site` (add `AIWORLD_HOST=0.0.0.0` if it must be reachable from other machines). There is one world per server, so it is meant for a single viewer.
+
+---
+
+## 📜 The syllabus
+
+Students move up through **seven levels**. To be promoted, a student must pass every subject of its level, meet the extra requirement (if any) and have built enough knowledge. Then it advances to the next level, and so on.
+
+| Level | Name | Subjects | Also needed | Knowledge to leave |
+|---|---|---|---|---|
+| 1 | Foundations | Left vs Right · Top vs Bottom · Diagonal | | 2 notes |
+| 2 | Shapes | Stripe · Circle · Diamond | | 4 notes, 📘 Learner |
+| 3 | Curves & Logic | Ellipse · XOR · Waves | | 8 notes, 📘 Learner |
+| 4 | Patterns | Rings · Checkerboard | pass a real-data subject | 12 notes, 🎓 Expert |
+| 5 | Mastery | Flower · Spiral | | 16 notes, 🎓 Expert |
+| 6 | Invention | | create a puzzle or invent a sense | 20 notes, 🏆 Master of a field |
+| 7 | Open research | no gates | | |
+
+The order follows curriculum learning (easy before hard), the dataset order of TensorFlow Playground, UNESCO's education levels and Bloom's taxonomy. Read the reasoning and the references in **[docs/SYLLABUS.md](docs/SYLLABUS.md)**.
 
 ---
 

@@ -12,7 +12,7 @@ python brain.py                     # self-test, should print "brain self-test p
 python server.py                    # http://localhost:8000
 ```
 
-For the professor and student minds, install [Ollama](https://ollama.com) and run `ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma`. Everything except those features works without it.
+For the student minds, install [Ollama](https://ollama.com) and run `ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma`. Everything except those features works without it.
 
 ## How the code is organised
 
@@ -33,7 +33,7 @@ For the professor and student minds, install [Ollama](https://ollama.com) and ru
 - [ ] `python brain.py` passes
 - [ ] The page loads with no console errors, with and without Ollama running
 - [ ] Syntax check the page script if you edited it (`node --check` on the contents of the `<script type="module">` block works)
-- [ ] You did not commit model weights, `students-memory*.json`, `professor-memory.json` or `training-data.jsonl` (they are git-ignored)
+- [ ] You did not commit model weights, `students-memory*.json` or `training-data.jsonl` (they are git-ignored)
 
 ## Commit messages
 
