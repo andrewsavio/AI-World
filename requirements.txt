@@ -1,3 +1,4 @@
-torch>=2.5
+torch>=2.5,<3.0
 pystray
 pillow
+pytest>=7.0

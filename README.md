@@ -11,6 +11,7 @@
 
 ### *A living, breathing 3D planet where tiny neural networks go to school, fall in love with curiosity, and learn to think — one synapse at a time.*
 
+[![CI](https://github.com/andrewsavio/AI-World/actions/workflows/ci.yml/badge.svg)](https://github.com/andrewsavio/AI-World/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
 [![three.js](https://img.shields.io/badge/three.js-WebGL-000000?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org)
@@ -159,13 +160,15 @@ python server.py
 
 ```
 AI-World/
+├── .github/workflows/ci.yml ← GitHub Actions CI pipeline
+├── tests/test_brain.py      ← Pytest test suite (31 unit & integration tests)
 ├── index.html              ← Entire front end: 3D world, simulation, UI
 │                             (single file, ES modules from CDN)
 ├── brain.py                ← PyTorch brains (skill brain + decision brain)
-│                             run `python brain.py` for the self-test
+│                             recursive descent formula parser & model persistence
 ├── server.py               ← HTTP server: static files, /brain/*, /policy/*
 ├── launcher.py             ← Windows tray-icon launcher
-├── requirements.txt        ← torch  (that's the only pip dependency)
+├── requirements.txt        ← torch, pytest, pystray, pillow
 ├── start-world.bat         ← Windows one-click launcher
 ├── start-world-background.bat
 └── docs/screenshots/       ← Images used in this README
@@ -207,14 +210,28 @@ The order follows curriculum learning (easy before hard), the dataset order of T
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & CI
+
+Continuous integration runs on every push and pull request via GitHub Actions.
+
+Run the test suite locally with `pytest`:
+
+```bash
+pytest tests/ -v
+```
+
+The test suite covers:
+- **Supervised Learning**: Backpropagation on non-linear circular decision boundaries (>93% exam accuracy after 6 000 lessons).
+- **Dynamic Topology**: Growing hidden layer neurons and dynamic input sense injection without breaking activations.
+- **Reinforcement Learning**: REINFORCE policy-gradient learning, baseline advantage estimation, and entropy regularisation.
+- **Math Parser**: Hand-crafted recursive-descent parser verifying operator precedence, safe function whitelist, and code injection rejection.
+- **Model Persistence**: Serializing and loading `Brain` and `Policy` models with identical weight reproduction and evaluation scores.
+
+Or run the standalone engine self-test:
 
 ```bash
 python brain.py
-# Runs: learning test · grow-neuron test · add-sense test · policy (reward) learning
 ```
-
-No test framework yet — adding `pytest` is a great first contribution.
 
 ---
 
@@ -223,10 +240,10 @@ No test framework yet — adding `pytest` is a great first contribution.
 All contributions welcome — from fixing a typo to adding a whole new kind of student. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, conventions and the review checklist.
 
 **Good first issues**
-- 🧪 Add `pytest` tests for `brain.py` (grow / add-sense, policy learning)
-- 💾 Persist student network weights so they survive a restart
 - 🍎 macOS / Linux launcher scripts (`start-world.sh`)
 - ♿ Keyboard navigation and screen-reader labels for the dashboard
+- 🏷️ Python type annotations across `brain.py` and `server.py`
+- 🐳 Minimal Dockerfile for one-command containerized execution
 
 **Bigger ideas**
 - 🖥️ Headless mode — run the simulation server-side so the world lives 24/7 with no browser

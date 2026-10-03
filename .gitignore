@@ -3,5 +3,8 @@ __pycache__/
 *.pyc
 .venv/
 *.tmp
+.pytest_cache/
+*.pt
 .agents/
 skills-lock.json
+
