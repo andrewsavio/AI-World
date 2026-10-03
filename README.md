@@ -48,7 +48,7 @@ Click on any student. Watch its neurons fire. Watch its weights shift. Watch it 
 | 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation right in your browser session |
 | 🎲 | **True free will** | Students have needs, personalities and learned preferences that drive every decision |
 | 🌐 | **Live internet access** | They search **Wikipedia**, test hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
-| 🧠 | **A real language mind** | A local **Gemma 2 2B** LLM lets each student choose topics, write notes and invent new input senses as math formulas |
+| 🎓 | **A real language mind** | A local **Gemma 2 2B** LLM lets each student choose topics, write notes and invent new input senses as math formulas |
 | 📜 | **A seven-level syllabus** | Students are **promoted** level by level, from straight lines to inventing new puzzles, plus an open curriculum of whatever they freely choose to learn ([details](docs/SYLLABUS.md)) |
 | 🌅 | **Gorgeous on integrated graphics** | Day/night cycle, atmosphere, real interior shadows, auto-resolution scaling for 60 fps on iGPUs |
 

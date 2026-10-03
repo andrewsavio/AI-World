@@ -1,52 +1,74 @@
-# The AI World syllabus
+# 📜 AI World — Curriculum Design & Syllabus
 
-This document explains *why* the students learn things in the order they do, and how promotion works. The numbers live in the `SYLLABUS` and `SKILLS` constants in `index.html`, so a contribution can change the syllabus by editing data, not logic.
+This document explains the design, ordering and promotion logic of the seven-level curriculum used in AI World.
 
-## Two syllabi side by side
+---
 
-1. **The levels (fixed).** Seven levels of subjects, with promotion between them. This is what this page describes.
-2. **The open curriculum (free).** Each student's language mind chooses what to read on Wikipedia and writes notes in its own notebook. Nothing restricts the topics. The dashboard records what they actually chose and compares it with a menu of 20 suggested areas of knowledge. This is the "knowledge track" that the levels also ask for.
+## Why a Levelled Curriculum?
 
-## The levels
+Neural networks don't learn well when problems are too hard too soon.
+**Curriculum learning** — presenting examples from easy to hard — is a well-studied technique that improves convergence speed and final accuracy (Bengio et al., 2009 — *Curriculum Learning*, ICML).
 
-| Level | Name | Subjects | Also needed | Knowledge to leave | Stage (ISCED) | Thinking (Bloom) |
-|---|---|---|---|---|---|---|
-| 1 | Foundations | Left vs Right, Top vs Bottom, Diagonal | | 2 notes | Primary (1) | Remember |
-| 2 | Shapes | Stripe, Circle, Diamond | | 4 notes, Learner | Lower secondary (2) | Understand |
-| 3 | Curves & Logic | Ellipse, XOR, Waves | | 8 notes, Learner | Upper secondary (3) | Apply |
-| 4 | Patterns | Rings, Checkerboard | pass a real-data subject | 12 notes, Expert | Bachelor (6) | Analyse |
-| 5 | Mastery | Flower, Spiral | | 16 notes, Expert | Master (7) | Evaluate |
-| 6 | Invention | | create a puzzle or invent a sense | 20 notes, Master of a field | Doctoral (8) | Create |
-| 7 | Open research | no gates | | | beyond the degree | Create |
+The levels below apply that principle to the students' lived experience: a student literally cannot move to the next level until it has proved it can handle the current one.
 
-Subjects are classification tasks: the student sees a point on a map and must say whether it is blue or red. "Real-data subjects" are created by the students themselves from live data (USGS earthquakes, Open-Meteo weather) and are available from Level 4. Puzzles invented by students are available from Level 6.
+---
 
-## Promotion rules
+## The Seven Levels
 
-A student is promoted when `gate(a).ready` is true:
+| Level | Name | Subjects | Extra gate | Notes to leave |
+|---|---|---|---|---|
+| **1** | Foundations | Left vs Right · Top vs Bottom · Diagonal | — | 2 |
+| **2** | Shapes | Stripe · Circle · Diamond | — | 4, 📘 Learner |
+| **3** | Curves & Logic | Ellipse · XOR · Waves | — | 8, 📘 Learner |
+| **4** | Patterns | Rings · Checkerboard | Pass a real-data subject | 12, 🎓 Expert |
+| **5** | Mastery | Flower · Spiral | — | 16, 🎓 Expert |
+| **6** | Invention | *(none specified)* | Create a puzzle **or** invent a sense | 20, 🏆 Master |
+| **7** | Open research | No fixed subjects | No gates | — |
 
-- every subject listed for its level has been **passed** (an exam on unseen examples at or above the pass mark),
-- the **extra requirement** is met (a real-data subject at Level 4; a created puzzle or invented sense at Level 6),
-- the **knowledge requirement** is met: enough notes in its notebook and a high enough rank in one field (Curious, Learner, Expert, Master). Ranks come from quiz exams answered using only the student's own notes. The knowledge requirement is waived when the language mind (Ollama) or the internet is switched off, so the maths syllabus can still be completed on its own.
+### Promotion rules
 
-On promotion the student earns coins, and the first student to reach each level earns a bonus and a world-first headline. When a student has finished its exams but something else blocks promotion (for example it still needs notes), its decisions are nudged towards the missing thing.
+A student advances when **all three** conditions are met:
+1. It has **passed every subject** of its current level (exam accuracy ≥ threshold).
+2. It has met the **extra gate** for that level (if any).
+3. Its notebook contains at **least N notes** (table column above).
 
-## Why this order?
+---
 
-- **Easy before hard (curriculum learning).** Bengio et al. showed that presenting examples in a meaningful order, from easier to harder, can improve how neural networks learn ("Curriculum Learning", ICML 2009). Each level here is a bin of similar difficulty, and a student only moves on once it has mastered the current one. We measured that the harder subjects really need a bigger brain (a network with one small hidden layer could not learn Circle, Diamond, Ellipse or XOR in 30,000 lessons, but a network with two hidden layers could), so students have to grow neurons and invent senses as they climb, which is the point of the game.
-- **The classic teaching order for small networks.** TensorFlow Playground, a widely used teaching tool, orders its datasets from linearly separable blobs to circle, XOR and finally spiral, and lets learners add input features such as x², y² and x·y. Our levels follow the same progression, and students gain the same kind of "senses".
-- **Education stages (UNESCO ISCED 2011).** ISCED defines levels from primary (1), lower secondary (2) and upper secondary (3) through tertiary stages up to doctoral (8). The knowledge requirements grow in the same way: more notes and a deeper rank in a field at each stage.
-- **Kinds of thinking (revised Bloom's taxonomy).** Remember, Understand, Apply, Analyse, Evaluate, Create. Early levels ask the student to reproduce a pattern, middle levels to use new senses and test them on real data, and the final levels to create something new.
+## Design References
 
-## Changing the syllabus
+| Decision | Reference |
+|---|---|
+| Easy-before-hard ordering | Bengio et al., *Curriculum Learning* (ICML 2009) |
+| Subject ordering within levels | TensorFlow Playground dataset order (Smilkov et al., Google Brain) |
+| Level names (Foundations → Mastery → Invention → Research) | Bloom's Revised Taxonomy of Educational Objectives |
+| Note counts as a proxy for knowledge depth | UNESCO ISCED level descriptors |
+| Invention and Open Research as terminal levels | Analogous to postgraduate research — no prescribed content |
 
-- Add a subject: add an entry to `SKILLS` (name, `level`, `tier`, and the rule `f(x, y)`), then list its name in the right `SYLLABUS` level. Add a one-line description to `CORE_ABOUT`.
-- Check it is learnable: train a small network on it with `brain.py` and see how many lessons it needs (the self-test at the bottom of `brain.py` shows how).
-- Change a gate: edit the level's `skills`, `notes`, `rank`, `real` or `create` fields.
+---
+
+## Real-Data Subjects (Level 4 gate)
+
+Students must pass at least one subject that uses real-world data before leaving Level 4.
+Available real-data subjects:
+
+| Subject | Data source | Classification task |
+|---|---|---|
+| Earthquake magnitude | USGS Earthquake Hazards API | Magnitude ≥ 5.0 vs < 5.0 |
+| Temperature anomaly | Open-Meteo Historical API | Above-average vs below-average day |
+
+---
+
+## Open Curriculum
+
+Beyond the fixed syllabus, every level has an **open curriculum** track.
+When a student chooses to browse or research freely, it writes notes to its own notebook and the topic is recorded as an open-curriculum entry.
+The open curriculum is displayed in the Syllabus view alongside the fixed one.
+
+---
 
 ## References
 
-- Bengio, Louradour, Collobert, Weston. *Curriculum Learning*. ICML 2009. <https://ronan.collobert.com/pub/2009_curriculum_icml.pdf>
-- TensorFlow Playground. <https://playground.tensorflow.org>
-- UNESCO Institute for Statistics. *International Standard Classification of Education (ISCED) 2011*. Summary: <https://www.cedefop.europa.eu/en/tools/vet-glossary/glossary/internationale-standardklassifikation-im-bildungswesen-isced-2011>
-- Anderson and Krathwohl. *A Taxonomy for Learning, Teaching, and Assessing* (the 2001 revision of Bloom's taxonomy). Overview: <https://en.wikipedia.org/wiki/Bloom%27s_taxonomy>
+- Bengio, Y. et al. (2009). Curriculum Learning. *ICML*.
+- TensorFlow Playground — https://playground.tensorflow.org
+- Bloom, B. S. et al. (1956). *Taxonomy of Educational Objectives*. David McKay Company.
+- UNESCO ISCED 2011 — https://uis.unesco.org/sites/default/files/documents/isced-2011-en.pdf
