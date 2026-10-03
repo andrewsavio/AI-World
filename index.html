@@ -67,7 +67,7 @@ dialog.dash{max-width:1200px}
 .matrix td.ok{background:#12361f;color:#7ee787}.matrix td.now{background:#0d2a4a;color:#79c0ff}
 .models{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px}
 .model{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.6;color:var(--mute)}
-.model b{color:var(--text)} .model.prof{border-color:#d29922}
+.model b{color:var(--text)}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
@@ -90,19 +90,10 @@ dialog.dash{max-width:1200px}
   <p>When an AI decides to go online, it explores on its own. It reads 20 random Wikipedia articles, and if one is a real place (a town, a lake, a mountain…) it makes up a <b>hypothesis</b>, for example <i>"can air pressure and wind speed tell when it rains in Kpendua?"</i>. It then downloads 3 months of real hourly weather for that exact spot from Open-Meteo and tests the idea. Confirmed hypotheses become new subjects for everyone. Rejected ones are reported honestly in the news. The AIs can also download every earthquake of the last 30 days from USGS.</p>
   <p>Real data is messy, so the pass mark is set just below what a simple reference method (copy the answer of the 7 most similar examples) manages on the same data.</p>
   <p><b>Honest limits:</b> their brains only see two numbers at a time, so they can't understand the words in an article. They only notice whether it has a location. Their internet is also <b>read-only on purpose</b>: they download public data but never post, sign up, send messages or buy anything, and nothing about you is sent. Switch it off any time with the 🌐 button.</p>
-  <h3>🎓 Professor Gemma: the flagship model</h3>
-  <p>Professor Gemma is <b>Gemma 2</b> (2.6 billion parameters, made by Google). The world keeps its <b>own copy</b> of the model in <code>models/gemma2-2b.gguf</code>, registered in Ollama as <code>aiworld-gemma</code>, and runs it on your computer. That's about ten million times bigger than a student, and it understands language. When a student is stuck, it can walk to the University and ask. The Professor looks at a text drawing of the problem and recommends one new "sense". The world then <b>measures</b> whether the advice really helped.</p>
-  <h3>How the Professor learns by itself</h3>
-  <p>Changing Gemma's 2.6 billion weights is called <i>fine-tuning</i>. It needs a powerful graphics card and is far too heavy for this computer, so the weights never change. Instead, the Professor learns the way a person does with a notebook:<br>
-  • <b>From experience:</b> every tip is tested, and "radius helped on Rings 2 of 2 times" goes into the notebook.<br>
-  • <b>From the internet:</b> in its free time it <b>picks its own Wikipedia article</b> to study (for example "Polar coordinate system"), reads it, and writes down one lesson for teaching.<br>
-  • <b>Before every piece of advice</b> it re-reads its results and notes. This is called <i>in-context learning</i>, and it's how most real AI assistants "remember".<br>
-  The notebook is saved in <code>professor-memory.json</code> in the project folder, so it survives restarts. The notebook panel compares its first 10 tips with its latest 10, so you can see whether it's really getting better.</p>
-  <p>The students can't grow into a Gemma: their brains have room for a few hundred connections. What the Professor can do is help them master <i>their</i> subjects faster. Start the world with <b>start-world.bat</b> to meet it. Without Ollama the world still runs, and the Professor stays home.</p>
   <h3>🧠 Gemma minds and inventions</h3>
   <p>A student's brain has room for a few hundred connections, so it can't hold Gemma's knowledge. Instead, every student gets <b>Gemma as its mind</b>: the same model file thinks for all ten of them, one thought at a time, while each keeps its own memory and its own trained "skill brain". This is how real multi-agent AI systems are built. Before a hard new subject, a student's Gemma mind looks at the problem and switches on the right senses, so it <b>doesn't start from scratch</b>. Its mind can also <b>invent brand-new senses</b> as maths formulas, for example <code>sin(9*r)</code>. Every invention is tested on real examples and only published if it truly helps. Open the 📊 <b>Dashboard</b> to see who learned what, every invention, and whether the head-start really saves lessons. Use the 🧠 button to compare against learning from scratch.</p>
-  <h3>📜 The syllabus</h3>
-  <p>There are two parts. The <b>classroom syllabus</b> is fixed: School (straight lines), University (circles, XOR, waves), Research (rings, flowers, checkerboards, spirals), plus real datasets and puzzles the students create themselves. The <b>open syllabus</b> is not fixed at all: each student's Gemma mind <b>chooses what to learn from the whole of Wikipedia</b>, so the syllabus is whatever they decide. It is written as they go. Press <b>📜 Syllabus</b> to read both parts, with every field the students have actually studied and how much of 20 suggested areas of human knowledge (science, history, music, law, sport…) they have touched. Those 20 areas are only a menu of ideas, never a rule.</p>
+  <h3>📜 The syllabus: seven levels</h3>
+  <p>Students move up like pupils through school. <b>Level 1 Foundations</b> (straight lines) → <b>2 Shapes</b> → <b>3 Curves &amp; Logic</b> (ellipse, XOR, waves) → <b>4 Patterns</b> (rings, checkerboards, plus a real-world dataset) → <b>5 Mastery</b> (flower, spiral) → <b>6 Invention</b> (create a puzzle or a new sense) → <b>7 Open research</b>. To be <b>promoted</b>, a student must pass every subject of its level and have built enough knowledge (notes and a rank in a field). Then it moves on to the next level, and so on. The order follows <i>curriculum learning</i> (easy before hard), the dataset order of TensorFlow Playground, UNESCO's education levels and Bloom's taxonomy. Alongside the levels, each student's mind <b>chooses what to learn freely from the whole of Wikipedia</b>: that open curriculum is written as they go. Press <b>📜 Syllabus</b> to read both parts.</p>
   <h3>📚 Learning anything they want</h3>
   <p>Maths patterns are only one part of their lives. In the <b>Internet Lab</b>, each student's Gemma mind <b>decides for itself</b> what it wants to learn, based on its personality, its past interests and something it happened to notice that day. It searches Wikipedia with its own words, reads the article, and writes a note in <b>its own notebook</b>. Students build up their own fields (astronomy, music, history, cooking…) and rank up 🌱 Curious → 📘 Learner → 🎓 Expert → 🏆 Master. The first to master a field earns a 🌍 World First. Mastery is tested in the Exam Hall with questions answered <b>only from the student's own notes</b>, found by keyword search. This technique, called retrieval-augmented generation (RAG), is how real AI assistants use documents. Notebooks hold 60 notes, after which old ones are forgotten. You can ask any student a question in its Mind panel. Notebooks are saved in <code>students-memory.json</code>.</p>
   <p><b>Honest limits:</b> searches go to Wikipedia (about 7 million articles on almost every topic). Searching the whole web needs a search service with an API key. A student's knowledge is its notes: Gemma does the reading and the reasoning for every student.</p>
@@ -113,11 +104,9 @@ dialog.dash{max-width:1200px}
      • <b>3D world:</b> three.js (WebGL) on your graphics chip: smooth terrain, shiny sea, a day and night cycle, atmosphere glow and real shadows when you look inside a building. Instancing, merged meshes and automatic resolution scaling keep Intel graphics fast.<br>
      • <b>Brain diagrams and charts:</b> HTML Canvas 2D.<br>
      • <b>Internet:</b> the browser's built-in <code>fetch()</code> calling three free public APIs with no keys: Wikipedia, Open-Meteo and USGS.<br>
-     • <b>Professor:</b> the project's own Gemma 2 (2.6B) file, served by Ollama at <code>localhost:11434</code>. Ollama is written in Go and C++ (llama.cpp), not Python.<br>
-     • <b>Web server:</b> <code>server.py</code> (Python standard library). It serves the page and saves the Professor's notebook.<br>
-     • <b>Memory:</b> the students live in the page (refreshing starts a new world). The Professor's notebook is saved to disk.</p>
-  <h3>Why JavaScript and not Python for the students?</h3>
-  <p>Neural networks can be written in any language. Python is the most popular because of libraries like PyTorch, but the maths is identical in JavaScript. Writing the students in JavaScript lets them run <b>inside the page</b> next to the 3D world, with no install. A Python version would need a separate program running in the background and constant messages back and forth for every lesson.</p>
+     • <b>Student minds:</b> a local Gemma 2 (2.6B) model served by Ollama at <code>localhost:11434</code>. Ollama is written in Go and C++ (llama.cpp), not Python.<br>
+     • <b>Web server:</b> <code>server.py</code> (Python standard library). It serves the page, hosts the PyTorch brains and saves the students' notebooks.<br>
+     • <b>Memory:</b> the students' networks live in the Python server and their notebooks are saved to disk. Reloading the page starts a new world.</p>
   <p style="margin-top:18px;text-align:right"><button id="guideClose" style="background:#238636;border-color:#2ea043">Enter the world →</button></p>
 </dialog>
 
@@ -133,10 +122,9 @@ dialog.dash{max-width:1200px}
   <span class="stat">World firsts <b id="wfCount">0</b></span>
   <span class="stat">Papers <b id="papers">0</b></span>
   <span class="stat">🧮 <b id="pyStat">brains: connecting…</b></span>
-  <span class="stat">🎓 <b id="profStat">Prof. Gemma: checking…</b></span>
-  <select id="modelPick" title="Which Ollama model thinks for the Professor and the student minds" style="background:#21262d;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px"></select>
+  <span class="stat">💬 <b id="llmStat">mind: checking…</b></span>
+  <select id="modelPick" title="Which Ollama model thinks for the student minds" style="background:#21262d;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px"></select>
   <button id="btnCompute"></button>
-  <button id="btnLab"></button>
   <button id="btnWeb" class="on"></button>
   <button id="btnMinds" class="on"></button>
   <button id="btnSyll">📜 Syllabus</button>
@@ -159,21 +147,17 @@ dialog.dash{max-width:1200px}
       <div class="panel"><h2>🗞 World news</h2><div id="news" class="feed"></div></div>
       <div class="panel"><h2>💭 Thoughts: what they decide and why</h2><div id="thoughts" class="feed"></div></div>
     </div>
-    <div class="panel">
-      <h2>🎓 Professor Gemma's notebook: what it has learned (saved in professor-memory.json)</h2>
-      <div id="notebook" class="info"></div>
-    </div>
     <div class="panel scroll">
       <h2>Population</h2>
-      <table><thead><tr><th>AI</th><th>Doing</th><th>Subject</th><th>Degrees</th><th>Practice score</th><th>Brain</th><th>Senses</th></tr></thead><tbody id="roster"></tbody></table>
+      <table><thead><tr><th>AI</th><th>Level</th><th>Doing</th><th>Subject</th><th>Degrees</th><th>Practice score</th><th>Brain</th><th>Senses</th></tr></thead><tbody id="roster"></tbody></table>
     </div>
   </div>
   <div class="col">
     <div class="panel">
       <h2>Mind of <span id="mindName"></span></h2>
       <div id="mind" class="info"></div>
-      <div style="margin-top:8px"><button id="btnExplain" disabled>🎓 Ask Prof. Gemma to explain what this AI is doing</button></div>
-      <div id="profSays" class="thought" style="font-size:13px"></div>
+      <div style="margin-top:8px"><button id="btnExplain" disabled>✨ Explain what this AI is doing</button></div>
+      <div id="explainOut" class="thought" style="font-size:13px"></div>
       <div style="display:flex;gap:6px;margin-top:8px"><input id="askInput" maxlength="200" placeholder="Ask this AI anything it has learned…" style="flex:1;min-width:0;background:#0d1117;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit"><button id="askBtn">Ask</button></div>
       <div id="askAnswer" class="thought" style="font-size:13px"></div>
     </div>
@@ -210,19 +194,38 @@ const clamp = v => Math.max(0, Math.min(1, v));
 const STUDY_STEPS = 25, CHECK_EVERY = 3000, PATIENCE = 3, MAX_NEURONS = 12;
 
 // ================= what they learn =================
+// Subjects, each with the level (grade) it belongs to. The order follows the classic teaching order for small neural networks
+// (linear → closed shapes → logic and curves → repeating patterns → spirals), which is also "curriculum learning": easy before hard.
 const SKILLS = [
-  {name: 'Left vs Right', tier: 'School',     f: (x, y) => x > 0},
-  {name: 'Diagonal',      tier: 'School',     f: (x, y) => x + y > 0.2},
-  {name: 'Circle',        tier: 'University', f: (x, y) => x * x + y * y < 0.4},
-  {name: 'XOR',           tier: 'University', f: (x, y) => x * y > 0},
-  {name: 'Waves',         tier: 'University', f: (x, y) => y > 0.5 * Math.sin(3 * x)},
-  {name: 'Rings',         tier: 'Research',   f: (x, y) => Math.floor(Math.hypot(x, y) * 3) % 2 === 0},
-  {name: 'Flower',        tier: 'Research',   f: (x, y) => Math.hypot(x, y) < 0.5 + 0.25 * Math.sin(5 * Math.atan2(y, x))},
-  {name: 'Checkerboard',  tier: 'Research',   f: (x, y) => (Math.floor(x * 2 + 2) + Math.floor(y * 2 + 2)) % 2 === 0},
-  {name: 'Spiral',        tier: 'Research',   f: (x, y) => ((Math.atan2(y, x) + 3 * Math.PI * Math.hypot(x, y)) % TAU + TAU) % TAU < Math.PI},
+  {name: 'Left vs Right',  level: 1, tier: 'School',     f: (x, y) => x > 0},
+  {name: 'Top vs Bottom',  level: 1, tier: 'School',     f: (x, y) => y > 0},
+  {name: 'Diagonal',       level: 1, tier: 'School',     f: (x, y) => x + y > 0.2},
+  {name: 'Stripe',         level: 2, tier: 'School',     f: (x, y) => Math.abs(x) < 0.35},
+  {name: 'Circle',         level: 2, tier: 'School',     f: (x, y) => x * x + y * y < 0.4},
+  {name: 'Diamond',        level: 2, tier: 'School',     f: (x, y) => Math.abs(x) + Math.abs(y) < 0.75},
+  {name: 'Ellipse',        level: 3, tier: 'University', f: (x, y) => (x / 0.85) ** 2 + (y / 0.45) ** 2 < 1},
+  {name: 'XOR',            level: 3, tier: 'University', f: (x, y) => x * y > 0},
+  {name: 'Waves',          level: 3, tier: 'University', f: (x, y) => y > 0.5 * Math.sin(3 * x)},
+  {name: 'Rings',          level: 4, tier: 'University', f: (x, y) => Math.floor(Math.hypot(x, y) * 3) % 2 === 0},
+  {name: 'Checkerboard',   level: 4, tier: 'University', f: (x, y) => (Math.floor(x * 2 + 2) + Math.floor(y * 2 + 2)) % 2 === 0},
+  {name: 'Flower',         level: 5, tier: 'Research',   f: (x, y) => Math.hypot(x, y) < 0.5 + 0.25 * Math.sin(5 * Math.atan2(y, x))},
+  {name: 'Spiral',         level: 5, tier: 'Research',   f: (x, y) => ((Math.atan2(y, x) + 3 * Math.PI * Math.hypot(x, y)) % TAU + TAU) % TAU < Math.PI},
 ];
+// The syllabus: seven levels. A student is promoted when it has passed every subject of its level, met the extra requirement
+// (if any) and built enough knowledge. Sources: easy-to-hard ordering (Bengio et al., "Curriculum Learning", ICML 2009), the
+// dataset order of TensorFlow Playground (linear → circle → XOR → spiral), UNESCO's ISCED levels for the knowledge track and the
+// revised Bloom's taxonomy (remember → understand → apply → analyse → evaluate → create) for the kind of thinking asked for.
+// `notes` and `rank` are the knowledge needed to *leave* the level (rank: 0 curious, 1 learner, 2 expert, 3 master of a field).
+const SYLLABUS = [
+  {n: 1, name: 'Foundations', edu: 'Primary (ISCED 1)', think: 'Remember', skills: ['Left vs Right', 'Top vs Bottom', 'Diagonal'], notes: 2, rank: 0, goal: 'Split the map in two with one straight line'},
+  {n: 2, name: 'Shapes', edu: 'Lower secondary (ISCED 2)', think: 'Understand', skills: ['Stripe', 'Circle', 'Diamond'], notes: 4, rank: 1, goal: 'Recognise simple closed shapes'},
+  {n: 3, name: 'Curves & Logic', edu: 'Upper secondary (ISCED 3)', think: 'Apply', skills: ['Ellipse', 'XOR', 'Waves'], notes: 8, rank: 1, goal: 'Use new senses to solve non-linear puzzles'},
+  {n: 4, name: 'Patterns', edu: 'Bachelor (ISCED 6)', think: 'Analyse', skills: ['Rings', 'Checkerboard'], real: true, notes: 12, rank: 2, goal: 'Find repeating structure, then test it on real-world data'},
+  {n: 5, name: 'Mastery', edu: 'Master (ISCED 7)', think: 'Evaluate', skills: ['Flower', 'Spiral'], notes: 16, rank: 2, goal: 'Solve the hardest classic patterns'},
+  {n: 6, name: 'Invention', edu: 'Doctoral (ISCED 8)', think: 'Create', skills: [], create: true, notes: 20, rank: 3, goal: 'Create a new puzzle or sense, and master a field of knowledge'},
+  {n: 7, name: 'Open research', edu: 'Beyond the degree', think: 'Create', skills: [], open: true, notes: 0, rank: 0, goal: 'No more gates: keep exploring, inventing and teaching'}];
 const sample = (n, f) => Array.from({length: n}, () => { const x = rnd(), y = rnd(); return [x, y, +f(x, y)]; });
-SKILLS.forEach((s, i) => Object.assign(s, {train: sample(600, s.f), test: sample(300, s.f), firstBy: null, unlocked: s.tier !== 'Research' || i === 5, labels: ['red', 'blue']}));
+SKILLS.forEach(s => Object.assign(s, {train: sample(600, s.f), test: sample(300, s.f), firstBy: null, unlocked: true, labels: ['red', 'blue']}));
 const PASS = {School: 0.95, University: 0.95, Research: 0.9};
 const passOf = s => s.pass ?? PASS[s.tier];
 const REWARD = {School: 10, University: 30, Research: 80, Internet: 60};
@@ -263,7 +266,7 @@ const DOMAINS = {
   'Nature & wildlife': {ideas: 'animals, plants, forests, conservation', re: /wildlife|animal|plant|forest|bird|species|biodivers|conserv|ecosystem|national park|mammal/i},
   'Psychology & education': {ideas: 'how minds learn, teaching, memory', re: /psycholog|educat|school|learning|cognit|universit|teach|brain|memory|mind/i},
   'Space exploration': {ideas: 'rockets, satellites, the Moon, Mars, telescopes', re: /space|rocket|satellite|moon|mars|astronaut|nasa|isro|orbit|telescope/i}};
-const CORE_ABOUT = {'Left vs Right': 'Blue on the right half, red on the left (a straight line)', 'Diagonal': 'Blue above a slanted line', 'Circle': 'Blue inside a circle',
+const CORE_ABOUT = {'Left vs Right': 'Blue on the right half, red on the left (a straight line)', 'Top vs Bottom': 'Blue in the top half, red in the bottom half', 'Diagonal': 'Blue above a slanted line', 'Stripe': 'Blue in a vertical band down the middle', 'Circle': 'Blue inside a circle', 'Diamond': 'Blue inside a diamond (a rotated square)', 'Ellipse': 'Blue inside a flattened circle',
   'XOR': 'Blue where x and y have the same sign (opposite corners)', 'Waves': 'Blue above a wavy line', 'Rings': 'Alternating blue and red rings around the centre',
   'Flower': 'Blue inside a five-petal flower shape', 'Checkerboard': 'Blue and red squares like a chessboard', 'Spiral': 'Two interleaved spiral arms'};
 
@@ -302,7 +305,7 @@ function makeWebSkill(src, rows) {
   const ones = test.filter(r => r[2]).length / test.length, base = Math.max(ones, 1 - ones), ref = knnAccuracy(train, test);
   if (ref < base + 0.04) throw new Error(`no clear pattern (guessing "${src.labels[ones > 0.5 ? 1 : 0]}" every time already scores ${pct(base)})`);
   return {name: src.name, tier: 'Internet', train, test, pass: Math.round((ref - 0.03) * 100) / 100, base, ref, n: rows.length,
-    firstBy: null, unlocked: true, web: src, labels: src.labels, axes: src.axes};
+    firstBy: null, unlocked: true, level: 4, web: src, labels: src.labels, axes: src.axes};
 }
 async function getJSON(url) {
   const res = await fetch(url);
@@ -347,23 +350,18 @@ async function goOnline(a) {
   finally { webBusy = false; webNext = frame + 1800; }
 }
 
-// ================= Professor Gemma: a real language model (Ollama, running on this computer) =================
-// The flagship can't share its 2.6 billion weights with 50-weight students, so it mentors instead: it looks at a text
-// drawing of the student's problem and recommends one new sense. The world then measures whether the advice helped.
-// Gemma's weights never change here (that would be fine-tuning, which needs a strong GPU). It learns like a person with a
-// notebook: it records which tips worked, reads Wikipedia on topics it picks itself, and re-reads its notes before advising.
-// The notebook is saved by server.py into professor-memory.json in the project folder.
-const PROF = {model: null, url: 'http://localhost:11434', online: false, busy: false, says: '', nextStudy: 900,
-  mem: {experience: {}, notes: [], tips: []}};
+// ================= the shared mind: a local language model (Ollama, on this computer) =================
+// Every student's mind is the same local Gemma model, taking turns: it picks what to learn, writes notes, sets and answers quizzes
+// and can invent new senses. Its weights never change; what a student *knows* is its own notebook (see "knowledge" below).
+const LLM = {model: null, url: 'http://localhost:11434', online: false, busy: false};
 const MODELS = ['aiworld-gemma:latest', 'gemma2:2b']; // the project's own copy (models/gemma2-2b.gguf) first
 const canSave = location.protocol.startsWith('http');
-// One Gemma serves the Professor and all ten student minds. Ollama on this computer thinks one thought at a time,
-// so requests wait in a queue.
+// Ollama on this computer thinks one thought at a time, so requests wait in a queue.
 let llmChain = Promise.resolve(), llmPending = 0, llmCalls = 0;
 function askLLM(prompt, json) {
   llmPending++;
   const job = llmChain.then(async () => {
-    const res = await fetch(PROF.url + '/api/generate', {method: 'POST', body: JSON.stringify({model: PROF.model, prompt, stream: false, format: json ? 'json' : undefined, options: {temperature: 0.3, num_predict: 160}})});
+    const res = await fetch(LLM.url + '/api/generate', {method: 'POST', body: JSON.stringify({model: LLM.model, prompt, stream: false, format: json ? 'json' : undefined, options: {temperature: 0.3, num_predict: 160}})});
     if (!res.ok) throw new Error(`Ollama answered ${res.status}`);
     llmCalls++;
     return String((await res.json()).response ?? '').trim();
@@ -372,57 +370,17 @@ function askLLM(prompt, json) {
   return job;
 }
 const parseJSON = text => { try { return JSON.parse(text) ?? {}; } catch { return {}; } };
-function saveMemory() {
-  if (canSave) fetch('/memory', {method: 'POST', body: JSON.stringify(PROF.mem)}).catch(() => {});
-}
-async function wakeProfessor() {
-  if (canSave) {
-    const m = parseJSON(await (await fetch('/memory').catch(() => null))?.text());
-    if (m.experience && typeof m.experience === 'object' && Array.isArray(m.notes) && Array.isArray(m.tips)) PROF.mem = m;
-  }
+async function wakeLLM() {
   try {
-    const names = ((await (await fetch(PROF.url + '/api/tags')).json()).models ?? []).map(m => m.name);
-    PROF.model = MODELS.find(n => names.includes(n)) ?? null;
-    $('modelPick').innerHTML = names.map(n => `<option ${n === PROF.model ? 'selected' : ''}>${esc(n)}</option>`).join('');
-    $('modelPick').onchange = e => { PROF.model = e.target.value; PROF.online = true; news(`🎓 The shared mind is now ${PROF.model}. Bigger models give better advice and inventions, but think more slowly.`); };
-    PROF.online = !!PROF.model;
-    news(PROF.online ? `🎓 Professor Gemma has arrived at the University: ${PROF.model === MODELS[0] ? "the world's own copy of Gemma 2 (models/gemma2-2b.gguf)" : PROF.model}, a 2.6-billion-parameter language model running in Ollama on this computer. Notebook: ${PROF.mem.notes.length} notes, ${PROF.mem.tips.length} tips remembered.` : `🎓 Ollama is running, but no Gemma model is registered, so the Professor stays home. (Run start-world.bat.)`);
+    const names = ((await (await fetch(LLM.url + '/api/tags')).json()).models ?? []).map(m => m.name);
+    LLM.model = MODELS.find(n => names.includes(n)) ?? null;
+    $('modelPick').innerHTML = names.map(n => `<option ${n === LLM.model ? 'selected' : ''}>${esc(n)}</option>`).join('');
+    $('modelPick').onchange = e => { LLM.model = e.target.value; LLM.online = true; news(`💬 The shared mind is now ${LLM.model}. Bigger models give better notes and inventions, but think more slowly.`); };
+    LLM.online = !!LLM.model;
+    news(LLM.online ? `💬 The students' minds are ready: ${LLM.model === MODELS[0] ? "the world's own copy of Gemma 2 (models/gemma2-2b.gguf)" : LLM.model}, a 2.6-billion-parameter language model running in Ollama on this computer.` : '💬 Ollama is running, but no Gemma model is registered, so the students have no language mind. (Run start-world.bat.)');
   } catch {
-    news(location.protocol === 'file:' ? '🎓 Professor Gemma can\'t reach a page opened as a plain file. Start the world with start-world.bat to meet the Professor.' : '🎓 Professor Gemma is offline: Ollama isn\'t running.');
+    news(location.protocol === 'file:' ? '💬 The language mind needs the world to be started with start-world.bat.' : "💬 The students' language mind is offline: Ollama isn't running. They can still study the maths syllabus.");
   }
-}
-// Self-directed study: the Professor decides what to read on Wikipedia, reads it, and writes one lesson into the notebook.
-async function profStudy() {
-  PROF.busy = true; PROF.nextStudy = frame + 3600;
-  try {
-    PROF.says = '🤔 deciding what to study…';
-    const struggling = [...new Set(agents.filter(a => a.skill >= 0 && a.struggles > 0).map(a => SKILLS[a.skill].name))];
-    const choice = parseJSON(await askLLM(`You are Professor Gemma. You teach tiny AI students that learn to separate blue and red dots on 2D maps (patterns like circles, XOR, rings, flowers, spirals, checkerboards, and real earthquake and rain data). They can only improve by adding "senses" such as x², y², x·y, sin x, sin y, radius or angle.
-Your students are struggling with: ${struggling.join(', ') || 'nothing in particular'}.
-You already studied: ${PROF.mem.notes.slice(-12).map(n => n.topic).join(', ') || 'nothing yet'}.
-Pick ONE new English Wikipedia article (on mathematics, learning, geometry, or anything else that helps) that would make you a better teacher. Reply only with JSON: {"title": "<article title>", "why": "<short reason>"}`, true));
-    const want = String(choice.title ?? '').slice(0, 80);
-    if (!want) throw new Error('it could not decide what to read');
-    const found = await getJSON(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(want)}&srlimit=1&format=json&origin=*`);
-    const title = String(found?.query?.search?.[0]?.title ?? '');
-    if (!title) throw new Error(`Wikipedia has no article called "${want}"`);
-    PROF.says = `📖 reading "${title}" on Wikipedia…`;
-    const page = await getJSON(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`);
-    const note = (await askLLM(`You are Professor Gemma. You just read this Wikipedia summary of "${title}":
-"""${String(page.extract ?? '').slice(0, 1500)}"""
-In ONE short sentence, write the most useful lesson from it for teaching tiny AIs to separate blue and red dots on a 2D map (for example which sense would reveal a pattern). Plain text only.`, false)).replace(/\s+/g, ' ').slice(0, 240);
-    PROF.mem.notes.push({topic: title, note, day: day()});
-    PROF.mem.notes = PROF.mem.notes.slice(-60);
-    saveMemory();
-    PROF.says = `📝 learned something from "${title}"`;
-    news(`🎓 Prof. Gemma chose to study "${title}" on Wikipedia${choice.why ? ` (${String(choice.why).slice(0, 100)})` : ''} and wrote in the notebook: "${note}"`, 'web');
-  } catch (e) {
-    PROF.says = '';
-    news(`🎓 Prof. Gemma tried to study, but ${e.message}.`);
-  } finally { PROF.busy = false; }
-}
-function tickProfessor() {
-  if (PROF.online && !PROF.busy && webOn && llmPending === 0 && frame >= PROF.nextStudy) profStudy(); // studies only when no student is waiting
 }
 // Draw the subject as text so a language model can "see" it: B = mostly blue, R = mostly red, . = no examples.
 function asciiMap(s, n = 10) {
@@ -430,52 +388,6 @@ function asciiMap(s, n = 10) {
   for (const [x, y, t] of s.train) votes[Math.min(n - 1, (1 - y) / 2 * n | 0) * n + Math.min(n - 1, (x + 1) / 2 * n | 0)][t]++;
   return Array.from({length: n}, (_, r) => votes.slice(r * n, r * n + n).map(([red, blue]) => red + blue ? (blue > red ? 'B' : 'R') : '.').join('')).join('\n');
 }
-async function askProfessor(a) {
-  const s = SKILLS[a.skill], options = missingFeats(a);
-  if (!s) return;
-  if (!PROF.online || PROF.busy) return think(a, '🙋', 'The Professor is busy right now. I\'ll ask another time.');
-  if (!options.length) return think(a, '🎓', 'The Professor says I already have every sense. I just need more practice!');
-  PROF.busy = true; PROF.says = `💭 thinking about ${a.name}'s ${s.name} problem…`;
-  const [ax, ay] = s.axes ?? ['x', 'y'];
-  try {
-    const answer = await askLLM(`You are Professor Gemma, a kind teacher in a world of tiny AI students.
-Student ${a.name} is learning "${s.name}" and is stuck at ${pct(a.conf)} correct.
-Task: for any point (${ax}, ${ay}), each scaled from -1 to 1, say if it is BLUE or RED.${s.web ? ` This is real data: blue means "${s.labels[1]}", red means "${s.labels[0]}".` : ''}
-Map of the examples (top row = high ${ay}, bottom row = low ${ay}; left = low ${ax}, right = high ${ax}; B = blue, R = red, . = no data):
-${asciiMap(s)}
-Your own past results on ${s.name}: ${Object.entries(PROF.mem.experience).filter(([k]) => k.startsWith(s.name + '|')).map(([k, e]) => `"${k.split('|')[1]}" helped ${e.helped} of ${e.tries} times`).join('; ') || 'none yet'}. Prefer senses that helped before; avoid ones that did not.
-Notes from your own reading: ${PROF.mem.notes.slice(-4).map(n => `(${n.topic}) ${n.note}`).join(' ') || 'none yet'}
-The student already senses: ${a.feats.map(i => FEATURES[i].name).join(', ')}.
-It can add ONE new sense from this list: ${options.map(i => FEATURES[i].name).join(', ')}.
-Which one would make the pattern easiest to learn? Reply only with JSON: {"sense": "<exactly one name from the list>", "tip": "<one short friendly sentence for the student>"}`, true);
-    let reply = {};
-    try { reply = JSON.parse(answer); } catch {}
-    const fi = options.find(i => FEATURES[i].name.toLowerCase() === String(reply.sense ?? '').trim().toLowerCase());
-    const tip = String(reply.tip ?? '').slice(0, 160);
-    if (fi === undefined) { PROF.says = '🤔 (gave an answer that didn\'t name a real sense)'; return think(a, '🤨', `The Professor's answer didn't make sense to me: "${answer.slice(0, 80)}"`); }
-    addFeature(a, fi);
-    if (!published[fi]) published[fi] = 'Prof. Gemma';
-    a.advice = {skill: a.skill, conf: a.conf, until: a.steps + 9000, key: `${s.name}|${FEATURES[fi].name}`};
-    PROF.says = `💬 ${a.name}, try "${FEATURES[fi].name}". ${tip}`;
-    think(a, '🎓', `Prof. Gemma says: try the sense "${FEATURES[fi].name}". "${tip}"`);
-    news(`🎓 Prof. Gemma advised ${a.name} on ${s.name}: add the sense "${FEATURES[fi].name}". Let's see if it helps…`);
-  } catch (e) {
-    PROF.says = '📴 (lost connection)';
-    think(a, '📡', `Couldn't reach the Professor: ${e.message}`);
-  } finally { PROF.busy = false; }
-}
-// Did the advice actually help? Judged on the student's practice score some lessons later (or by passing the subject).
-function judgeAdvice(a, passed) {
-  const gain = a.conf - a.advice.conf, good = passed || gain > 0.02;
-  const e = PROF.mem.experience[a.advice.key] ??= {tries: 0, helped: 0};
-  e.tries++; if (good) e.helped++;
-  PROF.mem.tips.push(good ? 1 : 0);
-  saveMemory();
-  feel(a, 'ask', good ? 1 : -0.2);
-  think(a, good ? '🙏' : '🤨', good ? `Prof. Gemma's advice worked${passed ? ', I passed!' : `: +${pct(gain)}!`}` : `Prof. Gemma's advice didn't help much (${gain >= 0 ? '+' : ''}${pct(gain)}).`);
-  a.advice = null;
-}
-
 // ================= Gemma minds: every student thinks with the same Gemma model =================
 // A few-hundred-connection brain can't hold Gemma's knowledge, so each student gets Gemma as its *mind* (one shared
 // model, taking turns) while its tiny network stays its trained *skill*. Before a new subject the mind switches on the
@@ -558,7 +470,7 @@ function linearAcc(s, feats) {
 }
 async function inventSense(a) {
   if (FEATURES.length >= MAX_FEATURES) return think(a, '💡', 'We already have plenty of senses. Time to use them!');
-  const targets = [...new Set([SKILLS[a.skill], ...shuffle(SKILLS.filter(s => s.unlocked && !s.firstBy))].filter(s => s && LEVEL[s.tier] >= 1))].slice(0, 2);
+  const targets = [...new Set([SKILLS[a.skill], ...shuffle(SKILLS.filter(s => s.level <= a.level && !s.firstBy))].filter(s => s && LEVEL[s.tier] >= 1))].slice(0, 2);
   if (!targets.length) return think(a, '💡', 'Every hard problem I know is already solved.');
   const reply = parseJSON(await askLLM(`You are the mind of ${a.name}, an inventive AI student. Students learn to separate blue and red dots on maps where x and y go from -1 to 1. A "sense" is a formula the student's tiny brain can look at.
 Senses that already exist: ${senseList(FEATURES.map((_, i) => i))}.
@@ -580,7 +492,7 @@ Reply only with JSON: {"name": "<short name>", "formula": "<formula>", "idea": "
     pyOp('/brain/sense', {name, expr: formula, mean: f.mean, sd: f.sd}); // Python learns the same formula (before anyone uses it)
     published.push(a.name);
     addFeature(a, FEATURES.length - 1);
-    a.firsts++; coins += 150; MINDS.inventions++; feel(a, 'invent', 1.5); a.lastIdea = `"${formula}", which worked (+${pct(best.gain)} on ${best.t.name})`;
+    a.firsts++; coins += 150; a.created++; MINDS.inventions++; feel(a, 'invent', 1.5); a.lastIdea = `"${formula}", which worked (+${pct(best.gain)} on ${best.t.name})`;
     think(a, '💡', `I invented "${name}" = ${formula}! ${idea}`);
     news(`💡 WORLD FIRST INVENTION: ${a.name}, thinking with its Gemma mind, invented the sense "${name}" = ${formula}. Tested on real examples, it makes ${best.t.name} ${pct(best.gain)} easier to separate. Published to the Library. +150💰`, 'wf');
   } catch (e) {
@@ -618,11 +530,11 @@ function recall(a, question, k = 4) { // find the student's own notes that best 
     .sort((p, r) => r.score - p.score).slice(0, k).map(x => x.n);
 }
 function saveKnowledge() {
-  if (canSave) fetch('/memory/students', {method: 'POST', body: JSON.stringify(Object.fromEntries(agents.map(a => [a.name, a.know])))}).catch(() => {});
+  if (canSave) fetch(API + '/memory/students', {method: 'POST', body: JSON.stringify(Object.fromEntries(agents.map(a => [a.name, a.know])))}).catch(() => {});
 }
 async function loadKnowledge() {
   if (!canSave) return;
-  const saved = parseJSON(await (await fetch('/memory/students').catch(() => null))?.text());
+  const saved = parseJSON(await (await fetch(API + '/memory/students').catch(() => null))?.text());
   const str = (v, n) => String(v ?? '').slice(0, n);
   for (const a of agents) {
     const k = saved[a.name];
@@ -715,11 +627,15 @@ let coins = 0, computeLvl = 1, paused = false, frame = 0, selected = 0, probe = 
 // agent 3's exam score", "which action should agent 3 take?". All calls go through one queue so they arrive in the order they
 // were made. There is no second brain in the browser: if Python is not reachable the world pauses and says why, then
 // reconnects by itself. The page remembers each brain's *shape* (sizes, senses) so a restarted Python can rebuild it.
-const PY = {online: false, why: location.protocol === 'file:' ? 'file' : 'connecting', info: null, pending: {}, studying: false, view: null, viewBusy: false, everOnline: false, misses: 0, dirty: false};
+// Local-first: by default the page talks to the Python server it was loaded from (start-world.bat). A copy hosted somewhere else,
+// for demonstration, can be pointed at a Python server you run yourself with  ?api=https://your-server  (remembered in this browser).
+const API = (() => { try { const q = new URLSearchParams(location.search).get('api'); if (q) { const u = new URL(q); if (/^https?:$/.test(u.protocol)) localStorage.setItem('aiworld-api', u.origin); } return localStorage.getItem('aiworld-api') || ''; } catch { return ''; } })();
+const isLocalHost = ['localhost', '127.0.0.1', '[::1]', ''].includes(location.hostname);
+const PY = {online: false, why: location.protocol === 'file:' ? 'file' : !API && !isLocalHost ? 'hosted' : 'connecting', info: null, pending: {}, studying: false, view: null, viewBusy: false, everOnline: false, misses: 0, dirty: false};
 let pyChain = Promise.resolve();
 function pyCall(path, body) {
   const job = pyChain.then(async () => {
-    const res = await fetch(path, {method: 'POST', body: JSON.stringify(body)});
+    const res = await fetch(API + path, {method: 'POST', body: JSON.stringify(body)});
     if (!res.ok) throw new Error(`${path}: ${(await res.json().catch(() => ({}))).error ?? res.status}`);
     return res.json();
   });
@@ -759,12 +675,13 @@ async function pyViewTick() { // the selected student's weights, neuron activity
   const a = agents[selected];
   PY.viewBusy = true;
   try {
-    const r = await fetch(`/brain/view?id=${a.id}&skill=${SKILLS.indexOf(currentSkill(a))}&px=${probe[0]}&py=${probe[1]}`);
+    const r = await fetch(`${API}/brain/view?id=${a.id}&skill=${SKILLS.indexOf(currentSkill(a))}&px=${probe[0]}&py=${probe[1]}`);
     if (r.ok) PY.view = {...await r.json(), id: a.id};
   } catch {}
   finally { PY.viewBusy = false; }
 }
 const PY_MESSAGE = {
+  hosted: '👋 This is a <b>hosted copy of the AI World front end</b>, shown for demonstration. The students\' brains run in Python on <i>your own computer</i>: clone the repository and run <b>start-world.bat</b> (or <code>python server.py</code>) to run the real world, which is local-first. To connect this page to a Python server you host yourself, add <code>?api=https://your-server</code> to the address.',
   file: '🐍 The students think with <b>Python (PyTorch)</b>, but this page was opened as a plain file. Start the world with <b>start-world.bat</b> (or run <code>python server.py</code>) and open <b>http://localhost:8000</b>.',
   connecting: '🐍 Connecting to the Python brains…',
   noserver: "🐍 Can't reach the Python server. Start it with <b>start-world.bat</b> (or <code>python server.py</code>). This page reconnects by itself.",
@@ -779,9 +696,9 @@ function showPyBanner() {
 }
 async function pyConnect() { // runs for the life of the page: connects, and reconnects if Python goes away
   for (;;) {
-    if (location.protocol !== 'file:') {
+    if (location.protocol !== 'file:' && PY.why !== 'hosted') {
       try {
-        const res = await fetch('/brain/info'), info = res.ok ? await res.json() : null;
+        const res = await fetch(API + '/brain/info'), info = res.ok ? await res.json() : null;
         if (!info) { PY.why = 'noserver'; if (PY.online) PY.misses++; }
         else if (info.engine) {
           PY.info = info; PY.misses = 0;
@@ -807,8 +724,8 @@ function makeAgent(id) {
     energy: rnd(0.7, 1), fun: rnd(0.6, 1), social: rnd(0.5, 1),
     feats: [0, 1], sizes: [2, ...hidden, 1], passed: [], skill: -1,
     conf: 0.5, bestConf: 0, stuck: 0, steps: 0, nextCheck: CHECK_EVERY, examAfter: 0, lastExam: 0,
-    confHist: [], exams: [], sampleN: 0, wantsPaper: false, firsts: 0, log: [], why: [], lesson: null,
-    taste: Object.fromEntries(Object.keys(ACT).map(k => [k, 0])), reward: 0, struggles: 0, dropped: -1, start: null, advice: null, know: {notes: [], exams: {}},
+    level: 1, created: 0, confHist: [], exams: [], sampleN: 0, wantsPaper: false, firsts: 0, log: [], why: [], lesson: null,
+    taste: Object.fromEntries(Object.keys(ACT).map(k => [k, 0])), reward: 0, struggles: 0, dropped: -1, start: null, know: {notes: [], exams: {}},
     act: 'none', place: null, spot: -1, path: [], arrived: true, timer: 0, thought: 'Just woke up…', emoji: '👶'};
   return a;
 }
@@ -859,28 +776,51 @@ function readPaper(a) {
 }
 
 // ================= school life =================
-const LEVEL = {School: 0, University: 1, Research: 2, Internet: 2};
+const LEVEL = {School: 0, University: 1, Research: 2, Internet: 2}; // where a subject is taught, and how it is rewarded
+const levelFirst = {};
 const weightedPick = w => { let r = Math.random() * w.reduce((x, y) => x + y), i = 0; while ((r -= w[i]) > 0 && i < w.length - 1) i++; return i; };
-// Free choice of subject: each AI is drawn to subjects that match its experience, stretched by its curiosity.
+// Free choice of subject, inside the syllabus: a student studies subjects up to its own level (curious ones sometimes peek one level up).
 function enroll(a) {
-  const avail = SKILLS.map((s, i) => i).filter(i => SKILLS[i].unlocked && !a.passed.includes(i) && i !== a.dropped);
+  const cap = a.level + (Math.random() < a.p.curiosity * 0.25 ? 1 : 0);
+  const avail = SKILLS.map((s, i) => i).filter(i => SKILLS[i].level <= cap && !a.passed.includes(i) && i !== a.dropped);
   a.dropped = -1;
   if (!avail.length) { a.skill = -1; return; }
-  const aim = a.passed.length / 3 + a.p.curiosity * 1.2;
-  a.skill = avail[weightedPick(avail.map(i => Math.exp((-Math.abs(LEVEL[SKILLS[i].tier] - aim) + (SKILLS[i].web ? 0.4 * a.taste.browse : 0) + rnd(0, 0.4)) / 0.3)))];
-  const s = SKILLS[a.skill], gap = LEVEL[s.tier] - a.passed.length / 3;
+  const bias = s => (s.level === a.level ? 1 : s.level < a.level ? 0.4 : -0.3) + (s.web ? 0.4 * a.taste.browse : 0);
+  a.skill = avail[weightedPick(avail.map(i => Math.exp((bias(SKILLS[i]) + rnd(0, 0.4)) / 0.3)))];
+  const s = SKILLS[a.skill];
   Object.assign(a, {conf: 0.5, bestConf: 0, stuck: 0, struggles: 0, confHist: [], exams: [], examAfter: a.steps + 3000, lastExam: a.steps});
-  think(a, '🎒', `I choose to learn ${s.name} at the ${BUILD[s.tier].label}${gap > 0.8 ? '. It looks hard, but I want to try!' : gap < -0.5 ? '. Should be easy.' : '.'}`);
+  think(a, '🎒', `Level ${a.level}: I choose to learn ${s.name} at the ${BUILD[s.tier].label}${s.level > a.level ? '. It is from the next level, but I want to try!' : '.'}`);
   a.enrollSteps = a.steps; a.mindUsed = false;
-  if (MINDS.on && PROF.online && LEVEL[s.tier] >= 1 && llmPending < 3) mindPrime(a).catch(() => {}); // a busy Gemma means starting the hard way, not waiting
+  if (MINDS.on && LLM.online && LEVEL[s.tier] >= 1 && llmPending < 3) mindPrime(a).catch(() => {}); // a busy Gemma means starting the hard way, not waiting
+}
+// What is still missing before this student may leave its level?
+function gate(a) {
+  const L = SYLLABUS[a.level - 1], needs = [];
+  for (const name of L.skills) if (!a.passed.includes(SKILLS.findIndex(s => s.name === name))) needs.push(name);
+  const skillsDone = !needs.length;
+  if (L.real && webOn && !a.passed.some(i => SKILLS[i].web)) needs.push('a real-data subject');
+  if (L.create && !a.created) needs.push('create a puzzle or invent a sense');
+  if (LLM.online && webOn && MINDS.on && !L.open) { // the knowledge track needs the language mind; without it the maths syllabus stands alone
+    const notes = a.know.notes.length, rank = Math.max(-1, ...fieldsOf(a).map(f => f.level));
+    if (notes < L.notes) needs.push(`${L.notes} notes (has ${notes})`);
+    if (rank < L.rank) needs.push(`${LEVELS[L.rank][1]} rank in a field`);
+  }
+  return {L, needs, skillsDone, ready: !needs.length && !L.open};
+}
+function checkPromotion(a) {
+  const g = gate(a);
+  if (!g.ready) return;
+  a.level++; coins += 100 * a.level; a.reward += 1.5; a.fun = clamp(a.fun + 0.3);
+  const next = SYLLABUS[a.level - 1];
+  think(a, '🎓', `I finished Level ${a.level - 1} and I'm promoted to Level ${a.level}: ${next.name}!`);
+  news(`🎓 ${a.name} completed Level ${a.level - 1} (${g.L.name}) and is promoted to Level ${a.level}: ${next.name}. +${100 * a.level}💰`, a.level >= 4 ? 'wf' : '');
+  if (!levelFirst[a.level]) { levelFirst[a.level] = a.name; coins += 150; news(`🌍 ${a.name} is the first student ever to reach Level ${a.level} (${next.name})!`, 'wf'); }
 }
 function study(a, steps) {
   PY.pending[a.id] = Math.min((PY.pending[a.id] ?? 0) + steps, 400 * computeLvl); // trained in Python, in batches, by pyStudyTick
 }
 function afterStudy(a) {
   const s = SKILLS[a.skill];
-  if (a.advice && a.advice.skill !== a.skill) a.advice = null;
-  if (a.advice && a.steps >= a.advice.until) judgeAdvice(a, false);
   if (a.steps >= a.nextCheck) {
     a.nextCheck = a.steps + CHECK_EVERY;
     if (a.conf > a.bestConf + 0.01 || a.conf >= passOf(s) - 0.02) { a.bestConf = Math.max(a.bestConf, a.conf); a.stuck = 0; } // improving, or ready for the exam = not stuck
@@ -894,7 +834,6 @@ async function exam(a) {
   if (acc >= passOf(s)) {
     a.passed.push(a.skill);
     if (LEVEL[s.tier] >= 1) PASS_STATS[a.mindUsed ? 'with' : 'without'].push({tier: s.tier, lessons: a.steps - (a.enrollSteps ?? 0)});
-    if (a.advice?.skill === a.skill) judgeAdvice(a, true);
     coins += REWARD[s.tier]; a.fun = clamp(a.fun + 0.3); a.reward += 1;
     think(a, '🎉', `I passed ${s.name} with ${pct(acc)}!`);
     if (!s.firstBy) {
@@ -910,10 +849,10 @@ async function exam(a) {
 }
 
 // ================= free will: needs + personality + learned likes + a weighted dice roll =================
-const EMOJI = {study: '📖', sleep: '😴', play: '⚽', chat: '💬', read: '📚', exam: '📝', wander: '🚶', browse: '🌐', create: '🧩', ask: '🙋', invent: '💡', learn: '🔎', kexam: '🧾', none: '👶'};
-const ACT = {study: 'Studying', sleep: 'Sleeping', play: 'Playing', chat: 'Chatting', read: 'Reading papers', exam: 'Taking an exam', wander: 'Exploring', browse: 'Going online', create: 'Inventing a puzzle', ask: 'Asking Prof. Gemma', invent: 'Inventing a new sense', learn: 'Learning online', kexam: 'Taking a knowledge exam', none: 'Waking up'};
-const PLACE_OF = {sleep: 'Dorm', play: 'Park', chat: 'Park', read: 'Library', exam: 'Exam', browse: 'Internet', create: 'Research', ask: 'University', invent: 'Research', learn: 'Internet', kexam: 'Exam'};
-const DUR = {study: 600, sleep: 2500, play: 300, chat: 300, read: 240, exam: 150, wander: 260, browse: 260, create: 300, ask: 220, invent: 300, learn: 320, kexam: 200, none: 0};
+const EMOJI = {study: '📖', sleep: '😴', play: '⚽', chat: '💬', read: '📚', exam: '📝', wander: '🚶', browse: '🌐', create: '🧩', invent: '💡', learn: '🔎', kexam: '🧾', none: '👶'};
+const ACT = {study: 'Studying', sleep: 'Sleeping', play: 'Playing', chat: 'Chatting', read: 'Reading papers', exam: 'Taking an exam', wander: 'Exploring', browse: 'Going online', create: 'Inventing a puzzle', invent: 'Inventing a new sense', learn: 'Learning online', kexam: 'Taking a knowledge exam', none: 'Waking up'};
+const PLACE_OF = {sleep: 'Dorm', play: 'Park', chat: 'Park', read: 'Library', exam: 'Exam', browse: 'Internet', create: 'Research', invent: 'Research', learn: 'Internet', kexam: 'Exam'};
+const DUR = {study: 600, sleep: 2500, play: 300, chat: 300, read: 240, exam: 150, wander: 260, browse: 260, create: 300, invent: 300, learn: 320, kexam: 200, none: 0};
 // Reinforcement learning, simplest form: after each activity the AI asks "how did that feel?" and moves its taste for
 // that activity a little towards the answer. Over time every AI develops its own likes and dislikes.
 function feel(a, act, reward) {
@@ -922,7 +861,7 @@ function feel(a, act, reward) {
 }
 function reflect(a) {
   const st = a.start;
-  if (!st || a.act === 'none' || a.act === 'browse' || a.act === 'ask' || a.act === 'invent' || a.act === 'learn' || a.act === 'kexam') return; // judged later: when the download finishes / when the advice is tested
+  if (!st || a.act === 'none' || a.act === 'browse' || a.act === 'invent' || a.act === 'learn' || a.act === 'kexam') return; // judged later: when the download finishes / when the advice is tested
   let r = a.reward + 0.5 * ((a.energy - st.energy) + (a.fun - st.fun) + (a.social - st.social));
   if (a.act === 'study' && a.skill === st.skill) r += 6 * (a.conf - st.conf); // the joy of making progress
   feel(a, a.act, r);
@@ -939,15 +878,16 @@ function inventPuzzle(a) {
     const train = sample(600, f), share = train.filter(p => p[2]).length / train.length;
     if (share < 0.25 || share > 0.75) continue;
     const rule = `${FEATURES[i].name} ${times ? '×' : '−'} ${FEATURES[j].name} > ${c.toFixed(2)}`;
-    SKILLS.push({name: `${a.name}'s puzzle #${++puzzles}`, tier: 'Research', f, train, test: sample(300, f), firstBy: null, unlocked: true, labels: ['red', 'blue'], rule});
+    SKILLS.push({name: `${a.name}'s puzzle #${++puzzles}`, level: 6, tier: 'Research', f, train, test: sample(300, f), firstBy: null, unlocked: true, labels: ['red', 'blue'], rule});
     syncSkill(SKILLS.at(-1));
-    a.reward += 1; coins += 30;
+    a.reward += 1; coins += 30; a.created++;
     think(a, '🧩', `I invented a new puzzle! Secret rule: ${rule}`);
     return news(`🧩 ${a.name} invented a brand-new puzzle for everyone (secret rule: ${rule}). +30💰`, 'wf');
   }
   think(a, '🧩', 'My puzzle ideas were all too easy or unfair. Maybe later.');
 }
 function decide(a) {
+  checkPromotion(a);
   if (a.skill >= 0 && a.struggles >= 3 && Math.random() < 1 - a.p.diligence) {
     think(a, '🤷', `${SKILLS[a.skill].name} is too hard for me right now. I'll choose something else.`);
     a.dropped = a.skill; a.skill = -1;
@@ -961,17 +901,22 @@ function decide(a) {
   opts.push(['chat', (1 - a.social) ** 2 * 2.5 * a.p.social, 'I miss my friends']);
   opts.push(['read', a.wantsPaper ? 2.2 : 0.15 * a.p.curiosity, a.wantsPaper ? 'Maybe someone already figured this out. To the Library!' : "Let's see what others have discovered"]);
   if (s && a.steps >= a.examAfter) opts.push(['exam', ready ? 3 : a.steps - a.lastExam > 40000 ? 0.5 : 0, ready ? `I feel ready for the ${s.name} exam!` : "Let's test myself"]);
-  if (PROF.online && !PROF.busy && s && a.struggles >= 1 && !a.advice) opts.push(['ask', 1.0 + 0.6 * a.p.social, `I'm stuck on ${s.name}. Let me ask Prof. Gemma!`]);
   if (webReady()) opts.push(['browse', 0.3 + 0.6 * a.p.curiosity + (!s ? 1.6 : 0) + (!SKILLS.some(k => k.web) ? 0.4 : 0), !s ? "I've learned everything here… what's out on the internet?" : "Let's see what the real world is like"]);
-  if (a.passed.length >= 3 && puzzles < MAX_PUZZLES) opts.push(['create', 0.5 * a.p.curiosity, 'I want to invent a puzzle nobody has seen before']);
-  if (MINDS.on && PROF.online && llmPending < 2 && FEATURES.length < MAX_FEATURES && a.passed.length >= 2) opts.push(['invent', 0.4 * a.p.curiosity + (a.struggles >= 2 ? 0.6 : 0), 'Let me invent a completely new way of seeing these problems']);
-  const canThink = MINDS.on && PROF.online && llmPending < 3, due = examDue(a);
+  if (a.level >= 6 && puzzles < MAX_PUZZLES) opts.push(['create', 0.5 * a.p.curiosity, 'I want to invent a puzzle nobody has seen before']);
+  if (MINDS.on && LLM.online && llmPending < 2 && FEATURES.length < MAX_FEATURES && a.level >= 6) opts.push(['invent', 0.4 * a.p.curiosity + (a.struggles >= 2 ? 0.6 : 0), 'Let me invent a completely new way of seeing these problems']);
+  const canThink = MINDS.on && LLM.online && llmPending < 3, due = examDue(a);
   if (canThink && webOn) opts.push(['learn', 0.5 + 0.9 * a.p.curiosity, 'I want to learn something new about the world']);
   if (canThink && due) opts.push(['kexam', 1.0 + 0.5 * a.p.diligence, `Let me test what I know about ${due}`]);
+  const g = gate(a); // when the exams are done but something else blocks promotion, steer towards it
+  if (g.skillsDone && !g.ready) for (const o of opts) {
+    if ((o[0] === 'learn' || o[0] === 'kexam') && g.needs.some(n => /notes|rank/.test(n))) o[1] += 1.2;
+    if (o[0] === 'browse' && g.needs.includes('a real-data subject')) o[1] += 1.2;
+    if ((o[0] === 'create' || o[0] === 'invent') && g.L.create && !a.created) o[1] += 1.2;
+  }
   opts.push(['wander', 0.3 * a.p.curiosity, "I wonder what's over there…"]);
   // The decision brain (Python, PyTorch) adds what it has learned from reward to the world's built-in instincts.
   const state = [a.energy, a.fun, a.social, a.p.diligence, a.p.curiosity, a.p.social, s ? 1 : 0, s ? a.conf : 0, Math.min(1, a.struggles / 5), Math.min(1, a.passed.length / 10),
-    a.wantsPaper ? 1 : 0, a.advice ? 1 : 0, Math.min(1, a.know.notes.length / 30), webReady() ? 1 : 0];
+    a.wantsPaper ? 1 : 0, Math.min(1, a.firsts / 3), Math.min(1, a.know.notes.length / 30), webReady() ? 1 : 0];
   a.busy = true;
   pyCall('/policy/act', {id: a.id, state, prior: Object.fromEntries(opts.map(o => [o[0], o[1] / 0.35]))}).then(r => {
     a.why = Object.entries(r.probs).sort((x, y) => y[1] - x[1]); a.resid = r.resid;
@@ -994,7 +939,6 @@ function live(a) {
     if (a.act === 'exam' && a.skill >= 0) { a.busy = true; exam(a).catch(e => think(a, '📡', `The exam was interrupted: ${e.message}`)).finally(() => { a.busy = false; reflect(a); decide(a); }); return; }
     if (a.act === 'read') readPaper(a);
     if (a.act === 'browse') goOnline(a);
-    if (a.act === 'ask') askProfessor(a);
     if (a.act === 'create') inventPuzzle(a);
     if (a.act === 'invent') inventSense(a).catch(() => {});
     if (a.act === 'learn') learnOnline(a).catch(e => think(a, '📡', `Learning online failed: ${e.message}`));
@@ -1024,12 +968,6 @@ function think(a, emoji, text) {
   feed('thoughts', `${a.name}: ${emoji} "${text}"`);
 }
 const computeCost = () => 60 * 2 ** (computeLvl - 1);
-const labCost = () => 200 * 2 ** (SKILLS.filter(s => s.tier === 'Research' && s.unlocked).length - 1);
-$('btnCompute').onclick = () => { if (coins >= computeCost()) { coins -= computeCost(); computeLvl++; news(`⚡ Compute upgraded to level ${computeLvl}: every lesson now covers ${computeLvl}× more examples.`); updateUI(); } };
-$('btnLab').onclick = () => {
-  const s = SKILLS.find(s => !s.unlocked);
-  if (s && coins >= labCost()) { coins -= labCost(); s.unlocked = true; news(`🔬 New research lab opened: the unsolved problem "${s.name}" can now be studied.`); updateUI(); }
-};
 $('btnWeb').onclick = () => { webOn = !webOn; news(webOn ? '🌐 Internet connection switched ON.' : '📴 Internet connection switched OFF. The AIs can only learn from what is already in the world.'); updateUI(); };
 $('btnPause').onclick = () => { paused = !paused; $('btnPause').textContent = paused ? '▶ Resume' : '⏸ Pause'; };
 $('btnGuide').onclick = () => $('guide').showModal();
@@ -1038,7 +976,7 @@ if (canSave) $('btnStop').style.display = '';
 $('btnStop').onclick = async () => {
   if (!confirm('Stop the AI World? The students stop living and the notebooks stay saved.')) return;
   saveMemory(); saveKnowledge();
-  await fetch('/shutdown', {method: 'POST'}).catch(() => {});
+  await fetch(API + '/shutdown', {method: 'POST'}).catch(() => {});
   document.body.innerHTML = '<p style="padding:40px;font:16px system-ui;color:#e6edf3">⏹ The AI World has been stopped. Start it again with start-world.bat or the tray launcher.</p>';
 };
 $('btnSyll').onclick = () => { renderDashboard(); $('dash').showModal(); $('syllabus')?.scrollIntoView(); };
@@ -1053,9 +991,17 @@ function syllabusHtml() {
   for (const a of agents) for (const n of a.know.notes) { const e = fieldsAll[n.field.toLowerCase()]; if (e && !e.topics.includes(n.topic)) e.topics.push(n.topic); }
   const open = Object.values(fieldsAll).sort((p, q) => q.level - p.level || q.notes - p.notes);
   const allNotes = agents.flatMap(a => a.know.notes), top = Math.max(1, ...Object.values(DOMAINS).map(d => allNotes.filter(n => d.re.test(`${n.field} ${n.topic}`)).length));
-  return `<h3 id="syllabus">📜 Syllabus: part 1, the classroom (fixed)</h3>
+  return `<h3 id="syllabus">📜 Syllabus: part 1, the levels (a student is promoted when it finishes one)</h3>
+  <table><tr><th>Level</th><th>Name</th><th>Education stage · thinking</th><th>Subjects (students who passed)</th><th>Also needed</th><th>Knowledge to leave</th><th>Students here</th></tr>
+  ${SYLLABUS.map(L => `<tr><td>${L.n}</td><td><b>${esc(L.name)}</b><br><span class="hint">${esc(L.goal)}</span></td><td>${esc(L.edu)}<br><span class="hint">${esc(L.think)}</span></td>
+    <td>${L.skills.map(n => { const i = SKILLS.findIndex(s => s.name === n); return `${esc(n)} (${agents.filter(a => a.passed.includes(i)).length}/${agents.length})`; }).join(' · ') || '–'}</td>
+    <td>${L.real ? 'pass a real-data subject' : L.create ? 'create a puzzle or invent a sense' : L.open ? '–' : '–'}</td>
+    <td>${L.open ? '–' : `${L.notes} notes · ${LEVELS[L.rank][0]} ${LEVELS[L.rank][1]} in a field`}</td>
+    <td>${esc(agents.filter(a => a.level === L.n).map(a => a.name).join(', ') || '–')}</td></tr>`).join('')}</table>
+  <p class="hint">Easy before hard (curriculum learning), in the teaching order used by TensorFlow Playground. Education stages follow UNESCO's ISCED and the thinking column follows the revised Bloom's taxonomy. The knowledge needs the language mind (Ollama); without it only the subjects count.</p>
+  <h3>All subjects in detail</h3>
   <table><tr><th>Level</th><th>Subject</th><th>What the student must learn</th><th>Pass mark</th><th>Passed by</th></tr>
-  ${SKILLS.map((s, i) => `<tr><td>${esc(s.tier)}</td><td>${s.web ? '🌐 ' : s.rule ? '🧩 ' : ''}${esc(s.name)}</td><td>${esc(CORE_ABOUT[s.name] ?? (s.web ? `Real data (${s.web.host}): ${s.web.axes.join(' + ')} → ${s.labels[1]}` : `Secret rule made by a student: ${s.rule}`))}</td><td>${pct(passOf(s))}</td><td>${agents.filter(a => a.passed.includes(i)).length}/${agents.length}</td></tr>`).join('')}</table>
+  ${SKILLS.map((s, i) => `<tr><td>${s.level}</td><td>${s.web ? '🌐 ' : s.rule ? '🧩 ' : ''}${esc(s.name)}</td><td>${esc(CORE_ABOUT[s.name] ?? (s.web ? `Real data (${s.web.host}): ${s.web.axes.join(' + ')} → ${s.labels[1]}` : `Secret rule made by a student: ${s.rule}`))}</td><td>${pct(passOf(s))}</td><td>${agents.filter(a => a.passed.includes(i)).length}/${agents.length}</td></tr>`).join('')}</table>
   <h3>📜 Syllabus: part 2, the open curriculum (chosen freely by the students)</h3>
   ${open.length ? `<table><tr><th>Field</th><th>Studied by</th><th>Notes</th><th>Best rank</th><th>Articles read</th></tr>${open.map(e => `<tr><td>${esc(e.name)}</td><td>${esc(e.students.join(', '))}</td><td>${e.notes}</td><td>${LEVELS[e.level][0]} ${LEVELS[e.level][1]}</td><td>${esc(e.topics.slice(-4).join(' · '))}</td></tr>`).join('')}</table>` : '<p class="hint">Nothing yet. Each student decides for itself what to learn, so this table fills in as they explore (it needs Ollama running).</p>'}
   <h3>Suggested areas of knowledge: how much has been touched?</h3>
@@ -1063,13 +1009,13 @@ function syllabusHtml() {
   <p class="hint">These 20 areas are only a menu of ideas shown to the students. They can learn about anything, and nobody has to cover all of them.</p>`;
 }
 function renderDashboard() {
-  const tips = PROF.mem.tips, invented = FEATURES.filter(f => f.by), degrees = agents.reduce((n, a) => n + a.passed.length, 0);
+  const invented = FEATURES.filter(f => f.by), degrees = agents.reduce((n, a) => n + a.passed.length, 0);
   const avg = (key, tier) => { const v = PASS_STATS[key].filter(p => p.tier === tier).map(p => p.lessons); return v.length ? `<b>${Math.round(v.reduce((p, q) => p + q) / v.length).toLocaleString()}</b> lessons (${v.length} passes)` : '–'; };
   const card = (big, small) => `<div class="card"><b>${big}</b><span>${small}</span></div>`;
   const cell = (a, i) => a.passed.includes(i) ? '<td class="ok">✓</td>' : a.skill === i ? `<td class="now">${pct(a.conf)}</td>` : '<td></td>';
   const short = n => esc(n.length > 13 ? n.slice(0, 12) + '…' : n);
   $('dashBody').innerHTML = `
-  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(FEATURES.length, `senses in the world (${invented.length} invented by AIs)`)}${card(SKILLS.filter(s => s.web).length, 'real datasets from the internet')}${card(`${tips.reduce((n, t) => n + t, 0)}/${tips.length}`, 'Professor tips that helped')}${card(llmCalls, `Gemma thoughts so far${llmPending ? ` · ${llmPending} waiting` : ''}`)}${card(PY.online ? 'PyTorch' : 'offline', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'Python brains not connected')}${card(MINDS.on ? 'ON' : 'OFF', `Gemma minds · ${MINDS.primes} head-starts given`)}${card(agents.reduce((n, a) => n + a.know.notes.length, 0), `notes in the students' notebooks (${new Set(agents.flatMap(a => a.know.notes.map(n => n.field))).size} fields)`)}</div>
+  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(`L${Math.max(...agents.map(a => a.level))}`, 'highest level reached')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(FEATURES.length, `senses in the world (${invented.length} invented by AIs)`)}${card(SKILLS.filter(s => s.web).length, 'real datasets from the internet')}${card(llmCalls, `Gemma thoughts so far${llmPending ? ` · ${llmPending} waiting` : ''}`)}${card(PY.online ? 'PyTorch' : 'offline', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'Python brains not connected')}${card(MINDS.on ? 'ON' : 'OFF', `Gemma minds · ${MINDS.primes} head-starts given`)}${card(agents.reduce((n, a) => n + a.know.notes.length, 0), `notes in the students' notebooks (${new Set(agents.flatMap(a => a.know.notes.map(n => n.field))).size} fields)`)}</div>
   ${syllabusHtml()}
   <h3>Who has learned what</h3>
   <div class="scroll"><table class="matrix"><tr><th>AI</th>${SKILLS.map(s => `<th title="${esc(s.name)}">${s.web ? '🌐' : s.rule ? '🧩' : ''}${short(s.name)}</th>`).join('')}</tr>
@@ -1077,12 +1023,10 @@ function renderDashboard() {
   <tr><th>first solved by</th>${SKILLS.map(s => `<td>${esc(s.firstBy ?? '')}</td>`).join('')}</tr></table></div>
   <div class="hint">✓ = passed the exam · % = studying it right now (practice score) · empty = not learned yet</div>
   <h3>The models</h3>
-  <div class="models"><div class="model prof"><b>🎓 Professor Gemma</b> · large language model<br>Model: <b>${esc(PROF.model ?? 'offline')}</b> (file models/gemma2-2b.gguf) · 2.6 billion parameters, frozen<br>
-    Learns by keeping a notebook: <b>${PROF.mem.notes.length}</b> notes from Wikipedia, <b>${tips.length}</b> tips tested<br>Also thinks for all ten students' minds<br>
-    Recently studied: ${esc(PROF.mem.notes.slice(-6).map(n => n.topic).join(', ') || 'nothing yet')}</div>
+  <div class="models">
   ${agents.map(a => { const fav = Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1])[0]; return `<div class="model"><b><span class="dot" style="background:${a.color}"></span>${a.name}</b>${a.firsts ? ` · ★${a.firsts} world firsts` : ''}<br>
-    Skill brain (PyTorch): ${a.sizes.join('-')} neurons, <b>${connections(a)}</b> connections${MINDS.on && PROF.online ? ' · mind: Gemma' : ''}${PY.online && PY.info?.policy?.[a.id] ? ` · decision brain: ${PY.info.policy[a.id].updates} updates, avg reward ${PY.info.policy[a.id].reward}` : ''}<br>
-    Now: ${esc(doingText(a))}<br>Degrees (${a.passed.length}): ${esc(a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet')}<br>
+    Skill brain (PyTorch): ${a.sizes.join('-')} neurons, <b>${connections(a)}</b> connections${MINDS.on && LLM.online ? ' · mind: Gemma' : ''}${PY.online && PY.info?.policy?.[a.id] ? ` · decision brain: ${PY.info.policy[a.id].updates} updates, avg reward ${PY.info.policy[a.id].reward}` : ''}<br>
+    Level ${a.level} (${esc(SYLLABUS[a.level - 1].name)}) · Now: ${esc(doingText(a))}<br>Degrees (${a.passed.length}): ${esc(a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet')}<br>
     Senses: ${esc(a.feats.map(i => FEATURES[i].name).join(', '))}<br>
     Inventions: ${esc(FEATURES.filter(f => f.by === a.name).map(f => f.name).join(', ') || 'none yet')} · likes ${fav ? `${EMOJI[fav[0]]} ${fav[0]}` : '–'} · ${a.steps.toLocaleString()} lessons</div>`; }).join('')}</div>
   <h3>📚 Knowledge: what each student chose to learn about</h3>
@@ -1564,15 +1508,6 @@ for (const a of agents) {
   a.place = 'Dorm'; a.spot = a.id; dorm.occ[a.id] = a.id; a.timer = 30 + a.id * 25;
   a.v = {...v, dir: dorm.spotPos[a.id].clone().normalize(), fwd: dorm.spotFwd[a.id].clone()};
 }
-// Professor Gemma stands at the University lectern, facing the students (only visible while Ollama is reachable)
-const prof = buildAvatar('#f5f5f5', 0xe0ac69, 0x9aa5b1, '🎓 Prof. Gemma', 0.75);
-prof.hat.visible = true;
-{
-  const U = BUILD.University, pos = U.g.localToWorld(new THREE.Vector3(0, FLOOR, -U.d / 2 + 0.8));
-  prof.g.position.copy(pos); prof.g.up.copy(U.dir); prof.g.lookAt(pos.clone().add(U.front));
-  prof.bubble = label('', '#0d1117', 0.6, true, 'rgba(255,240,200,.95)');
-  prof.bubble.position.y = 2.3; prof.g.add(prof.bubble);
-}
 const ring = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.36, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide, toneMapped: false}));
 const bubble = label('', '#0d1117', 0.75, true, 'rgba(255,255,255,.94)');
 world.add(ring, bubble);
@@ -1636,7 +1571,7 @@ function updateAvatar(a, t) {
   } else if (pose === 'chat') {
     v.armR.rotation.x = -0.8 + Math.sin(ph * 2) * 0.4; v.body.rotation.y = Math.sin(ph * 0.7) * 0.2;
   }
-  v.hat.visible = a.passed.filter(i => SKILLS[i].tier === 'University').length >= 3;
+  v.hat.visible = a.level >= 4; // the graduation cap comes with Level 4
   v.halo.visible = a.firsts > 0;
   v.halo.rotation.y = t * 0.002;
   v.tag.userData.set(`${a.emoji} ${a.name}${a.firsts ? ' ★' + a.firsts : ''}`);
@@ -1753,19 +1688,11 @@ function updateUI() {
   $('day').textContent = day(); $('coins').textContent = coins;
   $('wfCount').textContent = agents.reduce((n, a) => n + a.firsts, 0);
   $('papers').textContent = published.filter(Boolean).length - 2;
-  const tips = PROF.mem.tips, helped = tips.reduce((n, t) => n + t, 0);
   $('pyStat').textContent = PY.online ? 'brains: PyTorch' : 'brains: OFFLINE';
-  $('profStat').textContent = !PROF.online ? 'Prof. Gemma: offline' : `Prof. Gemma: ${PROF.busy ? 'thinking…' : 'online'} · ${helped}/${tips.length} tips helped`;
-  const rate = arr => arr.length ? pct(arr.reduce((n, t) => n + t, 0) / arr.length) : '–';
-  $('notebook').innerHTML = `<b>Track record</b>: ${helped} of ${tips.length} tips helped. First 10 tips: <b>${rate(tips.slice(0, 10))}</b> · latest 10: <b>${rate(tips.slice(-10))}</b>${tips.length >= 20 ? '' : ' (needs 20 tips to compare)'}<br>`
-    + `<b>What worked</b>: ${Object.entries(PROF.mem.experience).sort((x, y) => y[1].tries - x[1].tries).slice(0, 8).map(([k, e]) => `${esc(k.replace('|', ' + '))} ${e.helped}/${e.tries}`).join(' · ') || 'nothing tested yet'}<br>`
-    + `<b>Notes from its own reading</b> (${PROF.mem.notes.length})<br>${PROF.mem.notes.slice(-6).reverse().map(n => `📖 <b>${esc(n.topic)}</b>: ${esc(n.note)}`).join('<br>') || 'none yet'}`;
-  $('btnExplain').disabled = !PROF.online || PROF.busy;
+  $('llmStat').textContent = !LLM.online ? 'mind: offline' : `mind: ${LLM.busy ? 'thinking…' : llmPending ? `${llmPending} thinking` : 'ready'}`;
+  $('btnExplain').disabled = !LLM.online || LLM.busy;
   $('btnCompute').textContent = `⚡ Compute Lv${computeLvl + 1} (${computeCost()}💰)`;
   $('btnCompute').disabled = coins < computeCost();
-  const locked = SKILLS.find(s => !s.unlocked);
-  $('btnLab').textContent = locked ? `🔬 Open lab: ${locked.name} (${labCost()}💰)` : '🔬 All labs open';
-  $('btnLab').disabled = !locked || coins < labCost();
   $('btnWeb').textContent = `🌐 Internet ${webOn ? 'ON' : 'OFF'} · ${SKILLS.filter(s => s.web).length} real datasets${webBusy ? ' · downloading…' : ''}`;
   $('btnWeb').className = webOn ? 'on' : '';
   $('btnMinds').textContent = `🧠 Gemma minds ${MINDS.on ? 'ON' : 'OFF'}${llmPending ? ` · ${llmPending} thinking` : ''}`;
@@ -1773,7 +1700,7 @@ function updateUI() {
   [...$('places').querySelectorAll('button[data-k] span')].forEach(sp => { const k = sp.parentElement.dataset.k, n = agents.filter(a => a.place === k && a.arrived).length; sp.textContent = n ? `· ${n}` : ''; });
   const doing = a => `${a.emoji} ${a.arrived ? ACT[a.act] : 'Walking'} ${a.place ? (a.arrived ? 'at ' : 'to ') + BUILD[a.place].label : ''}`;
   $('roster').innerHTML = agents.map(a => `<tr data-id="${a.id}" class="${a.id === selected ? 'sel' : ''}"><td><span class="dot" style="background:${a.color}"></span>${a.name}${a.firsts ? ' ★' + a.firsts : ''}</td>
-      <td>${doing(a)}</td><td>${a.skill >= 0 ? (SKILLS[a.skill].web ? '🌐 ' : '') + SKILLS[a.skill].name : a.passed.length ? '🎓 all done' : '—'}</td><td>${a.passed.length}</td>
+      <td>L${a.level}</td><td>${doing(a)}</td><td>${a.skill >= 0 ? (SKILLS[a.skill].web ? '🌐 ' : '') + SKILLS[a.skill].name : a.passed.length ? '🎓 all done' : '—'}</td><td>${a.passed.length}</td>
       <td>${a.skill >= 0 ? bar(a.conf) : ''}</td><td>${connections(a)} links</td><td>${a.feats.length}</td></tr>`).join('');
   const a = agents[selected];
   $('hudAgent').innerHTML = `<span>${a.emoji} <b>${esc(a.name)}</b> · ${esc(doingText(a))}</span><i>“${esc(a.thought)}”</i>`;
@@ -1787,6 +1714,7 @@ function updateUI() {
     <div style="margin-top:6px"><b>Likes learned from experience</b>: ${Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1]).map(([k, v]) => `${EMOJI[k]} ${v >= 0 ? '+' : ''}${v.toFixed(2)}`).join(' · ')}</div>
     ${PY.online && a.resid ? `<div style="margin-top:6px"><b>🧮 What its decision brain (PyTorch) has learned</b>: it nudges the built-in instincts towards ${Object.entries(a.resid).sort((x, y) => y[1] - x[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r >= 0 ? '+' : ''}${r.toFixed(2)})`).join(', ')} and away from ${Object.entries(a.resid).sort((x, y) => x[1] - y[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r.toFixed(2)})`).join(', ')}</div>` : ''}
     <div style="margin-top:6px"><b>Why it chose this</b>: chances it gave each option at its last decision:<br>${a.why.map(([k, p]) => `${EMOJI[k]} ${k} ${pct(p)}`).join(' · ') || '—'}</div>
+    <div style="margin-top:6px">📜 <b>Level ${a.level}: ${SYLLABUS[a.level - 1].name}</b> · ${(() => { const g = gate(a); return g.L.open ? 'no more gates, open research' : g.ready ? 'ready for promotion!' : `still needs: ${esc(g.needs.join(', '))}`; })()}</div>
     <div style="margin-top:6px">Degrees: <b>${a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet'}</b> · Lessons done: <b>${a.steps.toLocaleString()}</b></div>
     <div style="margin-top:6px"><b>Knowledge fields</b> (${a.know.notes.length}/${KNOW_MAX_NOTES} notes): ${fieldsOf(a).map(f => `${esc(fieldBadge(f))} <span>(${f.notes}${f.graded ? `, exam ${pct(f.score)}` : ''})</span>`).join(' · ') || 'nothing yet'}</div>
     <div style="margin-top:6px"><b>Recent memories</b><br>${a.log.map(esc).join('<br>')}</div>`;
@@ -1804,7 +1732,7 @@ function updateUI() {
 $('roster').onclick = e => { const tr = e.target.closest('tr'); if (tr) select(+tr.dataset.id, true); };
 
 news('The world is born. 10 baby AIs wake up in the Dormitory knowing only x and y.');
-wakeProfessor();
+wakeLLM();
 loadKnowledge();
 pyConnect();
 setInterval(pyStudyTick, 100);
@@ -1813,7 +1741,7 @@ setInterval(pyViewTick, 250);
 $('askBtn').onclick = async () => {
   const a = agents[selected], question = $('askInput').value.trim().slice(0, 200);
   if (!question) return;
-  if (!PROF.online) return $('askAnswer').textContent = `${a.name} needs its Gemma mind (Ollama) to answer in words.`;
+  if (!LLM.online) return $('askAnswer').textContent = `${a.name} needs its Gemma mind (Ollama) to answer in words.`;
   const notes = recall(a, question);
   if (!notes.length) return $('askAnswer').textContent = `🗣 ${a.name}: I haven't learned about that yet. Nothing in my notebook matches. (Its notebook has ${a.know.notes.length} note${a.know.notes.length === 1 ? '' : 's'}.)`; // don't let shared Gemma knowledge leak in
   $('askAnswer').textContent = `💭 ${a.name} is looking through its notes…`;
@@ -1826,30 +1754,30 @@ Question: ${question}`, false);
   } catch (e) { $('askAnswer').textContent = `📡 Couldn't think: ${e.message}`; }
 };
 $('askInput').onkeydown = e => { if (e.key === 'Enter') $('askBtn').click(); };
-// You can ask the Professor to explain any AI in plain English (the answer is shown as plain text, never as HTML)
+// Ask the local model to explain any AI in plain English (the answer is shown as plain text, never as HTML)
 $('btnExplain').onclick = async () => {
   const a = agents[selected], s = SKILLS[a.skill];
-  PROF.busy = true; PROF.says = `💭 explaining ${a.name} to you…`; $('profSays').textContent = '💭 Prof. Gemma is thinking…'; updateUI();
+  LLM.busy = true; $('explainOut').textContent = '💭 Thinking…'; updateUI();
   try {
-    $('profSays').textContent = '🎓 ' + await askLLM(`You are Professor Gemma, explaining things to a curious person who is completely new to AI.
+    $('explainOut').textContent = '✨ ' + await askLLM(`You are a friendly guide explaining things to a curious person who is completely new to AI.
 In at most 3 short sentences of plain English, explain what this tiny neural-network student is doing right now and how it is learning. Be concrete and friendly. Refer to the student by name or as "it". No lists, no markdown.
 Facts about the student:
-- name: ${a.name}; currently: ${a.arrived ? ACT[a.act] : 'walking'}${a.place ? ' at the ' + BUILD[a.place].label : ''}
+- name: ${a.name}; level ${a.level} (${SYLLABUS[a.level - 1].name}); currently: ${a.arrived ? ACT[a.act] : 'walking'}${a.place ? ' at the ' + BUILD[a.place].label : ''}
 - subject: ${s ? `${s.name} (${s.web ? `real data from ${s.web.host}: ${s.web.what}` : s.rule ? `a puzzle with secret rule ${s.rule}` : 'tell blue dots from red dots on a 2D map'})` : 'none'}
 - practice score: ${pct(a.conf)}; brain size: ${connections(a)} connections; senses: ${a.feats.map(i => FEATURES[i].name).join(', ')}
 - passed subjects: ${a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet'}
 - its latest thoughts: ${a.log.slice(0, 3).join(' | ')}`, false);
-  } catch (e) { $('profSays').textContent = `📡 Couldn't reach the Professor: ${e.message}`; }
-  finally { PROF.busy = false; PROF.says = ''; }
+  } catch (e) { $('explainOut').textContent = `📡 Couldn't reach the language model: ${e.message}`; }
+  finally { LLM.busy = false; }
 };
-window.sim = {QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, learnOnline, knowledgeExam, fieldsOf, recall, MINDS, PASS_STATS, FEATURES, mindPrime, inventSense, compileFormula, makeSense, linearAcc, renderDashboard, PROF, askProfessor, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); tickProfessor(); }, profStudy, makeAgent, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
+window.sim = {LLM, gate, checkPromotion, SYLLABUS, QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, learnOnline, knowledgeExam, fieldsOf, recall, MINDS, PASS_STATS, FEATURES, mindPrime, inventSense, compileFormula, makeSense, linearAcc, renderDashboard, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); }, makeAgent, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
 $('guide').showModal();
 let renders = 0;
 // The simulation runs on its own timer, not on the drawing loop, so the world keeps living when its window is minimized
 // (the launcher starts the browser with background throttling disabled). If drawing has stopped, avatars still walk.
 let lastDraw = 0, lastT = 0;
 setInterval(() => {
-  if (!paused && PY.online) { frame++; for (const a of agents) live(a); tickProfessor(); }
+  if (!paused && PY.online) { frame++; for (const a of agents) live(a); }
   if (performance.now() - lastDraw > 100) for (const a of agents) updateAvatar(a, performance.now());
 }, 1000 / 60);
 applyQuality();
@@ -1859,9 +1787,6 @@ applyQuality();
   const inside = focused || camera.position.length() < R + 11;
   for (const b of placeList) { if (b.roofMesh) b.roofMesh.visible = !inside; b.tag.visible = !inside; }
   beam.visible = webBusy;
-  prof.g.visible = PROF.online;
-  prof.bubble.userData.set(PROF.says); prof.bubble.visible = !!PROF.says;
-  prof.armR.rotation.x = PROF.busy ? -1.3 + Math.sin(t * 0.008) * 0.4 : -0.15; prof.body.rotation.y = Math.sin(t * 0.001) * 0.25;
   M.beacon.color.setHex(webBusy ? (t % 300 < 150 ? 0x79c0ff : 0x1f6feb) : (t % 1600 < 200 ? 0xff4040 : 0x400000));
   M.led.color.setHex(webBusy && t % 200 < 100 ? 0xa5f3b0 : 0x3fb950);
   clouds.rotation.y += 0.0004;

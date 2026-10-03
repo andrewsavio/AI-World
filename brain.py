@@ -252,7 +252,7 @@ class Brain:
                 'grid': [round(v, 3) for v in grid.tolist()], 'lessons': self.lessons, 'params': sum(p.numel() for p in self.params())}
 
 
-ACTIONS = ['study', 'sleep', 'play', 'chat', 'read', 'exam', 'wander', 'browse', 'create', 'ask', 'invent', 'learn', 'kexam']
+ACTIONS = ['study', 'sleep', 'play', 'chat', 'read', 'exam', 'wander', 'browse', 'create', 'invent', 'learn', 'kexam']
 N_STATE = 14
 
 

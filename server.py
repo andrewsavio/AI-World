@@ -1,10 +1,13 @@
 """AI World server.
 
 Serves the world on http://localhost:8000 (Ollama only talks to pages served from localhost), keeps the
-notebooks (professor-memory.json, students-memory.json) because a web page can't write files by itself, and hosts the
-students' neural brains (brain.py, PyTorch). Listens on this computer only (127.0.0.1).
+students' notebooks (students-memory.json) because a web page can't write files by itself, and hosts the students' neural
+brains (brain.py, PyTorch). Local-first: it listens on this computer only (127.0.0.1) and accepts writes only from its own page.
+To let a copy of the page hosted elsewhere talk to a server you run, set AIWORLD_ORIGINS=https://your-site (comma separated)
+and, if it must be reachable from other machines, AIWORLD_HOST=0.0.0.0. There is one world per server, so it is meant for one viewer.
 """
 import json
+import os
 import pathlib
 import sys
 import threading
@@ -13,7 +16,9 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 ROOT = pathlib.Path(__file__).parent
-NOTEBOOKS = {'/memory': ROOT / 'professor-memory.json', '/memory/students': ROOT / 'students-memory.json'}
+NOTEBOOKS = {'/memory/students': ROOT / 'students-memory.json'}
+HOST = os.environ.get('AIWORLD_HOST', '127.0.0.1')
+ALLOWED = {'http://localhost:8000', 'http://127.0.0.1:8000', *filter(None, os.environ.get('AIWORLD_ORIGINS', '').split(','))}
 MAX_BYTES = 5_000_000
 brain = None  # the PyTorch brains; loaded in the background so the page opens at once
 BRAIN_ERROR = None
@@ -55,7 +60,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         # Only the world's own page may change anything (browsers always send Origin on cross-site posts). curl sends none.
-        if self.headers.get('Origin') not in (None, 'http://localhost:8000'):
+        if self.headers.get('Origin') not in (None, *ALLOWED):
             return self.reply(403, b'{"error": "forbidden"}')
         if self.path == '/shutdown':
             if self.headers.get('Origin') != 'http://localhost:8000':
@@ -90,6 +95,8 @@ class Handler(SimpleHTTPRequestHandler):
 
     def reply(self, code, body):
         self.send_response(code)
+        if self.headers.get('Origin') in ALLOWED:  # lets an allowed hosted copy of the page read the answers
+            self.send_header('Access-Control-Allow-Origin', self.headers['Origin'])
         if code >= 400:  # an error may leave an unread request body, so don't reuse this connection
             self.close_connection = True
             self.send_header('Connection', 'close')
@@ -107,4 +114,4 @@ if __name__ == '__main__':
     print('AI World running at http://localhost:8000  (close this window or press Ctrl+C to stop)')
     if '--no-browser' not in sys.argv:
         threading.Timer(1, webbrowser.open, ['http://localhost:8000']).start()
-    ThreadingHTTPServer(('127.0.0.1', 8000), Handler).serve_forever()
+    ThreadingHTTPServer((HOST, 8000), Handler).serve_forever()

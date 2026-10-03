@@ -1,4 +1,4 @@
-"""Turns what the students and the Professor learned into a fine-tuning dataset (chat-style JSONL).
+"""Turns what the students learned into a fine-tuning dataset (chat-style JSONL).
 
 Run:  python export_dataset.py        ->  training-data.jsonl
 Each line is one example: a question and the answer the student's own notes support. Feed the file to a LoRA
@@ -19,14 +19,9 @@ if students.exists():
                 continue  # skip quizzes the small model formatted badly
             correct = q['options'][q['answer']]
             rows.append({'messages': [
-                {'role': 'system', 'content': 'You are an expert on India. Answer from what you know about India.'},
+                {'role': 'system', 'content': 'You are a knowledgeable assistant. Answer from what you have learned.'},
                 {'role': 'user', 'content': q['question']},
                 {'role': 'assistant', 'content': f"{correct}. ({n['note']})"}], 'source': f"{name}: {n['topic']} ({n['field']})"})
-prof = ROOT / 'professor-memory.json'
-if prof.exists():
-    for n in json.loads(prof.read_text(encoding='utf-8')).get('notes', []):
-        rows.append({'messages': [{'role': 'user', 'content': f"What is a useful lesson from '{n['topic']}'?"},
-                                  {'role': 'assistant', 'content': n['note']}], 'source': f"Professor: {n['topic']}"})
 out = ROOT / 'training-data.jsonl'
 out.write_text('\n'.join(json.dumps(r, ensure_ascii=False) for r in rows), encoding='utf-8')
 print(f'{len(rows)} training examples written to {out.name}')

@@ -1,7 +1,6 @@
 # The model weights are 1.6 GB (GitHub's limit is 100 MB). start-world.bat pulls gemma2:2b through Ollama instead.
 models/*.gguf
-# Runtime state: what the students and the Professor have learned on *your* machine
-professor-memory.json
+# Runtime state: what the students have learned on *your* machine
 students-memory*.json
 training-data.jsonl
 *.tmp
