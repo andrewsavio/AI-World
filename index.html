@@ -55,6 +55,9 @@ dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);bo
 dialog::backdrop{background:rgba(0,0,0,.65)}
 dialog h3{margin:16px 0 4px;font-size:15px}
 dialog p{margin:0;color:#c9d1d9}
+#pyBanner{position:fixed;z-index:50;top:12px;left:50%;transform:translateX(-50%);max-width:min(720px,calc(100% - 24px));background:#3a2a05;border:1px solid #d29922;color:#ffe6a8;border-radius:10px;padding:10px 16px;font-size:13px;line-height:1.5;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+#pyBanner[hidden]{display:none}
+#pyBanner code{background:rgba(0,0,0,.35);padding:1px 5px;border-radius:4px}
 dialog.dash{max-width:1200px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}
 .card{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
@@ -105,7 +108,7 @@ dialog.dash{max-width:1200px}
   <p><b>Honest limits:</b> searches go to Wikipedia (about 7 million articles on almost every topic). Searching the whole web needs a search service with an API key. A student's knowledge is its notes: Gemma does the reading and the reasoning for every student.</p>
   <h3>🛠 Tech stack</h3>
   <p>• <b>One HTML file</b> opened in your browser: no install, no server, no account.<br>
-     • <b>Brains:</b> <b>Python + PyTorch</b> (file <code>brain.py</code>, served by <code>server.py</code>). Each student has a <i>skill brain</i> (a neural network trained with backpropagation) and a <i>decision brain</i> (a neural network trained with reinforcement learning from the world's rewards). If PyTorch isn't available, brains written in plain JavaScript take over.<br>
+     • <b>Brains:</b> <b>Python + PyTorch</b> (file <code>brain.py</code>, served by <code>server.py</code>). Each student has a <i>skill brain</i> (a neural network trained with backpropagation) and a <i>decision brain</i> (a neural network trained with reinforcement learning from the world's rewards). The page has no brain of its own: it needs the Python server (start-world.bat).<br>
      • <b>Decisions:</b> needs + personality (a "utility AI", as in The Sims) + learned likes (reinforcement learning) + a weighted dice roll.<br>
      • <b>3D world:</b> three.js (WebGL) on your graphics chip: smooth terrain, shiny sea, a day and night cycle, atmosphere glow and real shadows when you look inside a building. Instancing, merged meshes and automatic resolution scaling keep Intel graphics fast.<br>
      • <b>Brain diagrams and charts:</b> HTML Canvas 2D.<br>
@@ -122,13 +125,14 @@ dialog.dash{max-width:1200px}
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 style="font-size:18px;text-transform:none;letter-spacing:0;color:var(--text);margin:0">📊 Dashboard: what every model has learned</h2><button id="dashClose">Close</button></div>
   <div id="dashBody"></div>
 </dialog>
+<div id="pyBanner" role="status"></div>
 <header>
   <h1>🌍 AI World Tycoon</h1>
   <span class="stat">Day <b id="day">1</b></span>
   <span class="stat">💰 <b id="coins">0</b></span>
   <span class="stat">World firsts <b id="wfCount">0</b></span>
   <span class="stat">Papers <b id="papers">0</b></span>
-  <span class="stat">🧮 <b id="pyStat">brains: JS</b></span>
+  <span class="stat">🧮 <b id="pyStat">brains: connecting…</b></span>
   <span class="stat">🎓 <b id="profStat">Prof. Gemma: checking…</b></span>
   <select id="modelPick" title="Which Ollama model thinks for the Professor and the student minds" style="background:#21262d;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:5px"></select>
   <button id="btnCompute"></button>
@@ -573,7 +577,7 @@ Reply only with JSON: {"name": "<short name>", "formula": "<formula>", "idea": "
     const best = targets.map(t => ({t, gain: linearAcc(t, [...base, f]) - linearAcc(t, base)})).sort((p, q) => q.gain - p.gain)[0];
     if (best.gain < 0.04) throw new Error(`tested on ${targets.map(t => t.name).join(' and ')}, it only helped ${pct(Math.max(0, best.gain))}`);
     FEATURES.push({name, expr: formula, f, by: a.name, gain: best.gain, for: best.t.name, day: day()});
-    if (PY.online) pyCall('/brain/sense', {name, expr: formula, mean: f.mean, sd: f.sd}).catch(pyDown); // Python learns the same formula (before anyone uses it)
+    pyOp('/brain/sense', {name, expr: formula, mean: f.mean, sd: f.sd}); // Python learns the same formula (before anyone uses it)
     published.push(a.name);
     addFeature(a, FEATURES.length - 1);
     a.firsts++; coins += 150; MINDS.inventions++; feel(a, 'invent', 1.5); a.lastIdea = `"${formula}", which worked (+${pct(best.gain)} on ${best.t.name})`;
@@ -706,13 +710,12 @@ Reply only with JSON: {"answers": [${qs.map(() => '"<A, B, C or D>"').join(', ')
 // ================= the brain: a tiny neural network (tanh hidden layers, sigmoid output) =================
 const NAMES = ['Ada', 'Alan', 'Grace', 'Hedy', 'Marie', 'Nikola', 'Rosalind', 'Kurt', 'Emmy', 'Srini'];
 let coins = 0, computeLvl = 1, paused = false, frame = 0, selected = 0, probe = [0.3, 0.3];
-const initRow = n => Array.from({length: n}, () => rnd() * 1.5 / Math.sqrt(n));
 // ================= the Python brains (brain.py, PyTorch) =================
-// When the world is served by server.py, every student's neural network lives in Python and learns there. This page only
-// asks: "train agent 3 on subject 5", "give me agent 3's exam score", "which action should agent 3 take?". All calls go through
-// one queue so they reach Python in the order they were made. Without Python, the brains written in JavaScript below take over.
-const PY = {online: false, booting: canSave0(), info: null, pending: {}, studying: false, view: null, viewBusy: false};
-function canSave0() { return location.protocol.startsWith('http'); }
+// Every student's neural networks live in Python and learn there; this page only asks: "train agent 3 on subject 5", "give me
+// agent 3's exam score", "which action should agent 3 take?". All calls go through one queue so they arrive in the order they
+// were made. There is no second brain in the browser: if Python is not reachable the world pauses and says why, then
+// reconnects by itself. The page remembers each brain's *shape* (sizes, senses) so a restarted Python can rebuild it.
+const PY = {online: false, why: location.protocol === 'file:' ? 'file' : 'connecting', info: null, pending: {}, studying: false, view: null, viewBusy: false, everOnline: false, misses: 0, dirty: false};
 let pyChain = Promise.resolve();
 function pyCall(path, body) {
   const job = pyChain.then(async () => {
@@ -723,8 +726,17 @@ function pyCall(path, body) {
   pyChain = job.catch(() => {});
   return job;
 }
-const pyDown = e => { if (!PY.online) return; PY.online = false; agents.forEach(rebuildJsBrain); news(`🧮 The Python brains stopped answering (${e.message}). The students continue with their JavaScript brains.`); };
-const syncSkill = s => { if (PY.online) pyCall('/brain/skills', {skills: [{id: SKILLS.indexOf(s), train: s.train, test: s.test}]}).catch(pyDown); };
+const pyLost = e => { if (!PY.online) return; PY.online = false; PY.why = 'lost'; PY.pending = {}; news(`🐍 The Python brains stopped answering (${e.message}). The world is paused until they are back.`); };
+// A change to a brain's structure. If Python is away, remember that a re-sync is needed instead of losing the change.
+const pyOp = (path, body) => PY.online ? pyCall(path, body).catch(pyLost) : void (PY.dirty = true);
+const syncSkill = s => pyOp('/brain/skills', {skills: [{id: SKILLS.indexOf(s), train: s.train, test: s.test}]});
+async function pySyncAll() { // (re)create every student's brain in Python in the shape this page remembers (weights start fresh)
+  await pyCall('/brain/reset', {agents: agents.map(a => ({id: a.id, hidden: a.sizes.slice(1, -1), lr: a.lr}))});
+  for (const f of FEATURES.slice(9)) await pyCall('/brain/sense', {name: f.name, expr: f.expr, mean: f.f.mean, sd: f.f.sd});
+  await pyCall('/brain/skills', {skills: SKILLS.map((s, i) => ({id: i, train: s.train, test: s.test}))});
+  for (const a of agents) for (const fi of a.feats.slice(2)) await pyCall('/brain/add_sense', {id: a.id, fi});
+  PY.dirty = false;
+}
 // Training runs in batches: every 100 ms all studying students are sent to Python together.
 async function pyStudyTick() {
   if (!PY.online || PY.studying) return;
@@ -739,7 +751,7 @@ async function pyStudyTick() {
       a.conf = r.conf; a.lesson = r.lesson; a.steps += r.steps;
       afterStudy(a);
     }
-  } catch (e) { pyDown(e); }
+  } catch (e) { pyLost(e); }
   finally { PY.studying = false; }
 }
 async function pyViewTick() { // the selected student's weights, neuron activity and map of guesses, for the brain panels
@@ -752,26 +764,40 @@ async function pyViewTick() { // the selected student's weights, neuron activity
   } catch {}
   finally { PY.viewBusy = false; }
 }
-async function pyBoot() {
-  if (!PY.booting) return;
-  for (let i = 0; i < 60 && !PY.info?.engine; i++) { // PyTorch takes a few seconds to load
-    const res = await fetch('/brain/info').catch(() => null);
-    if (!res?.ok) break; // a server without Python brains: use the JavaScript ones at once
-    const info = await res.json().catch(() => null);
-    if (info?.engine) PY.info = info;
-    else if (info && !info.loading) break;
-    else await new Promise(r => setTimeout(r, 500));
+const PY_MESSAGE = {
+  file: '🐍 The students think with <b>Python (PyTorch)</b>, but this page was opened as a plain file. Start the world with <b>start-world.bat</b> (or run <code>python server.py</code>) and open <b>http://localhost:8000</b>.',
+  connecting: '🐍 Connecting to the Python brains…',
+  noserver: "🐍 Can't reach the Python server. Start it with <b>start-world.bat</b> (or <code>python server.py</code>). This page reconnects by itself.",
+  loading: '🐍 Starting PyTorch… the first start can take up to a minute. The world begins as soon as the brains are ready.',
+  notorch: "🐍 PyTorch isn't installed. Run <code>pip install -r requirements.txt</code> and restart the world.",
+  lost: '🐍 The Python brains stopped answering. The world is paused and reconnects by itself.'};
+function showPyBanner() {
+  const b = $('pyBanner');
+  b.hidden = PY.online;
+  $('pyStat').textContent = PY.online ? 'brains: PyTorch' : PY.why === 'connecting' || PY.why === 'loading' ? 'brains: connecting…' : 'brains: OFFLINE';
+  if (!PY.online) b.innerHTML = PY_MESSAGE[PY.why] ?? PY_MESSAGE.noserver;
+}
+async function pyConnect() { // runs for the life of the page: connects, and reconnects if Python goes away
+  for (;;) {
+    if (location.protocol !== 'file:') {
+      try {
+        const res = await fetch('/brain/info'), info = res.ok ? await res.json() : null;
+        if (!info) { PY.why = 'noserver'; if (PY.online) PY.misses++; }
+        else if (info.engine) {
+          PY.info = info; PY.misses = 0;
+          if (!PY.online) {
+            if (!PY.everOnline || PY.dirty || info.brains !== agents.length) await pySyncAll();
+            PY.online = true;
+            news(PY.everOnline ? '🐍 The Python brains are back. The world continues.' : `🐍 The students' neural brains now run in Python: ${info.engine} on the ${info.device.toUpperCase()}. Each also has a decision brain that learns from the world's rewards.`, 'web');
+            PY.everOnline = true;
+          }
+        } else PY.why = info.error ? 'notorch' : 'loading';
+      } catch { PY.why = 'noserver'; if (PY.online) PY.misses++; }
+      if (PY.online && PY.misses >= 3) pyLost(new Error('no answer'));
+    }
+    showPyBanner();
+    await new Promise(r => setTimeout(r, PY.online ? 3000 : 1500));
   }
-  try {
-    if (!PY.info?.engine) throw new Error('PyTorch is not installed');
-    await pyCall('/brain/reset', {agents: agents.map(a => ({id: a.id, hidden: a.sizes.slice(1, -1), lr: a.lr}))});
-    await pyCall('/brain/skills', {skills: SKILLS.map((s, i) => ({id: i, train: s.train, test: s.test}))});
-    PY.online = true;
-    news(`🧮 The students' neural brains now run in Python: ${PY.info.engine} on the ${PY.info.device.toUpperCase()}. Each also has a decision brain that learns from the world's rewards.`, 'web');
-  } catch (e) {
-    news(`🧮 Python brains unavailable (${e.message}). The students use the brains written in JavaScript.`);
-  }
-  PY.booting = false;
 }
 function makeAgent(id) {
   const hidden = [2 + (Math.random() * 3 | 0)];
@@ -779,48 +805,13 @@ function makeAgent(id) {
   const a = {id, name: NAMES[id], color: `hsl(${id * 36},70%,58%)`, lr: rnd(0.02, 0.08),
     p: {diligence: rnd(0.5, 1), curiosity: Math.random(), social: rnd(0.2, 1)},
     energy: rnd(0.7, 1), fun: rnd(0.6, 1), social: rnd(0.5, 1),
-    feats: [0, 1], sizes: [2, ...hidden, 1], W: [], b: [], passed: [], skill: -1,
+    feats: [0, 1], sizes: [2, ...hidden, 1], passed: [], skill: -1,
     conf: 0.5, bestConf: 0, stuck: 0, steps: 0, nextCheck: CHECK_EVERY, examAfter: 0, lastExam: 0,
     confHist: [], exams: [], sampleN: 0, wantsPaper: false, firsts: 0, log: [], why: [], lesson: null,
     taste: Object.fromEntries(Object.keys(ACT).map(k => [k, 0])), reward: 0, struggles: 0, dropped: -1, start: null, advice: null, know: {notes: [], exams: {}},
     act: 'none', place: null, spot: -1, path: [], arrived: true, timer: 0, thought: 'Just woke up…', emoji: '👶'};
-  return rebuildJsBrain(a);
-}
-function rebuildJsBrain(a) { // fresh weights shaped like a.sizes (also used if Python stops answering)
-  a.W = []; a.b = [];
-  for (let l = 0; l < a.sizes.length - 1; l++) {
-    a.W.push(Array.from({length: a.sizes[l + 1]}, () => initRow(a.sizes[l])));
-    a.b.push(Array(a.sizes[l + 1]).fill(0));
-  }
   return a;
 }
-const input = (a, x, y) => a.feats.map(i => FEATURES[i].f(x, y));
-function forward(a, inp) {
-  const acts = [inp];
-  let v = inp;
-  for (let l = 0; l < a.W.length; l++) {
-    const last = l === a.W.length - 1;
-    v = a.W[l].map((row, i) => { let z = a.b[l][i]; for (let j = 0; j < row.length; j++) z += row[j] * v[j]; return last ? 1 / (1 + Math.exp(-z)) : Math.tanh(z); });
-    acts.push(v);
-  }
-  return acts;
-}
-// One lesson: guess (forward), measure error, nudge every connection against its share of the error (backprop).
-function train(a, inp, target) {
-  const acts = forward(a, inp), out = acts.at(-1)[0];
-  let delta = [out - target];
-  for (let l = a.W.length - 1; l >= 0; l--) {
-    const prev = acts[l], W = a.W[l];
-    const nextDelta = l > 0 ? prev.map((p, j) => { let s = 0; for (let i = 0; i < delta.length; i++) s += delta[i] * W[i][j]; return s * (1 - p * p); }) : null;
-    for (let i = 0; i < W.length; i++) {
-      for (let j = 0; j < prev.length; j++) W[i][j] -= a.lr * delta[i] * prev[j];
-      a.b[l][i] -= a.lr * delta[i];
-    }
-    delta = nextDelta;
-  }
-  return out;
-}
-const predict = (a, x, y) => forward(a, input(a, x, y)).at(-1)[0];
 const connections = a => a.sizes.slice(1).reduce((n, size, l) => n + size * (a.sizes[l] + 1), 0);
 
 // ================= getting unstuck =================
@@ -828,18 +819,14 @@ function growNeuron(a) {
   let h = 0;
   for (let k = 1; k < a.sizes.length - 1; k++) if (a.sizes[k] < MAX_NEURONS && (!h || a.sizes[k] < a.sizes[h])) h = k;
   if (!h) return false;
-  if (PY.online) { a.sizes[h]++; pyCall('/brain/grow', {id: a.id, layer: h}).catch(pyDown); return true; }
-  a.W[h - 1].push(initRow(a.sizes[h - 1]).map(w => w * 0.5));
-  a.b[h - 1].push(0);
-  a.W[h].forEach(r => r.push(rnd() * 0.1));
   a.sizes[h]++;
+  pyOp('/brain/grow', {id: a.id, layer: h});
   return true;
 }
 function addFeature(a, fi) {
   a.feats.push(fi);
-  if (PY.online) { a.sizes[0]++; return void pyCall('/brain/add_sense', {id: a.id, fi}).catch(pyDown); }
-  a.W[0].forEach(r => r.push(rnd() * 0.1));
   a.sizes[0]++;
+  pyOp('/brain/add_sense', {id: a.id, fi});
 }
 const missingFeats = a => FEATURES.map((_, i) => i).filter(i => !a.feats.includes(i));
 function selfImprove(a) {
@@ -888,15 +875,7 @@ function enroll(a) {
   if (MINDS.on && PROF.online && LEVEL[s.tier] >= 1 && llmPending < 3) mindPrime(a).catch(() => {}); // a busy Gemma means starting the hard way, not waiting
 }
 function study(a, steps) {
-  if (PY.online) { PY.pending[a.id] = Math.min((PY.pending[a.id] ?? 0) + steps, 400 * computeLvl); return; } // trained in batches by pyStudyTick
-  const s = SKILLS[a.skill];
-  for (let k = 0; k < steps; k++) {
-    const p = s.train[Math.random() * s.train.length | 0], out = train(a, input(a, p[0], p[1]), p[2]);
-    a.conf += (((out > 0.5) === !!p[2] ? 1 : 0) - a.conf) * 0.002;
-    if (k === steps - 1) a.lesson = {x: p[0], y: p[1], t: p[2], out};
-  }
-  a.steps += steps;
-  afterStudy(a);
+  PY.pending[a.id] = Math.min((PY.pending[a.id] ?? 0) + steps, 400 * computeLvl); // trained in Python, in batches, by pyStudyTick
 }
 function afterStudy(a) {
   const s = SKILLS[a.skill];
@@ -910,9 +889,7 @@ function afterStudy(a) {
 }
 async function exam(a) {
   const s = SKILLS[a.skill];
-  let acc;
-  if (PY.online) acc = (await pyCall('/brain/exam', {id: a.id, skill: a.skill})).acc;
-  else { let ok = 0; for (const [x, y, t] of s.test) ok += (predict(a, x, y) > 0.5) === !!t; acc = ok / s.test.length; }
+  const acc = (await pyCall('/brain/exam', {id: a.id, skill: a.skill})).acc;
   a.exams.push({n: a.sampleN, acc}); a.lastExam = a.steps;
   if (acc >= passOf(s)) {
     a.passed.push(a.skill);
@@ -941,7 +918,7 @@ const DUR = {study: 600, sleep: 2500, play: 300, chat: 300, read: 240, exam: 150
 // that activity a little towards the answer. Over time every AI develops its own likes and dislikes.
 function feel(a, act, reward) {
   a.taste[act] += 0.2 * (reward - a.taste[act]);
-  if (PY.online) pyCall('/policy/reward', {id: a.id, act, reward}).catch(() => {}); // the decision brain learns from it (REINFORCE)
+  pyOp('/policy/reward', {id: a.id, act, reward}); // the decision brain (Python) learns from it with REINFORCE
 }
 function reflect(a) {
   const st = a.start;
@@ -992,21 +969,14 @@ function decide(a) {
   if (canThink && webOn) opts.push(['learn', 0.5 + 0.9 * a.p.curiosity, 'I want to learn something new about the world']);
   if (canThink && due) opts.push(['kexam', 1.0 + 0.5 * a.p.diligence, `Let me test what I know about ${due}`]);
   opts.push(['wander', 0.3 * a.p.curiosity, "I wonder what's over there…"]);
-  if (PY.online) { // the decision brain in Python adds what it has learned from reward to the world's built-in instincts
-    const state = [a.energy, a.fun, a.social, a.p.diligence, a.p.curiosity, a.p.social, s ? 1 : 0, s ? a.conf : 0, Math.min(1, a.struggles / 5), Math.min(1, a.passed.length / 10),
-      a.wantsPaper ? 1 : 0, a.advice ? 1 : 0, Math.min(1, a.know.notes.length / 30), webReady() ? 1 : 0];
-    a.busy = true;
-    pyCall('/policy/act', {id: a.id, state, prior: Object.fromEntries(opts.map(o => [o[0], o[1] / 0.35]))}).then(r => {
-      a.why = Object.entries(r.probs).sort((x, y) => y[1] - x[1]); a.resid = r.resid;
-      choose(a, r.act, opts.find(o => o[0] === r.act)[2]);
-    }).catch(e => { pyDown(e); const o = opts[weightedPick(opts.map(o => Math.exp(o[1] / 0.35)))]; choose(a, o[0], o[2]); }).finally(() => { a.busy = false; });
-    return;
-  }
-  for (const o of opts) o[1] += 0.6 * a.taste[o[0]]; // learned likes and dislikes
-  const w = opts.map(o => Math.exp(o[1] / 0.35)), total = w.reduce((x, y) => x + y);
-  a.why = opts.map((o, i) => [o[0], w[i] / total]).sort((x, y) => y[1] - x[1]);
-  const i = weightedPick(w);
-  choose(a, opts[i][0], opts[i][2]);
+  // The decision brain (Python, PyTorch) adds what it has learned from reward to the world's built-in instincts.
+  const state = [a.energy, a.fun, a.social, a.p.diligence, a.p.curiosity, a.p.social, s ? 1 : 0, s ? a.conf : 0, Math.min(1, a.struggles / 5), Math.min(1, a.passed.length / 10),
+    a.wantsPaper ? 1 : 0, a.advice ? 1 : 0, Math.min(1, a.know.notes.length / 30), webReady() ? 1 : 0];
+  a.busy = true;
+  pyCall('/policy/act', {id: a.id, state, prior: Object.fromEntries(opts.map(o => [o[0], o[1] / 0.35]))}).then(r => {
+    a.why = Object.entries(r.probs).sort((x, y) => y[1] - x[1]); a.resid = r.resid;
+    choose(a, r.act, opts.find(o => o[0] === r.act)[2]);
+  }).catch(pyLost).finally(() => { a.busy = false; }); // if Python is away the student simply decides again once it is back
 }
 function live(a) {
   const doing = a.arrived ? a.act : 'walk';
@@ -1099,7 +1069,7 @@ function renderDashboard() {
   const cell = (a, i) => a.passed.includes(i) ? '<td class="ok">✓</td>' : a.skill === i ? `<td class="now">${pct(a.conf)}</td>` : '<td></td>';
   const short = n => esc(n.length > 13 ? n.slice(0, 12) + '…' : n);
   $('dashBody').innerHTML = `
-  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(FEATURES.length, `senses in the world (${invented.length} invented by AIs)`)}${card(SKILLS.filter(s => s.web).length, 'real datasets from the internet')}${card(`${tips.reduce((n, t) => n + t, 0)}/${tips.length}`, 'Professor tips that helped')}${card(llmCalls, `Gemma thoughts so far${llmPending ? ` · ${llmPending} waiting` : ''}`)}${card(PY.online ? 'PyTorch' : 'JavaScript', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'brain engine (Python not running)')}${card(MINDS.on ? 'ON' : 'OFF', `Gemma minds · ${MINDS.primes} head-starts given`)}${card(agents.reduce((n, a) => n + a.know.notes.length, 0), `notes in the students' notebooks (${new Set(agents.flatMap(a => a.know.notes.map(n => n.field))).size} fields)`)}</div>
+  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(FEATURES.length, `senses in the world (${invented.length} invented by AIs)`)}${card(SKILLS.filter(s => s.web).length, 'real datasets from the internet')}${card(`${tips.reduce((n, t) => n + t, 0)}/${tips.length}`, 'Professor tips that helped')}${card(llmCalls, `Gemma thoughts so far${llmPending ? ` · ${llmPending} waiting` : ''}`)}${card(PY.online ? 'PyTorch' : 'offline', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'Python brains not connected')}${card(MINDS.on ? 'ON' : 'OFF', `Gemma minds · ${MINDS.primes} head-starts given`)}${card(agents.reduce((n, a) => n + a.know.notes.length, 0), `notes in the students' notebooks (${new Set(agents.flatMap(a => a.know.notes.map(n => n.field))).size} fields)`)}</div>
   ${syllabusHtml()}
   <h3>Who has learned what</h3>
   <div class="scroll"><table class="matrix"><tr><th>AI</th>${SKILLS.map(s => `<th title="${esc(s.name)}">${s.web ? '🌐' : s.rule ? '🧩' : ''}${short(s.name)}</th>`).join('')}</tr>
@@ -1111,7 +1081,7 @@ function renderDashboard() {
     Learns by keeping a notebook: <b>${PROF.mem.notes.length}</b> notes from Wikipedia, <b>${tips.length}</b> tips tested<br>Also thinks for all ten students' minds<br>
     Recently studied: ${esc(PROF.mem.notes.slice(-6).map(n => n.topic).join(', ') || 'nothing yet')}</div>
   ${agents.map(a => { const fav = Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1])[0]; return `<div class="model"><b><span class="dot" style="background:${a.color}"></span>${a.name}</b>${a.firsts ? ` · ★${a.firsts} world firsts` : ''}<br>
-    Skill brain${PY.online ? ' (PyTorch)' : ''}: ${a.sizes.join('-')} neurons, <b>${connections(a)}</b> connections${MINDS.on && PROF.online ? ' · mind: Gemma' : ''}${PY.online && PY.info?.policy?.[a.id] ? ` · decision brain: ${PY.info.policy[a.id].updates} updates, avg reward ${PY.info.policy[a.id].reward}` : ''}<br>
+    Skill brain (PyTorch): ${a.sizes.join('-')} neurons, <b>${connections(a)}</b> connections${MINDS.on && PROF.online ? ' · mind: Gemma' : ''}${PY.online && PY.info?.policy?.[a.id] ? ` · decision brain: ${PY.info.policy[a.id].updates} updates, avg reward ${PY.info.policy[a.id].reward}` : ''}<br>
     Now: ${esc(doingText(a))}<br>Degrees (${a.passed.length}): ${esc(a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet')}<br>
     Senses: ${esc(a.feats.map(i => FEATURES[i].name).join(', '))}<br>
     Inventions: ${esc(FEATURES.filter(f => f.by === a.name).map(f => f.name).join(', ') || 'none yet')} · likes ${fav ? `${EMOJI[fav[0]]} ${fav[0]}` : '–'} · ${a.steps.toLocaleString()} lessons</div>`; }).join('')}</div>
@@ -1734,9 +1704,9 @@ $('map').onmousemove = e => {
 const actColor = v => v >= 0 ? `rgba(88,166,255,${0.15 + 0.85 * v})` : `rgba(255,123,114,${0.15 - 0.85 * v})`;
 const currentSkill = a => SKILLS[a.skill >= 0 ? a.skill : a.passed.at(-1) ?? 0];
 function drawBrain() {
-  const a = agents[selected], s = currentSkill(a), v = PY.online && PY.view?.id === a.id ? PY.view : null;
-  if (PY.online && !v) return; // waiting for Python's picture of this brain
-  const acts = v ? v.acts : forward(a, input(a, ...probe)), sizes = v ? v.sizes : a.sizes, feats = v ? v.feats : a.feats, Wt = v ? v.W : a.W, L = sizes.length;
+  const a = agents[selected], s = currentSkill(a), v = PY.view?.id === a.id ? PY.view : null;
+  if (!v) return; // waiting for Python's picture of this brain
+  const acts = v.acts, sizes = v.sizes, feats = v.feats, Wt = v.W, L = sizes.length;
   bctx.clearRect(0, 0, 410, 270);
   const pos = sizes.map((n, l) => { const gap = Math.min(22, 240 / n), x = 60 + l * (320 / (L - 1)); return Array.from({length: n}, (_, i) => [x, 135 + (i - (n - 1) / 2) * gap]); });
   for (let l = 0; l < L - 1; l++) for (let i = 0; i < sizes[l + 1]; i++) for (let j = 0; j < sizes[l]; j++) {
@@ -1758,7 +1728,7 @@ function drawBrain() {
   bctx.fillText('senses (inputs)', 4, 262); bctx.fillText('answer', 352, 262);
   const N = 40, cell = 200 / N;
   for (let gy = 0; gy < N; gy++) for (let gx = 0; gx < N; gx++) {
-    mctx.fillStyle = actColor((v ? v.grid[gy * N + gx] : predict(a, (gx + 0.5) / N * 2 - 1, 1 - (gy + 0.5) / N * 2)) * 2 - 1);
+    mctx.fillStyle = actColor(v.grid[gy * N + gx] * 2 - 1);
     mctx.fillRect(gx * cell, gy * cell, cell + 0.5, cell + 0.5);
   }
   for (const [x, y, t] of s.test.slice(0, s.web ? 300 : 150)) {
@@ -1784,7 +1754,7 @@ function updateUI() {
   $('wfCount').textContent = agents.reduce((n, a) => n + a.firsts, 0);
   $('papers').textContent = published.filter(Boolean).length - 2;
   const tips = PROF.mem.tips, helped = tips.reduce((n, t) => n + t, 0);
-  $('pyStat').textContent = PY.booting ? 'brains: starting PyTorch…' : PY.online ? 'brains: PyTorch' : 'brains: JavaScript';
+  $('pyStat').textContent = PY.online ? 'brains: PyTorch' : 'brains: OFFLINE';
   $('profStat').textContent = !PROF.online ? 'Prof. Gemma: offline' : `Prof. Gemma: ${PROF.busy ? 'thinking…' : 'online'} · ${helped}/${tips.length} tips helped`;
   const rate = arr => arr.length ? pct(arr.reduce((n, t) => n + t, 0) / arr.length) : '–';
   $('notebook').innerHTML = `<b>Track record</b>: ${helped} of ${tips.length} tips helped. First 10 tips: <b>${rate(tips.slice(0, 10))}</b> · latest 10: <b>${rate(tips.slice(-10))}</b>${tips.length >= 20 ? '' : ' (needs 20 tips to compare)'}<br>`
@@ -1836,10 +1806,9 @@ $('roster').onclick = e => { const tr = e.target.closest('tr'); if (tr) select(+
 news('The world is born. 10 baby AIs wake up in the Dormitory knowing only x and y.');
 wakeProfessor();
 loadKnowledge();
-pyBoot();
+pyConnect();
 setInterval(pyStudyTick, 100);
 setInterval(pyViewTick, 250);
-setInterval(() => { if (PY.online) fetch('/brain/info').then(r => r.json()).then(i => PY.info = i).catch(() => {}); }, 5000);
 // Ask a student a question: it answers only from its own notebook (shown as plain text, never HTML)
 $('askBtn').onclick = async () => {
   const a = agents[selected], question = $('askInput').value.trim().slice(0, 200);
@@ -1873,14 +1842,14 @@ Facts about the student:
   } catch (e) { $('profSays').textContent = `📡 Couldn't reach the Professor: ${e.message}`; }
   finally { PROF.busy = false; PROF.says = ''; }
 };
-window.sim = {QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, learnOnline, knowledgeExam, fieldsOf, recall, MINDS, PASS_STATS, FEATURES, mindPrime, inventSense, compileFormula, makeSense, linearAcc, renderDashboard, PROF, askProfessor, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); tickProfessor(); }, profStudy, makeAgent, train, input, predict, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
+window.sim = {QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, learnOnline, knowledgeExam, fieldsOf, recall, MINDS, PASS_STATS, FEATURES, mindPrime, inventSense, compileFormula, makeSense, linearAcc, renderDashboard, PROF, askProfessor, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); tickProfessor(); }, profStudy, makeAgent, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
 $('guide').showModal();
 let renders = 0;
 // The simulation runs on its own timer, not on the drawing loop, so the world keeps living when its window is minimized
 // (the launcher starts the browser with background throttling disabled). If drawing has stopped, avatars still walk.
 let lastDraw = 0, lastT = 0;
 setInterval(() => {
-  if (!paused && !PY.booting) { frame++; for (const a of agents) live(a); tickProfessor(); }
+  if (!paused && PY.online) { frame++; for (const a of agents) live(a); tickProfessor(); }
   if (performance.now() - lastDraw > 100) for (const a of agents) updateAvatar(a, performance.now());
 }, 1000 / 60);
 applyQuality();
