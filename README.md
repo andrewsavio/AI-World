@@ -14,7 +14,6 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
 [![three.js](https://img.shields.io/badge/three.js-WebGL-000000?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org)
-[![Ollama](https://img.shields.io/badge/Ollama-Gemma%202-111111?style=for-the-badge)](https://ollama.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-f59e0b?style=for-the-badge)](CONTRIBUTING.md)
 [![Netlify](https://img.shields.io/badge/Netlify-Ready-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://netlify.com)
@@ -35,7 +34,7 @@ They have **needs** — hunger, fun, friendships. They have **personalities** �
 
 Nobody tells them what to do.
 
-They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They invent new ways to sense the world. And each one thinks with a real local LLM (Gemma 2 via Ollama): it picks what to learn next, writes notes in its own notebook, and is quizzed on them.
+They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They create new puzzles and discover new ways to sense the world. And every one of them has two real neural networks that you can watch learn.
 
 Click on any student. Watch its neurons fire. Watch its weights shift. Watch it *think*.
 
@@ -45,11 +44,10 @@ Click on any student. Watch its neurons fire. Watch its weights shift. Watch it 
 
 | | Feature | Detail |
 |---|---|---|
-| 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation right in your browser session |
+| 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation while you watch |
 | 🎲 | **True free will** | Students have needs, personalities and learned preferences that drive every decision |
-| 🌐 | **Live internet access** | They search **Wikipedia**, test hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
-| 🎓 | **A real language mind** | A local **Gemma 2 2B** LLM lets each student choose topics, write notes and invent new input senses as math formulas |
-| 📜 | **A seven-level syllabus** | Students are **promoted** level by level, from straight lines to inventing new puzzles, plus an open curriculum of whatever they freely choose to learn ([details](docs/SYLLABUS.md)) |
+| 🌐 | **Live internet access** | They look up real places on **Wikipedia** and test their own hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
+| 📜 | **A seven-level syllabus** | Students are **promoted** level by level, from straight lines to creating new puzzles ([details](docs/SYLLABUS.md)) |
 | 🌅 | **Gorgeous on integrated graphics** | Day/night cycle, atmosphere, real interior shadows, auto-resolution scaling for 60 fps on iGPUs |
 
 <div align="center">
@@ -69,7 +67,7 @@ Each student carries **two brains** built from scratch in PyTorch:
 │  Trained by:  mini-batch SGD + backpropagation              │
 │  Task:        learn to separate blue dots from red dots      │
 │               on 2-D maps of growing complexity              │
-│  Superpower:  can grow new neurons · can invent new senses  │
+│  Superpower:  can grow new neurons · can discover new senses│
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐
@@ -80,7 +78,7 @@ Each student carries **two brains** built from scratch in PyTorch:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Gemma 2 2B** (via Ollama) is every student's shared mind: it reads Wikipedia, writes notes, sets quizzes, and invents new mathematical **input features** (validated by a tiny safe parser that never calls `eval`) that help students sense the world in new ways.
+There is no language model anywhere: every decision and every lesson comes from these small networks and the world's rewards. A student that gets stuck can grow neurons, read a paper another student published in the Library, or discover a new input **sense** (like x², radius or angle) and publish it for the others.
 
 ---
 
@@ -94,14 +92,10 @@ flowchart LR
     end
     subgraph Server["🐍 server.py  (Python stdlib HTTP)"]
         B["brain.py  ·  PyTorch<br/>skill brain · decision brain"]
-        N["Notebooks  ·  JSON on disk"]
     end
-    O["🦙 Ollama · Gemma 2<br/>Shared student minds"]
     I["🌐 Wikipedia · USGS · Open-Meteo<br/>(read-only GET)"]
 
     W <-->|"train · exam · act · reward"| B
-    W --> N
-    W <-->|"prompts"| O
     W -->|"GET only"| I
     UI --- W
 ```
@@ -110,10 +104,8 @@ flowchart LR
 |---|---|---|
 | **Skill brain** | PyTorch MLP · autograd · mini-batch SGD | Learns to separate blue / red dots; grows neurons; gains new senses |
 | **Decision brain** | PyTorch MLP · REINFORCE | Learns corrections to built-in instincts from world rewards |
-| **Student minds** | Gemma 2 2B via Ollama | Chooses topics · writes notes · sets exams · invents input formulas |
-| **Memory** | JSON notebooks + keyword RAG | Per-student knowledge (60-note cap → natural forgetting) |
 | **3D World** | three.js · instancing · merged meshes · canvas textures | Low-poly town · avatars · day/night · atmosphere |
-| **Server** | Python `http.server` · keep-alive · Origin checks | Serves the page · hosts brains · saves notebooks |
+| **Server** | Python `http.server` · keep-alive · Origin checks | Serves the page · hosts the brains |
 
 > Everything runs **entirely on your machine**. No cloud. No API keys. No telemetry.
 
@@ -124,7 +116,6 @@ flowchart LR
 ### Requirements
 
 - **Python 3.10+**
-- **[Ollama](https://ollama.com/download)** *(optional — world runs without it)*
 - A modern browser (Chrome / Edge recommended)
 
 ### Windows (30 seconds)
@@ -136,7 +127,7 @@ pip install -r requirements.txt
 start-world.bat
 ```
 
-The first run downloads **Gemma 2 2B** (~1.6 GB) through Ollama, then opens **http://localhost:8000** automatically.
+It opens **http://localhost:8000** automatically.
 
 ### macOS / Linux
 
@@ -144,13 +135,10 @@ The first run downloads **Gemma 2 2B** (~1.6 GB) through Ollama, then opens **ht
 git clone https://github.com/andrewsavio/AI-World.git
 cd AI-World
 pip install -r requirements.txt
-ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma   # once
 python server.py
 ```
 
 > **PyTorch is required.** The page has no brain of its own: if the Python server isn't running it pauses, shows a banner saying what to start, and reconnects by itself (even if Python restarts mid-run).
->
-> **Ollama is optional.** Without it the students have no language mind and no free-text learning, but the maths syllabus and the real-data experiments still work.
 
 ---
 
@@ -173,14 +161,11 @@ python server.py
 AI-World/
 ├── index.html              ← Entire front end: 3D world, simulation, UI
 │                             (single file, ES modules from CDN)
-├── brain.py                ← PyTorch brains + safe formula parser
+├── brain.py                ← PyTorch brains (skill brain + decision brain)
 │                             run `python brain.py` for the self-test
-├── server.py               ← HTTP server: static, /brain/*, /policy/*, notebooks
+├── server.py               ← HTTP server: static files, /brain/*, /policy/*
 ├── launcher.py             ← Windows tray-icon launcher
-├── export_dataset.py       ← Export student notes → fine-tuning JSONL
 ├── requirements.txt        ← torch  (that's the only pip dependency)
-├── models/
-│   └── Modelfile           ← Ollama model definition for Gemma
 ├── start-world.bat         ← Windows one-click launcher
 ├── start-world-background.bat
 └── docs/screenshots/       ← Images used in this README
@@ -206,17 +191,17 @@ Or drag-and-drop `index.html` into [app.netlify.com/drop](https://app.netlify.co
 
 ## 📜 The syllabus
 
-Students move up through **seven levels**. To be promoted, a student must pass every subject of its level, meet the extra requirement (if any) and have built enough knowledge. Then it advances to the next level, and so on.
+Students move up through **seven levels**. To be promoted, a student must pass every subject of its level and meet the extra requirement (if any). Then it advances to the next level, and so on.
 
-| Level | Name | Subjects | Also needed | Knowledge to leave |
-|---|---|---|---|---|
-| 1 | Foundations | Left vs Right · Top vs Bottom · Diagonal | | 2 notes |
-| 2 | Shapes | Stripe · Circle · Diamond | | 4 notes, 📘 Learner |
-| 3 | Curves & Logic | Ellipse · XOR · Waves | | 8 notes, 📘 Learner |
-| 4 | Patterns | Rings · Checkerboard | pass a real-data subject | 12 notes, 🎓 Expert |
-| 5 | Mastery | Flower · Spiral | | 16 notes, 🎓 Expert |
-| 6 | Invention | | create a puzzle or invent a sense | 20 notes, 🏆 Master of a field |
-| 7 | Open research | no gates | | |
+| Level | Name | Subjects | Also needed |
+|---|---|---|---|
+| 1 | Foundations | Left vs Right · Top vs Bottom · Diagonal | |
+| 2 | Shapes | Stripe · Circle · Diamond | |
+| 3 | Curves & Logic | Ellipse · XOR · Waves | |
+| 4 | Patterns | Rings · Checkerboard | pass a real-data subject |
+| 5 | Mastery | Flower · Spiral | |
+| 6 | Invention | | create a puzzle or discover a new sense |
+| 7 | Open research | no gates | |
 
 The order follows curriculum learning (easy before hard), the dataset order of TensorFlow Playground, UNESCO's education levels and Bloom's taxonomy. Read the reasoning and the references in **[docs/SYLLABUS.md](docs/SYLLABUS.md)**.
 
@@ -226,8 +211,7 @@ The order follows curriculum learning (easy before hard), the dataset order of T
 
 ```bash
 python brain.py
-# Runs: learning test · grow-neuron test · add-sense test
-#       formula parser (accepts maths, rejects arbitrary code) · policy learning
+# Runs: learning test · grow-neuron test · add-sense test · policy (reward) learning
 ```
 
 No test framework yet — adding `pytest` is a great first contribution.
@@ -239,25 +223,23 @@ No test framework yet — adding `pytest` is a great first contribution.
 All contributions welcome — from fixing a typo to adding a whole new kind of student. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, conventions and the review checklist.
 
 **Good first issues**
-- 🧪 Add `pytest` tests for `brain.py` (parser edge cases, grow/add-sense, policy learning)
+- 🧪 Add `pytest` tests for `brain.py` (grow / add-sense, policy learning)
 - 💾 Persist student network weights so they survive a restart
-- 🔎 Replace keyword retrieval with embeddings (`nomic-embed-text` via Ollama) and measure the difference
 - 🍎 macOS / Linux launcher scripts (`start-world.sh`)
 - ♿ Keyboard navigation and screen-reader labels for the dashboard
 
 **Bigger ideas**
 - 🖥️ Headless mode — run the simulation server-side so the world lives 24/7 with no browser
-- 🔬 LoRA fine-tuning of Gemma on `export_dataset.py` output, then compare exam scores before/after
+- 📚 A text-knowledge track that needs no language model (extractive notes from Wikipedia plus fill-in-the-blank quizzes)
 - 🧬 Richer task environments (grid worlds, simple games) beyond blue/red dots
-- 📈 CSV logging + plots (does the Gemma mind really save lessons?)
+- 📈 CSV logging + plots (does the decision brain really learn? how many lessons does each level take?)
 - 🗣️ Student-to-student teaching and peer conversation
 
 ---
 
 ## 🛡️ Safety
 
-- **Read-only internet.** Students make HTTPS GET requests only — to Wikipedia, USGS and Open-Meteo. They never post, sign up, send messages or buy anything. Nothing about you is sent anywhere.
-- **Safe formula engine.** Invented formulas go through a parser that understands only numbers, variables (`x y r a pi`), arithmetic and a short allowlist of maths functions. `eval` is never called.
+- **Read-only internet.** Students make HTTPS GET requests only — to Wikipedia (to look up places), USGS and Open-Meteo. They never post, sign up, send messages or buy anything. Nothing about you is sent anywhere.
 - **Local server only.** The server listens on `127.0.0.1`. Write requests are accepted only from the world's own page (Origin check).
 - **No telemetry.** Not a byte of usage data leaves your machine.
 
@@ -268,16 +250,13 @@ All contributions welcome — from fixing a typo to adding a whole new kind of s
 Built with love by **[Andrew Savio](https://github.com/andrewsavio)**.
 
 Standing on the shoulders of:
-[three.js](https://threejs.org) · [PyTorch](https://pytorch.org) · [Ollama](https://ollama.com) · [Gemma](https://ai.google.dev/gemma) · [Wikipedia](https://wikipedia.org) · [USGS Earthquake Hazards](https://earthquake.usgs.gov) · [Open-Meteo](https://open-meteo.com)
-
-**Gemma** is a model by Google, used under the [Gemma Terms of Use](models/GEMMA_TERMS.txt). Model weights are **not** included in this repository.
+[three.js](https://threejs.org) · [PyTorch](https://pytorch.org) · [Wikipedia](https://wikipedia.org) · [USGS Earthquake Hazards](https://earthquake.usgs.gov) · [Open-Meteo](https://open-meteo.com)
 
 ---
 
 ## 📄 License
 
 Code: **[MIT](LICENSE)**
-Gemma weights: governed by [Google's Gemma Terms of Use](models/GEMMA_TERMS.txt).
 
 ---
 

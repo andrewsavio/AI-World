@@ -1,6 +1,6 @@
 # Contributing to AI World
 
-Thanks for helping! This project is meant to be **readable and hackable**: a good place to learn how neural networks, reinforcement learning, retrieval and a 3D front end fit together.
+Thanks for helping! This project is meant to be **readable and hackable**: a good place to learn how neural networks, reinforcement learning and a 3D front end fit together.
 
 ## Set up
 
@@ -12,8 +12,6 @@ python brain.py                     # self-test, should print "brain self-test p
 python server.py                    # http://localhost:8000
 ```
 
-For the student minds, install [Ollama](https://ollama.com) and run `ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma`. Everything except those features works without it.
-
 ## How the code is organised
 
 - **`index.html`** holds the simulation and the 3D world. Search for the section banners (`// =====`) to jump around. State lives in plain objects (`agents`, `SKILLS`, `FEATURES`); there is no build step and no framework.
@@ -24,20 +22,20 @@ For the student minds, install [Ollama](https://ollama.com) and run `ollama pull
 
 1. **Keep it light.** The target is integrated graphics. Prefer instancing and merged meshes, avoid per-frame allocations, and test with `Quality: Low`.
 2. **Keep the students' internet read-only.** No posting, accounts, purchases or anything that sends user data.
-3. **Treat model output and web text as untrusted.** Render it with `esc()` (plain text), never as HTML, and never `eval` it. New formula functions go in `FN` in *both* `brain.py` and `index.html`.
+3. **Treat web data as untrusted.** Render text from the internet with `esc()` (plain text), never as HTML, and never `eval` it.
 4. **Explain the ML.** This is a learning project. Short comments that say *why* (not what) are valued, and the in-app guide (`#guide`) should stay accurate.
 5. **Small, focused PRs** with a clear description and, for visible changes, a screenshot.
 
 ## Before you open a pull request
 
 - [ ] `python brain.py` passes
-- [ ] The page loads with no console errors, with and without Ollama running
+- [ ] The page loads with no console errors
 - [ ] Syntax check the page script if you edited it (`node --check` on the contents of the `<script type="module">` block works)
-- [ ] You did not commit model weights, `students-memory*.json` or `training-data.jsonl` (they are git-ignored)
+- [ ] You did not commit large files or local data (see `.gitignore`)
 
 ## Commit messages
 
-Short imperative subject ("Add embedding retrieval"), then a few lines on *why*.
+Short imperative subject ("Add a Level 8"), then a few lines on *why*.
 
 ## Ideas
 

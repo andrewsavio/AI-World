@@ -29,110 +29,6 @@ SENSES = [  # same order as FEATURES in index.html
     ('radius', lambda x, y: torch.hypot(x, y)), ('angle', lambda x, y: torch.atan2(y, x) / math.pi)]
 N_BASE = len(SENSES)
 
-# Invented senses arrive as formula text. This tiny parser only knows numbers, x y r a pi, + - * / % ^ ( ) and a short list
-# of maths functions, so a formula can never run code. (Same grammar as the parser in index.html.)
-FN = {'sin': torch.sin, 'cos': torch.cos, 'tan': torch.tan, 'abs': torch.abs, 'sqrt': lambda v: torch.sqrt(v.abs()), 'tanh': torch.tanh,
-      'exp': lambda v: torch.exp(v.clamp(max=10)), 'floor': torch.floor, 'sign': torch.sign}
-
-
-def _mod(p, q):
-    return torch.where(q == 0, torch.zeros_like(p), ((p % q) + q) % q)
-
-
-def _div(p, q):
-    return torch.where(q == 0, torch.zeros_like(p), p / torch.where(q == 0, torch.ones_like(q), q))
-
-
-def compile_formula(src):
-    import re
-    src = re.sub(r'\s+', '', str(src).lower()).replace('π', 'pi')
-    toks = re.findall(r'\d*\.?\d+|[a-z]+|[-+*/%^(),]', src)
-    if not src or ''.join(toks) != src:
-        raise ValueError("it uses symbols I can't read")
-    pos = 0
-
-    def peek():
-        return toks[pos] if pos < len(toks) else None
-
-    def take():
-        nonlocal pos
-        pos += 1
-        return toks[pos - 1] if pos <= len(toks) else None
-
-    def expr():
-        f = term()
-        while peek() in ('+', '-'):
-            op, l, r = take(), f, term()
-            f = (lambda l, r: lambda v: l(v) + r(v))(l, r) if op == '+' else (lambda l, r: lambda v: l(v) - r(v))(l, r)
-        return f
-
-    def term():
-        f = unary()
-        while peek() in ('*', '/', '%'):
-            op, l, r = take(), f, unary()
-            f = {'*': lambda l, r: lambda v: l(v) * r(v), '/': lambda l, r: lambda v: _div(l(v), r(v)), '%': lambda l, r: lambda v: _mod(l(v), r(v))}[op](l, r)
-        return f
-
-    def unary():
-        if peek() == '-':
-            take()
-            f = unary()
-            return lambda v: -f(v)
-        if peek() == '+':
-            take()
-        return power()
-
-    def power():
-        b = atom()
-        if peek() != '^':
-            return b
-        take()
-        e = unary()
-        return lambda v: torch.pow(b(v), e(v))
-
-    def atom():
-        t = take()
-        if t is None:
-            raise ValueError('the formula ends too early')
-        if t == '(':
-            f = expr()
-            if take() != ')':
-                raise ValueError('expected ")"')
-            return f
-        if re.fullmatch(r'\d*\.?\d+', t):
-            return lambda v, n=float(t): torch.full_like(v['x'], n)
-        if t in ('x', 'y', 'r', 'a'):
-            return lambda v, k=t: v[k]
-        if t == 'pi':
-            return lambda v: torch.full_like(v['x'], math.pi)
-        if t in FN or t in ('min', 'max', 'mod'):
-            if take() != '(':
-                raise ValueError('expected "("')
-            args = [expr()]
-            while peek() == ',':
-                take()
-                args.append(expr())
-            if take() != ')':
-                raise ValueError('expected ")"')
-            if t == 'mod':
-                return lambda v: _mod(args[0](v), args[1](v))
-            if t in ('min', 'max'):
-                fn = torch.minimum if t == 'min' else torch.maximum
-                def reduce(v):
-                    out = args[0](v)
-                    for g in args[1:]:
-                        out = fn(out, g(v))
-                    return out
-                return reduce
-            return lambda v: FN[t](args[0](v))
-        raise ValueError(f'it uses the unknown word "{t}"')
-
-    f = expr()
-    if pos != len(toks):
-        raise ValueError(f'unexpected "{toks[pos]}"')
-    return f
-
-
 class World:
     """Everything shared by all brains: the senses, the subjects (datasets) and cached feature columns."""
 
@@ -142,16 +38,6 @@ class World:
         self.cache = {}    # (skill id | 'grid', sense index, split) -> column
         centres = (torch.arange(GRID) + 0.5) / GRID * 2          # cell centres, 0..2
         self.grid = (centres.repeat(GRID) - 1, 1 - centres.repeat_interleave(GRID))  # row 0 is the top of the map (y = 1)
-
-    def add_formula(self, name, expr, mean, sd):
-        f = compile_formula(expr)  # raises ValueError for anything that isn't plain maths
-
-        def sense(x, y):
-            raw = f({'x': x, 'y': y, 'r': torch.hypot(x, y), 'a': torch.atan2(y, x) / math.pi})
-            v = (torch.nan_to_num(raw, nan=0.0, posinf=0.0, neginf=0.0) - mean) / (sd or 1.0)
-            return v.clamp(-3, 3)
-        self.senses.append((name, sense))
-        return len(self.senses) - 1
 
     def column(self, key, fi, xy):
         k = (key, fi)
@@ -252,7 +138,7 @@ class Brain:
                 'grid': [round(v, 3) for v in grid.tolist()], 'lessons': self.lessons, 'params': sum(p.numel() for p in self.params())}
 
 
-ACTIONS = ['study', 'sleep', 'play', 'chat', 'read', 'exam', 'wander', 'browse', 'create', 'invent', 'learn', 'kexam']
+ACTIONS = ['study', 'sleep', 'play', 'chat', 'read', 'exam', 'wander', 'browse', 'create']
 N_STATE = 14
 
 
@@ -319,8 +205,6 @@ def handle(path, data):
             for s in data['skills']:
                 W.set_skill(s['id'], s['train'], s['test'])
             return {'ok': True}
-        if path == '/brain/sense':
-            return {'index': W.add_formula(str(data['name'])[:30], data['expr'], float(data['mean']), float(data['sd']))}
         if path == '/brain/add_sense':
             BRAINS[data['id']].add_sense(int(data['fi']))
             return {'ok': True}
@@ -371,18 +255,7 @@ def _selftest():
     v = handle('/brain/view', {'id': 0, 'skill': 0, 'px': 0.1, 'py': 0.2})
     assert v['sizes'] == [3, 7, 4, 1] and len(v['grid']) == GRID * GRID and len(v['W'][0][0]) == 3
     assert handle('/brain/exam', {'id': 0, 'skill': 0})['acc'] > 0.8, 'growing a neuron broke the brain'
-    # 3. the formula parser: right answers, and it refuses anything that is not maths
-    x, y = torch.tensor([0.5]), torch.tensor([-0.25])
-    v = {'x': x, 'y': y, 'r': torch.hypot(x, y), 'a': torch.atan2(y, x) / math.pi}
-    for src, want in [('x^2 - y^2', 0.1875), ('-x^2', -0.25), ('2^3^2', 512.0), ('3*-x', -1.5), ('max(x, y, 0.1)', 0.5), ('x/0', 0.0), ('mod(7, 3)', 1.0), ('sin(9*r)', math.sin(9 * v['r'].item()))]:
-        assert abs(compile_formula(src)(v).item() - want) < 1e-5, src
-    for bad in ['__import__("os")', 'x;y', '2x', 'open(1)', 'sin(', '']:
-        try:
-            compile_formula(bad)
-            raise AssertionError(f'accepted {bad!r}')
-        except ValueError:
-            pass
-    # 4. the decision brain learns from reward: rewarding "play" and punishing "study" shifts its choices
+    # 3. the decision brain learns from reward: rewarding "play" and punishing "study" shifts its choices
     p = POLICIES[0]
     state, prior = [0.5] * N_STATE, {'study': 0.0, 'play': 0.0, 'sleep': 0.0}
     p0 = p.act(state, prior)['probs']['play']

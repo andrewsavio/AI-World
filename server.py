@@ -1,10 +1,10 @@
 """AI World server.
 
-Serves the world on http://localhost:8000 (Ollama only talks to pages served from localhost), keeps the
-students' notebooks (students-memory.json) because a web page can't write files by itself, and hosts the students' neural
-brains (brain.py, PyTorch). Local-first: it listens on this computer only (127.0.0.1) and accepts writes only from its own page.
+Serves the world on http://localhost:8000 and hosts the students' neural brains (brain.py, PyTorch).
+Local-first: it listens on this computer only (127.0.0.1) and accepts writes only from its own page.
 To let a copy of the page hosted elsewhere talk to a server you run, set AIWORLD_ORIGINS=https://your-site (comma separated)
 and, if it must be reachable from other machines, AIWORLD_HOST=0.0.0.0. There is one world per server, so it is meant for one viewer.
+Python standard library only (plus PyTorch inside brain.py).
 """
 import json
 import os
@@ -16,7 +16,6 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 ROOT = pathlib.Path(__file__).parent
-NOTEBOOKS = {'/memory/students': ROOT / 'students-memory.json'}
 HOST = os.environ.get('AIWORLD_HOST', '127.0.0.1')
 ALLOWED = {'http://localhost:8000', 'http://127.0.0.1:8000', *filter(None, os.environ.get('AIWORLD_ORIGINS', '').split(','))}
 MAX_BYTES = 5_000_000
@@ -29,7 +28,7 @@ def load_brain():
     try:
         import brain as module
         brain = module
-    except Exception as e:  # PyTorch missing: the world falls back to the brains written in JavaScript
+    except Exception as e:  # PyTorch missing: the page shows a banner explaining what to install
         BRAIN_ERROR = str(e)
 
 
@@ -53,9 +52,6 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.reply(200, json.dumps(brain.handle('/brain/view', {'id': int(q['id']), 'skill': int(q['skill']), 'px': q['px'], 'py': q['py']})).encode())
             except (KeyError, ValueError):
                 return self.reply(404, b'{"error": "unknown brain"}')
-        if self.path in NOTEBOOKS:
-            file = NOTEBOOKS[self.path]
-            return self.reply(200, file.read_bytes() if file.exists() else b'{}')
         super().do_GET()
 
     def do_POST(self):
@@ -77,21 +73,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.reply(200, json.dumps(brain.handle(self.path, json.loads(self.rfile.read(size)))).encode())
             except (KeyError, ValueError, IndexError, TypeError) as e:
                 return self.reply(400, json.dumps({'error': f'{type(e).__name__}: {e}'}).encode())
-        if self.path not in NOTEBOOKS:
-            return self.reply(404, b'{"error": "not found"}')
-        size = int(self.headers.get('Content-Length', 0))
-        if size > MAX_BYTES:
-            return self.reply(413, b'{"error": "notebook too big"}')
-        body = self.rfile.read(size)
-        try:
-            json.loads(body)
-        except ValueError:
-            return self.reply(400, b'{"error": "not JSON"}')
-        file = NOTEBOOKS[self.path]
-        tmp = file.with_suffix('.tmp')  # write-then-rename so a crash never leaves half a notebook
-        tmp.write_bytes(body)
-        tmp.replace(file)
-        self.reply(200, b'{"ok": true}')
+        self.reply(404, b'{"error": "not found"}')
 
     def reply(self, code, body):
         self.send_response(code)
@@ -106,7 +88,7 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def log_message(self, fmt, *args):
-        if sys.stderr is not None and '/memory' not in self.path:  # under pythonw (background) there is no console to log to
+        if sys.stderr is not None and '/brain/' not in self.path and '/policy/' not in self.path:  # under pythonw there is no console to log to
             super().log_message(fmt, *args)
 
 
