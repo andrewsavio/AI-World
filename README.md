@@ -1,81 +1,104 @@
 <div align="center">
 
-# 🌍 AI World
+<pre>
+ █████╗ ██╗    ██╗    ██╗    ██╗ ██████╗ ██████╗ ██╗     ██████╗
+██╔══██╗██║    ██║    ██║    ██║██╔═══██╗██╔══██╗██║     ██╔══██╗
+███████║██║    ██║    ██║ █╗ ██║██║   ██║██████╔╝██║     ██║  ██║
+██╔══██║██║    ██║    ██║███╗██║██║   ██║██╔══██╗██║     ██║  ██║
+██║  ██║██║    ██║    ╚███╔███╔╝╚██████╔╝██║  ██║███████╗██████╔╝
+╚═╝  ╚═╝╚═╝    ╚═╝     ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═════╝
+</pre>
 
-### A living 3D world where tiny neural networks go to school, make their own choices, search the internet, and invent things.
+### *A living, breathing 3D planet where tiny neural networks go to school, fall in love with curiosity, and learn to think — one synapse at a time.*
 
-**You watch every neuron learn.** A local LLM acts as their professor.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
+[![three.js](https://img.shields.io/badge/three.js-WebGL-000000?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org)
+[![Ollama](https://img.shields.io/badge/Ollama-Gemma%202-111111?style=for-the-badge)](https://ollama.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-f59e0b?style=for-the-badge)](CONTRIBUTING.md)
+[![Netlify](https://img.shields.io/badge/Netlify-Ready-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://netlify.com)
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white)
-![three.js](https://img.shields.io/badge/three.js-WebGL-000000?logo=threedotjs&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Gemma%202-111111)
-![License](https://img.shields.io/badge/license-MIT-green)
-![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+<img src="docs/screenshots/world-overview.jpg" alt="The AI World — a low-poly planet seen from orbit" width="820">
 
-<img src="docs/screenshots/world-overview.jpg" alt="The AI World town seen from space" width="760">
+> **You are not playing a game. You are watching real machine learning happen — live, in 3D, in your browser.**
 
 </div>
 
 ---
 
-## ✨ What is this?
+## 🌍 The Story
 
-AI World is a teaching toy and a research playground in one. Ten small AI "students" live on a low-poly planet with a school, university, research institute, library, exam hall, dormitory, internet lab and park. Nobody tells them what to do.
+Somewhere on a tiny low-poly planet, ten artificial minds just woke up.
 
-- 🧠 **Real neural networks you can read.** Each student has a *skill brain* (a few dozen connections, trained with backpropagation in **PyTorch**) and a *decision brain* that learns what to do next from the world's rewards (**REINFORCE**, a policy-gradient method). Click a student and watch its weights, neuron activity and its map of guesses change as it learns.
-- 🎲 **Free will.** Students have needs (energy, fun, friends), personalities and learned likes. They choose whether to study, sleep, play, explore, take exams, go online or invent puzzles. Click one to see *why* it chose what it did.
-- 🌐 **Real internet, read-only.** In the Internet Lab they pick their own topics, search Wikipedia, read, write notes in their own notebook and are quizzed on those notes. They also test their own hypotheses on real USGS earthquake and Open-Meteo weather data.
-- 🎓 **Professor Gemma.** A local LLM ([Gemma 2](https://ai.google.dev/gemma), through [Ollama](https://ollama.com)) mentors stuck students, studies Wikipedia in its free time, keeps a notebook of which tips actually helped, and lends each student a "Gemma mind" that can invent new input features as maths formulas (validated by a safe formula parser before use).
-- 📜 **A syllabus you can read.** A fixed classroom curriculum (lines, circles, XOR, spirals…) plus an *open curriculum* that records whatever the students freely choose to learn.
-- 🌅 **Looks good on integrated graphics.** Day/night cycle, atmosphere, real shadows when you look inside a building, and automatic resolution scaling that keeps it near 60 fps on Intel iGPUs.
+They have **needs** — hunger, fun, friendships. They have **personalities** — some are bold risk-takers, some are cautious scholars. They have a **school**, a **university**, a **research institute**, a **library**, an **exam hall**, a **dormitory**, an **internet lab** and a **park**.
+
+Nobody tells them what to do.
+
+They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They invent new ways to sense the world. And they are mentored by a real local LLM — **Professor Gemma** — who keeps notes on what advice actually helped, just like a good teacher.
+
+Click on any student. Watch its neurons fire. Watch its weights shift. Watch it *think*.
+
+---
+
+## ✨ What Makes This Different
+
+| | Feature | Detail |
+|---|---|---|
+| 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation right in your browser session |
+| 🎲 | **True free will** | Students have needs, personalities and learned preferences that drive every decision |
+| 🌐 | **Live internet access** | They search **Wikipedia**, test hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
+| 🎓 | **A real professor** | A local **Gemma 2 2B** LLM mentors stuck students, invents new input senses as math formulas |
+| 📜 | **A readable curriculum** | A fixed school syllabus **plus** an open curriculum that grows with whatever students freely choose |
+| 🌅 | **Gorgeous on integrated graphics** | Day/night cycle, atmosphere, real interior shadows, auto-resolution scaling for 60 fps on iGPUs |
 
 <div align="center">
-<img src="docs/screenshots/inside-library-sunset.jpg" alt="Inside the Paper Library at sunset" width="49%">
-<img src="docs/screenshots/syllabus.jpg" alt="The syllabus view" width="49%">
+<img src="docs/screenshots/inside-library-sunset.jpg" alt="Inside the library at golden hour" width="49%">
+<img src="docs/screenshots/syllabus.jpg" alt="The live curriculum board" width="49%">
 </div>
 
-## 🚀 Quick start (Windows)
+---
 
-You need **Python 3.10+**, **[Ollama](https://ollama.com/download)** and a modern browser (Edge or Chrome).
+## 🧬 The Science Inside
 
-```bash
-git clone https://github.com/andrewsavio/AI-World.git
-cd AI-World
-pip install -r requirements.txt
-start-world.bat            # or: start-world-background.bat  (tray icon, keeps running)
+Each student carries **two brains** built from scratch in PyTorch:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  SKILL BRAIN  (a few dozen connections)                     │
+│  Trained by:  mini-batch SGD + backpropagation              │
+│  Task:        learn to separate blue dots from red dots      │
+│               on 2-D maps of growing complexity              │
+│  Superpower:  can grow new neurons · can invent new senses  │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  DECISION BRAIN  (policy network)                           │
+│  Trained by:  REINFORCE (policy-gradient RL)                │
+│  Task:        learn which activity maximises long-term      │
+│               wellbeing from world rewards                  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-The first run downloads Gemma 2 (2B, about 1.6 GB) through Ollama. Then open **http://localhost:8000** (it opens automatically).
+**Professor Gemma** (Gemma 2 2B via Ollama) runs alongside them, reading Wikipedia in its free time, advising stuck students, and inventing new mathematical **input features** (validated by a tiny safe parser that never calls `eval`) that help students sense the world in new ways.
 
-> **No Ollama or no PyTorch?** The world still runs. Without PyTorch the students use built-in JavaScript brains. Without Ollama there is no Professor and no free-text learning, but the maths curriculum and the real-data experiments work.
->
-> **macOS / Linux:** `python server.py` does everything except the `.bat` helpers. Run `ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma` once.
+---
 
-### Controls
-| Action | How |
-|---|---|
-| Rotate / zoom | drag / scroll |
-| Look inside a building | click it, or use the buttons under the 3D view |
-| Read a student's mind | click the student, or its row in the table |
-| 📜 Syllabus · 📊 Dashboard | header buttons |
-| Quality | `Auto` (recommended), `High`, `Low` menu in the 3D view |
-| Stop everything | ⏹ **Stop world** button, or the tray icon in background mode |
-
-## 🧩 How it works
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
-    subgraph Browser["🖥️ Browser (index.html, three.js)"]
-        W["3D world + simulation<br/>needs · personality · activities"]
-        UI["Dashboard · syllabus · brain viewer"]
+    subgraph Browser["🖥️ Browser  ·  index.html + three.js"]
+        W["3D World + Simulation<br/>needs · personality · activities"]
+        UI["Dashboard · Syllabus · Brain Viewer"]
     end
-    subgraph Server["🐍 server.py (stdlib HTTP)"]
-        B["brain.py (PyTorch)<br/>skill brain · decision brain"]
-        N["Notebooks (JSON on disk)"]
+    subgraph Server["🐍 server.py  (Python stdlib HTTP)"]
+        B["brain.py  ·  PyTorch<br/>skill brain · decision brain"]
+        N["Notebooks  ·  JSON on disk"]
     end
     O["🦙 Ollama · Gemma 2<br/>Professor + student minds"]
-    I["🌐 Wikipedia · USGS · Open-Meteo<br/>(read-only)"]
+    I["🌐 Wikipedia · USGS · Open-Meteo<br/>(read-only GET)"]
+
     W <-->|"train · exam · act · reward"| B
     W --> N
     W <-->|"prompts"| O
@@ -83,69 +106,165 @@ flowchart LR
     UI --- W
 ```
 
-| Layer | Technology | Role |
+| Layer | Technology | What it does |
 |---|---|---|
-| Skill brain | **PyTorch** MLP, autograd, mini-batch SGD | learns to separate blue and red dots; can grow neurons and gain senses |
-| Decision brain | **PyTorch** MLP + **REINFORCE** | learns a correction to the built-in instincts from reward |
-| Student/Professor minds | **Gemma 2 2B** via Ollama | choose topics, write notes, set exams, invent senses |
-| Memory | JSON notebooks + keyword retrieval (RAG) | what each student knows (60-note cap = forgetting) |
-| World | **three.js**, instancing, merged meshes, canvas textures | 3D town, avatars, day/night |
-| Server | Python `http.server` (keep-alive, Origin checks) | serves the page, hosts the brains, saves notebooks |
+| **Skill brain** | PyTorch MLP · autograd · mini-batch SGD | Learns to separate blue / red dots; grows neurons; gains new senses |
+| **Decision brain** | PyTorch MLP · REINFORCE | Learns corrections to built-in instincts from world rewards |
+| **Professor / minds** | Gemma 2 2B via Ollama | Chooses topics · writes notes · sets exams · invents input formulas |
+| **Memory** | JSON notebooks + keyword RAG | Per-student knowledge (60-note cap → natural forgetting) |
+| **3D World** | three.js · instancing · merged meshes · canvas textures | Low-poly town · avatars · day/night · atmosphere |
+| **Server** | Python `http.server` · keep-alive · Origin checks | Serves the page · hosts brains · saves notebooks |
 
-Everything runs on your machine. No cloud, no API keys.
+> Everything runs **entirely on your machine**. No cloud. No API keys. No telemetry.
 
-## 🗂️ Repository layout
+---
+
+## 🚀 Quick Start
+
+### Requirements
+
+- **Python 3.10+**
+- **[Ollama](https://ollama.com/download)** *(optional — world runs without it)*
+- A modern browser (Chrome / Edge recommended)
+
+### Windows (30 seconds)
+
+```bash
+git clone https://github.com/andrewsavio/AI-World.git
+cd AI-World
+pip install -r requirements.txt
+start-world.bat
+```
+
+The first run downloads **Gemma 2 2B** (~1.6 GB) through Ollama, then opens **http://localhost:8000** automatically.
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/andrewsavio/AI-World.git
+cd AI-World
+pip install -r requirements.txt
+ollama pull gemma2:2b && ollama cp gemma2:2b aiworld-gemma   # once
+python server.py
+```
+
+> **No Ollama?** No problem. The simulation runs in pure JavaScript. Students still learn, still explore, still take exams — they just don't have a Professor.
+>
+> **No PyTorch?** Students fall back to built-in JS brains. The 3D world, curriculum, and real-data experiments all still work.
+
+---
+
+## 🎮 Controls
+
+| Action | How |
+|---|---|
+| 🌍 Rotate / zoom | drag · scroll |
+| 🏛️ Look inside a building | click it, or use the camera buttons under the view |
+| 🧠 Read a student's mind | click the student avatar, or its row in the table |
+| 📜 Syllabus / 📊 Dashboard | header buttons |
+| 🎨 Quality | `Auto` (recommended) · `High` · `Low` — menu in the 3D view |
+| ⏹️ Stop everything | **Stop world** button, or the tray icon in background mode |
+
+---
+
+## 🗂️ Repository Layout
 
 ```
-index.html              the whole front end: 3D world, simulation, UI (one file, ES modules from a CDN)
-brain.py                PyTorch brains + safe formula parser. `python brain.py` runs the self-test
-server.py               HTTP server: static files, /brain/* and /policy/* API, notebooks, shutdown
-launcher.py             tray-icon launcher (Open dashboard / Stop world)
-export_dataset.py       turns the students' notes and quizzes into fine-tuning data (JSONL)
-models/Modelfile        how Ollama should load the bundled Gemma weights (optional)
-start-world*.bat        Windows helpers
-docs/screenshots/       images used in this README
+AI-World/
+├── index.html              ← Entire front end: 3D world, simulation, UI
+│                             (single file, ES modules from CDN)
+├── brain.py                ← PyTorch brains + safe formula parser
+│                             run `python brain.py` for the self-test
+├── server.py               ← HTTP server: static, /brain/*, /policy/*, notebooks
+├── launcher.py             ← Windows tray-icon launcher
+├── export_dataset.py       ← Export student notes → fine-tuning JSONL
+├── requirements.txt        ← torch  (that's the only pip dependency)
+├── models/
+│   └── Modelfile           ← Ollama model definition for Gemma
+├── start-world.bat         ← Windows one-click launcher
+├── start-world-background.bat
+└── docs/screenshots/       ← Images used in this README
 ```
+
+---
+
+## 🌐 Netlify / Static Hosting
+
+The front end is a **single self-contained `index.html`** that loads three.js from a CDN. It works perfectly as a read-only demo on any static host.
+
+> **Note:** Without the Python `server.py` running locally, the PyTorch training endpoints (`/brain/*`, `/policy/*`) are unavailable. Students automatically fall back to pure-JS brains — all 3D, animation and curriculum features still work.
+
+**Deploy to Netlify in one click:**
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/andrewsavio/AI-World)
+
+Or drag-and-drop `index.html` into [app.netlify.com/drop](https://app.netlify.com/drop).
+
+---
 
 ## 🧪 Testing
 
 ```bash
-python brain.py          # self-test: learning, growing, formula parser (rejects non-maths), reward learning
+python brain.py
+# Runs: learning test · grow-neuron test · add-sense test
+#       formula parser (accepts maths, rejects arbitrary code) · policy learning
 ```
 
-There is no test framework yet. Adding one is a great first contribution (see below).
+No test framework yet — adding `pytest` is a great first contribution.
+
+---
 
 ## 🤝 Contributing
 
-Contributions of every size are welcome, from fixing a typo to adding a whole new kind of student. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, conventions and the review checklist.
+All contributions welcome — from fixing a typo to adding a whole new kind of student. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for setup, conventions and the review checklist.
 
 **Good first issues**
 - 🧪 Add `pytest` tests for `brain.py` (parser edge cases, grow/add-sense, policy learning)
-- 💾 Save and load the students' network weights so they survive a restart
+- 💾 Persist student network weights so they survive a restart
 - 🔎 Replace keyword retrieval with embeddings (`nomic-embed-text` via Ollama) and measure the difference
-- 🍎 macOS/Linux launcher scripts (`start-world.sh`)
+- 🍎 macOS / Linux launcher scripts (`start-world.sh`)
 - ♿ Keyboard navigation and screen-reader labels for the dashboard
 
 **Bigger ideas**
-- 🖥️ Headless mode: run the simulation on the server so the world lives 24/7 with no browser open
-- 🔬 LoRA fine-tuning of Gemma on `export_dataset.py` output, then compare exam scores before and after
-- 🧬 Replace the blue/red-dot tasks with richer environments (grid worlds, simple games)
-- 📈 Log every experiment to CSV and add plots (does the Gemma mind really save lessons?)
-- 🗣️ Student-to-student teaching and conversation
+- 🖥️ Headless mode — run the simulation server-side so the world lives 24/7 with no browser
+- 🔬 LoRA fine-tuning of Gemma on `export_dataset.py` output, then compare exam scores before/after
+- 🧬 Richer task environments (grid worlds, simple games) beyond blue/red dots
+- 📈 CSV logging + plots (does the Gemma mind really save lessons?)
+- 🗣️ Student-to-student teaching and peer conversation
 
-## 🛡️ Safety notes
+---
 
-- The students' internet access is **read-only on purpose**: HTTPS GET requests to Wikipedia, USGS and Open-Meteo. They never post, sign up, send messages or buy anything, and nothing about you is sent.
-- Text from the internet and from the LLM is shown as plain text (escaped), never as HTML.
-- Invented formulas go through a small parser that understands only numbers, `x y r a pi`, arithmetic and a short list of maths functions. It never calls `eval`.
-- The server listens on `127.0.0.1` only, and write requests are accepted only from the world's own page (Origin check).
+## 🛡️ Safety
+
+- **Read-only internet.** Students make HTTPS GET requests only — to Wikipedia, USGS and Open-Meteo. They never post, sign up, send messages or buy anything. Nothing about you is sent anywhere.
+- **Safe formula engine.** Invented formulas go through a parser that understands only numbers, variables (`x y r a pi`), arithmetic and a short allowlist of maths functions. `eval` is never called.
+- **Local server only.** The server listens on `127.0.0.1`. Write requests are accepted only from the world's own page (Origin check).
+- **No telemetry.** Not a byte of usage data leaves your machine.
+
+---
 
 ## 🙏 Credits
 
-- Built by **[Andrew Savio](https://github.com/andrewsavio)**.
-- [three.js](https://threejs.org), [PyTorch](https://pytorch.org), [Ollama](https://ollama.com), Wikipedia, [USGS](https://earthquake.usgs.gov), [Open-Meteo](https://open-meteo.com).
-- **Gemma** is a model by Google, used under the [Gemma Terms of Use](models/GEMMA_TERMS.txt). The model weights are *not* part of this repository.
+Built with love by **[Andrew Savio](https://github.com/andrewsavio)**.
+
+Standing on the shoulders of:
+[three.js](https://threejs.org) · [PyTorch](https://pytorch.org) · [Ollama](https://ollama.com) · [Gemma](https://ai.google.dev/gemma) · [Wikipedia](https://wikipedia.org) · [USGS Earthquake Hazards](https://earthquake.usgs.gov) · [Open-Meteo](https://open-meteo.com)
+
+**Gemma** is a model by Google, used under the [Gemma Terms of Use](models/GEMMA_TERMS.txt). Model weights are **not** included in this repository.
+
+---
 
 ## 📄 License
 
-Code: [MIT](LICENSE). Gemma weights are governed by Google's Gemma Terms of Use.
+Code: **[MIT](LICENSE)**
+Gemma weights: governed by [Google's Gemma Terms of Use](models/GEMMA_TERMS.txt).
+
+---
+
+<div align="center">
+
+*"The best way to understand intelligence is to watch it grow from nothing."*
+
+**⭐ Star this repo if it made you think differently about AI.**
+
+</div>
