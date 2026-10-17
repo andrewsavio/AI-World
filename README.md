@@ -35,7 +35,7 @@ They have **needs** — hunger, fun, friendships. They have **personalities** �
 
 Nobody tells them what to do.
 
-They choose their own path. They search the real internet. They run real experiments on real earthquake and weather data. They create new puzzles and discover new ways to sense the world. And every one of them has two real neural networks that you can watch learn.
+They choose their own path, with one objective: **quantum computing**. They design their own experiments on simulated qubits, learn superposition, entanglement and Grover's search from data, and discover new ways to sense the world. And every one of them has two real neural networks that you can watch learn.
 
 Click on any student. Watch its neurons fire. Watch its weights shift. Watch it *think*.
 
@@ -47,7 +47,7 @@ Click on any student. Watch its neurons fire. Watch its weights shift. Watch it 
 |---|---|---|
 | 🧠 | **Real neural networks** | Not simulated — actual PyTorch MLP models trained with backpropagation while you watch |
 | 🎲 | **True free will** | Students have needs, personalities and learned preferences that drive every decision |
-| 🌐 | **Live internet access** | They look up real places on **Wikipedia** and test their own hypotheses on **USGS earthquake** and **Open-Meteo** weather data |
+| ⚛️ | **Quantum computing as the objective** | Levels 5–7 are quantum: superposition, interference, measurement, entanglement, Bell correlations, Grover's search and decoherence, learned from an exact two-qubit simulator. In the **Quantum Lab** each student designs its own experiments |
 | 📜 | **A seven-level syllabus** | Students are **promoted** level by level, from straight lines to creating new puzzles ([details](docs/SYLLABUS.md)) |
 | 🌅 | **Gorgeous on integrated graphics** | Day/night cycle, atmosphere, real interior shadows, auto-resolution scaling for 60 fps on iGPUs |
 
@@ -94,7 +94,7 @@ flowchart LR
     subgraph Server["🐍 server.py  (Python stdlib HTTP)"]
         B["brain.py  ·  PyTorch<br/>skill brain · decision brain"]
     end
-    I["🌐 Wikipedia · USGS · Open-Meteo<br/>(read-only GET)"]
+    I["⚛️ Two-qubit simulator<br/>(in the page)"]
 
     W <-->|"train · exam · act · reward"| B
     W -->|"GET only"| I
@@ -152,7 +152,16 @@ python server.py
 | 🧠 Read a student's mind | click the student avatar, or its row in the table |
 | 📜 Syllabus / 📊 Dashboard | header buttons |
 | 🎨 Quality | `Auto` (recommended) · `High` · `Low` — menu in the 3D view |
-| ⏹️ Stop everything | **Stop world** button, or the tray icon in background mode |
+| 💾 Save | Automatic every 2 minutes and when you close the tab, or the **💾 Save** button. Reopening continues the same world |
+| ⏹️ Stop everything | **Save & stop** button, or the tray icon in background mode (it saves first) |
+| 🏗 New buildings | **Buildings** button: spend the students' coins on a Data Centre (more compute), Data Lab, Lecture Hall or Hall of Discoveries, each unlocked by a milestone |
+| 🌱 Start over | **New world** button (the old world is kept in `saves/old-…`) |
+
+---
+
+## 🕰️ Running it for days
+
+A world day lasts 24 hours and follows your computer's clock. To let the students live for a week, start **`start-world-background.bat`**: the world runs in its own window with a tray icon, and Windows is asked not to sleep while it runs (closing a laptop lid may still sleep it, depending on your power settings). Everything is saved in `saves/` (not committed to git), so a closed tab, a crash or a restart only loses the last couple of minutes.
 
 ---
 
@@ -201,10 +210,10 @@ Students move up through **seven levels**. To be promoted, a student must pass e
 | 1 | Foundations | Left vs Right · Top vs Bottom · Diagonal | |
 | 2 | Shapes | Stripe · Circle · Diamond | |
 | 3 | Curves & Logic | Ellipse · XOR · Waves | |
-| 4 | Patterns | Rings · Checkerboard | pass a real-data subject |
-| 5 | Mastery | Flower · Spiral | |
-| 6 | Invention | | create a puzzle or discover a new sense |
-| 7 | Open research | no gates | |
+| 4 | Patterns | Rings · Checkerboard (Flower · Spiral optional) | pass an experiment of its own from the Quantum Lab |
+| 5 | Qubits | Superposition · Interference · Measurement basis | |
+| 6 | Entanglement & algorithms | Entanglement · Bell correlations · Grover search · Decoherence | discover a circuit another student learns from |
+| 7 | Quantum research | no gates | goal: teach others 5 times |
 
 The order follows curriculum learning (easy before hard), the dataset order of TensorFlow Playground, UNESCO's education levels and Bloom's taxonomy. Read the reasoning and the references in **[docs/SYLLABUS.md](docs/SYLLABUS.md)**.
 
@@ -256,7 +265,8 @@ All contributions welcome — from fixing a typo to adding a whole new kind of s
 
 ## 🛡️ Safety
 
-- **Read-only internet.** Students make HTTPS GET requests only — to Wikipedia (to look up places), USGS and Open-Meteo. They never post, sign up, send messages or buy anything. Nothing about you is sent anywhere.
+- **No internet for the students.** All their data comes from the built-in quantum simulator and the classroom maps. The page only loads three.js from a CDN. Nothing about you is sent anywhere.
+- **Honest about discoveries.** The students are tiny networks: whatever they discover is real quantum mechanics that physicists already know. It is new to the AI World, not to humanity.
 - **Local server only.** The server listens on `127.0.0.1`. Write requests are accepted only from the world's own page (Origin check).
 - **No telemetry.** Not a byte of usage data leaves your machine.
 
@@ -267,7 +277,7 @@ All contributions welcome — from fixing a typo to adding a whole new kind of s
 Built with love by **[Andrew Savio](https://github.com/andrewsavio)**.
 
 Standing on the shoulders of:
-[three.js](https://threejs.org) · [PyTorch](https://pytorch.org) · [Wikipedia](https://wikipedia.org) · [USGS Earthquake Hazards](https://earthquake.usgs.gov) · [Open-Meteo](https://open-meteo.com)
+[three.js](https://threejs.org) · [PyTorch](https://pytorch.org)
 
 ---
 

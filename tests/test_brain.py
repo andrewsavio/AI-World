@@ -199,3 +199,33 @@ def test_handle_persistence_api(tmp_path):
     load_res = handle('/brain/load', {'id': 0, 'path': b_file, 'policy_path': p_file})
     assert load_res['ok'] is True
     assert brain.BRAINS[0].lessons == 0  # Restored to 0
+
+
+def test_world_save_load_new(tmp_path, monkeypatch):
+    """The whole world survives a restart: page state, subjects' data and every brain's weights come back; New world starts over."""
+    monkeypatch.setattr(brain, 'SAVE_DIR', tmp_path / 'saves')
+    assert handle('/world/load', {}) == {'page': None}
+    rule = lambda x, y: x * x + y * y < 0.4
+    handle('/brain/reset', {'agents': [{'id': 0, 'hidden': [4], 'lr': 0.05}]})
+    handle('/brain/skills', {'skills': [{'id': 0, 'train': generate_dots(300, rule), 'test': generate_dots(100, rule)}]})
+    handle('/brain/study', {'jobs': [{'id': 0, 'skill': 0, 'steps': 640, 'conf': 0.5}]})
+    acc = handle('/brain/exam', {'id': 0, 'skill': 0})['acc']
+    page = {'version': 1, 'agents': [{'id': 0, 'level': 2}]}
+    assert handle('/world/save', {'page': page})['ok']
+
+    handle('/brain/reset', {'agents': [{'id': 0, 'hidden': [4], 'lr': 0.05}]})  # as if Python restarted
+    r = handle('/world/load', {})
+    assert r['page'] == page and r['brains'] and len(r['skills'][0]['train']) == 300
+    assert handle('/brain/exam', {'id': 0, 'skill': 0})['acc'] == acc  # same weights, same exam score
+
+    handle('/world/new', {})
+    assert handle('/world/load', {}) == {'page': None}
+    assert len(list((tmp_path / 'saves').glob('old-*/world.json'))) == 1  # the old world is kept, not deleted
+
+
+def test_world_log(tmp_path, monkeypatch):
+    """Each world day appends one row to saves/history.csv, with a header the first time."""
+    monkeypatch.setattr(brain, 'SAVE_DIR', tmp_path / 'saves')
+    handle('/world/log', {'row': {'day': 1, 'world_score': 12}})
+    handle('/world/log', {'row': {'day': 2, 'world_score': 19}})
+    assert (tmp_path / 'saves' / 'history.csv').read_text(encoding='utf-8').splitlines() == ['day,world_score', '1,12', '2,19']

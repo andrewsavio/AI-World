@@ -8,3 +8,9 @@ __pycache__/
 .agents/
 skills-lock.json
 
+
+# The saved world (students, news and brain weights) lives here, not in git
+saves/
+# Launch videos made for posts
+brag-output*/
+.impeccable/live/

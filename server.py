@@ -17,10 +17,13 @@ from urllib.parse import parse_qs, urlparse
 
 ROOT = pathlib.Path(__file__).parent
 HOST = os.environ.get('AIWORLD_HOST', '127.0.0.1')
-ALLOWED = {'http://localhost:8000', 'http://127.0.0.1:8000', *filter(None, os.environ.get('AIWORLD_ORIGINS', '').split(','))}
+PORT = int(os.environ.get('AIWORLD_PORT', 8000))  # e.g. to try a second world without stopping the first
+HOME = f'http://localhost:{PORT}'
+ALLOWED = {HOME, f'http://127.0.0.1:{PORT}', *filter(None, os.environ.get('AIWORLD_ORIGINS', '').split(','))}
 MAX_BYTES = 5_000_000
 brain = None  # the PyTorch brains; loaded in the background so the page opens at once
 BRAIN_ERROR = None
+STOPPING = False  # set by the tray launcher's "Stop world": the page sees it, saves the day, then shuts the server down
 
 
 def load_brain():
@@ -45,7 +48,8 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == '/brain/info':
-            return self.reply(200, json.dumps(brain.handle('/brain/info', {}) if brain else {'engine': None, 'loading': BRAIN_ERROR is None, 'error': BRAIN_ERROR}).encode())
+            info = brain.handle('/brain/info', {}) if brain else {'engine': None, 'loading': BRAIN_ERROR is None, 'error': BRAIN_ERROR}
+            return self.reply(200, json.dumps({**info, 'stopping': STOPPING}).encode())
         if url.path == '/brain/view' and brain:
             q = {k: v[0] for k, v in parse_qs(url.query).items()}
             try:
@@ -55,15 +59,19 @@ class Handler(SimpleHTTPRequestHandler):
         super().do_GET()
 
     def do_POST(self):
+        global STOPPING
         # Only the world's own page may change anything (browsers always send Origin on cross-site posts). curl sends none.
         if self.headers.get('Origin') not in (None, *ALLOWED):
             return self.reply(403, b'{"error": "forbidden"}')
+        if self.path == '/world/stop':  # polite stop: ask the page to save first (it then calls /shutdown)
+            STOPPING = True
+            return self.reply(200, b'{"ok": true}')
         if self.path == '/shutdown':
-            if self.headers.get('Origin') != 'http://localhost:8000':
+            if self.headers.get('Origin') != HOME:
                 return self.reply(403, b'{"error": "forbidden"}')
             self.reply(200, b'{"ok": true}')
             return threading.Thread(target=self.server.shutdown).start()
-        if self.path.startswith(('/brain/', '/policy/')):
+        if self.path.startswith(('/brain/', '/policy/', '/world/')):
             if not brain:
                 return self.reply(503, b'{"error": "brains not loaded"}')
             size = int(self.headers.get('Content-Length', 0))
@@ -74,6 +82,10 @@ class Handler(SimpleHTTPRequestHandler):
             except (KeyError, ValueError, IndexError, TypeError) as e:
                 return self.reply(400, json.dumps({'error': f'{type(e).__name__}: {e}'}).encode())
         self.reply(404, b'{"error": "not found"}')
+
+    def end_headers(self):  # always check for a newer page: a stale cached index.html would run yesterday's world
+        self.send_header('Cache-Control', 'no-cache')
+        super().end_headers()
 
     def reply(self, code, body):
         self.send_response(code)
@@ -92,8 +104,14 @@ class Handler(SimpleHTTPRequestHandler):
             super().log_message(fmt, *args)
 
 
+class Server(ThreadingHTTPServer):
+    # On Windows SO_REUSEADDR lets a second server bind the same port and silently split the page's requests between two
+    # sets of brains; refusing the bind makes a second start fail loudly instead.
+    allow_reuse_address = os.name != 'nt'
+
+
 if __name__ == '__main__':
-    print('AI World running at http://localhost:8000  (close this window or press Ctrl+C to stop)')
+    print(f'AI World running at {HOME}  (close this window or press Ctrl+C to stop)')
     if '--no-browser' not in sys.argv:
-        threading.Timer(1, webbrowser.open, ['http://localhost:8000']).start()
-    ThreadingHTTPServer((HOST, 8000), Handler).serve_forever()
+        threading.Timer(1, webbrowser.open, [HOME]).start()
+    Server((HOST, PORT), Handler).serve_forever()

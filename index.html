@@ -5,169 +5,292 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI World Tycoon</title>
 <style>
-:root{--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--mute:#8b949e;--acc:#58a6ff;--gold:#f2cc60}
+:root{
+  --bg:#0b0f1c;--panel:#111829;--raise:#18213a;--line:#263150;--line2:#1c2540;
+  --text:#eaeefa;--text2:#cdd5ea;--mute:#97a3c2;
+  --sig:#5ee6d0;--sig-ink:#06231f;--sig-tint:rgba(94,230,208,.09);
+  --acc:#5ee6d0;--blue:#58a6ff;--red:#ff7b72;--gold:#f2cc60;--ok:#56d364;
+  --serif:Newsreader,Georgia,'Times New Roman',serif;
+  --sans:'Schibsted Grotesk','Segoe UI',system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:13px system-ui,sans-serif}
-header{display:flex;gap:14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-header h1{font-size:16px;margin:0 8px 0 0}
-.stat{color:var(--mute)} .stat b{color:var(--text)}
-button{background:#21262d;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
-button:hover:not(:disabled){border-color:var(--acc)} button:disabled{opacity:.4;cursor:default}
-button.on{border-color:#2ea043;background:#12261a}
-main{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:12px;padding:12px 16px}
+html{color-scheme:dark;scrollbar-color:var(--line) var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:rgba(94,230,208,.3);color:#fff}
+a{color:var(--sig);text-underline-offset:3px}
+code{font:12.5px ui-monospace,Consolas,monospace;background:var(--raise);padding:1px 5px;border-radius:4px}
+.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+
+/* header: the world's name, its vital signs, then the way in */
+header{display:flex;gap:10px;align-items:center;padding:12px 16px 8px;border-bottom:1px solid var(--line2);flex-wrap:wrap;background:linear-gradient(var(--panel),var(--bg))}
+header h1{font:400 28px/1 var(--serif);letter-spacing:-.01em;margin:0;white-space:nowrap}
+header h1 em{color:var(--sig);font-style:italic}
+header .stats,header nav{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header .stats{order:2;flex-basis:100%;gap:6px 22px;padding-top:8px;border-top:1px solid var(--line2)}
+header nav{gap:5px;margin-left:auto}
+header nav a{display:inline-flex;gap:6px;align-items:center;color:var(--text2);text-decoration:none;padding:6px 8px;border-radius:7px}
+header nav a:hover{color:var(--sig)}
+.stat{display:inline-flex;gap:6px;align-items:center;color:var(--mute);font-size:13px;white-space:nowrap} .stat b{color:var(--text);font-weight:600}
+.stat .i{color:var(--mute)}
+:focus-visible{outline:2px solid var(--sig);outline-offset:2px}
+#guideTitle:focus{outline:none}
+
+button{display:inline-flex;gap:7px;align-items:center;background:var(--raise);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer;font:500 13px var(--sans);transition:border-color .15s,background-color .15s,color .15s}
+button:hover:not(:disabled){border-color:var(--sig);color:#fff} button:active:not(:disabled){background:var(--line2)} button:disabled{opacity:.4;cursor:default}
+button.on{border-color:rgba(86,211,100,.55);background:#0f2a1c}
+button.danger{border-color:#7d2028;color:#ffa198}
+button.danger:hover:not(:disabled){border-color:#f85149;color:#ffc1bb}
+.menu{position:relative}
+.menu summary{display:inline-flex;gap:7px;align-items:center;list-style:none;background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:6px 11px;cursor:pointer;font-weight:500;font-size:13px}
+.menu summary::-webkit-details-marker{display:none}
+.menu summary:hover,.menu[open] summary{border-color:var(--sig)}
+.menu>div{position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:flex;flex-direction:column;gap:6px;min-width:260px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.menu[open]>div{animation:pop .22s var(--ease)}
+.menu>div button{justify-content:flex-start}
+
+/* layout */
+main{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:14px;padding:14px 16px 24px}
 @media(max-width:1050px){main{grid-template-columns:1fr}}
-.col{display:flex;flex-direction:column;gap:12px;min-width:0}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:12px 14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:700px){.two{grid-template-columns:1fr}}
-h2{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:0 0 8px}
+h2{font:600 12px/1.3 var(--sans);text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:0 0 10px}
 canvas{display:block;max-width:100%;height:auto}
-#worldWrap{position:relative;border-radius:10px;overflow:hidden;background:#05070c;box-shadow:0 0 0 1px #30363d,0 10px 30px rgba(0,0,0,.35)}
+
+/* the lesson: the product's thesis, so it speaks in the world's voice */
+.panel.hero{border-color:rgba(94,230,208,.35);background:linear-gradient(180deg,rgba(94,230,208,.06),transparent 55%),var(--panel)}
+.panel.hero h2{font:400 25px/1.1 var(--serif);text-transform:none;letter-spacing:0;color:var(--text);margin:0 0 2px}
+.panel.hero h2 em{color:var(--sig)}
+.hero .sub{font-size:13px;color:var(--mute);margin:0 0 10px}
+#lessonHead{font-size:13px;line-height:1.55;color:var(--text2);margin-bottom:10px}
+#lessonHead b{color:var(--text)}
+.steps{list-style:none;margin:0;padding:0;position:relative}
+.steps::before{content:'';position:absolute;left:13px;top:14px;bottom:14px;width:1px;background:var(--line)}
+.steps li{position:relative;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:6px 8px 6px 0;border-radius:8px;font-size:13px;line-height:1.5;color:var(--text2)}
+.steps li>span:first-child{position:relative;z-index:1;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line);font:500 15px var(--serif);color:var(--mute)}
+.steps li>div>b:first-child{display:block;font-weight:600;color:var(--text);font-size:13px;letter-spacing:.01em}
+.steps[hidden]{display:none}
+.right{color:var(--ok);font-weight:600}.wrong{color:var(--red);font-weight:600}
+/* one beat runs down the four steps, over and over: the loop every student repeats thousands of times a second */
+@media (prefers-reduced-motion:no-preference){
+  .steps li{animation:beat 4.8s infinite}
+  .steps li>span:first-child{animation:beatn 4.8s infinite}
+  .steps li:nth-child(2),.steps li:nth-child(2)>span:first-child{animation-delay:1.2s}
+  .steps li:nth-child(3),.steps li:nth-child(3)>span:first-child{animation-delay:2.4s}
+  .steps li:nth-child(4),.steps li:nth-child(4)>span:first-child{animation-delay:3.6s}
+}
+@keyframes beat{0%{background:var(--sig-tint)}22%{background:var(--sig-tint)}30%,100%{background:transparent}}
+@keyframes beatn{0%,22%{background:var(--sig);color:var(--sig-ink);border-color:var(--sig);box-shadow:0 0 0 4px rgba(94,230,208,.15)}30%,100%{background:var(--panel);color:var(--mute);border-color:var(--line);box-shadow:none}}
+
+/* planet */
+#worldWrap{position:relative;border-radius:12px;overflow:hidden;background:#05070c;box-shadow:0 0 0 1px var(--line2),0 14px 34px rgba(0,0,0,.4)}
 #world{height:620px;overflow:hidden;background:#05070c;touch-action:none}
 #worldWrap:fullscreen #world{height:100vh}
-.hud{position:absolute;z-index:2;display:flex;gap:8px;align-items:center;background:rgba(13,17,23,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:5px 10px;font-size:12px;color:#e6edf3}
+.hud{position:absolute;z-index:2;display:flex;gap:8px;align-items:center;background:rgba(11,15,28,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:5px 10px;font-size:12px;color:var(--text)}
 .hud.tl{top:10px;left:10px}.hud.tr{top:10px;right:10px;padding:3px 5px}.hud.bl{left:10px;bottom:10px;max-width:min(420px,calc(100% - 20px));flex-direction:column;align-items:flex-start;gap:2px;pointer-events:none}
-.hud select,.hud button{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:3px 7px;font:inherit}
-#hudAgent{line-height:1.4}#hudAgent i{color:#c9d1d9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hud select,.hud button{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.16);border-radius:7px;padding:3px 7px;font:inherit}
+#hudAgent{line-height:1.4}#hudAgent i{color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #world canvas{max-width:none;height:100%}
 @media(max-width:600px){#world{height:400px}}
-#places{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-#places button{font-size:12px;padding:5px 8px}
-.feed{height:180px;overflow:auto;font-size:12px}
-.feed div{padding:3px 0;border-bottom:1px solid #21262d}
+#places{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#places button{font-size:12px;padding:5px 9px;border-radius:999px}
+/* milestones (promotions, world firsts, new buildings) surface over the planet for a few seconds */
+#toast{position:absolute;z-index:3;top:52px;left:50%;max-width:min(560px,calc(100% - 40px));transform:translateX(-50%);background:rgba(11,15,28,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(242,204,96,.45);border-radius:12px;padding:10px 16px;font:400 18px/1.35 var(--serif);color:#fff6da;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.45);pointer-events:none;opacity:0;visibility:hidden}
+#toast.show{visibility:visible;animation:toast 6.5s var(--ease) forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-10px) scale(.97)}7%{opacity:1;transform:translate(-50%,0) scale(1)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-6px)}}
+
+/* feeds and tables */
+.feed{height:190px;overflow:auto;font-size:12.5px;line-height:1.45;color:var(--text2)}
+.feed div{padding:5px 6px;border-bottom:1px solid var(--line2);border-radius:4px;animation:arrive 1.6s ease-out}
+@keyframes arrive{from{background:rgba(94,230,208,.12)}to{background:transparent}}
 .wf{color:var(--gold);font-weight:600}
 .web{color:#79c0ff}
-table{width:100%;border-collapse:collapse;font-size:12px}
-td,th{padding:4px 6px;text-align:left;border-bottom:1px solid #21262d;white-space:nowrap}
-th{color:var(--mute);font-weight:500}
-tbody tr{cursor:pointer} tbody tr:hover{background:#1c2128} tr.sel{background:#1f2937}
-.bar{display:inline-block;height:7px;background:#21262d;border-radius:4px;overflow:hidden;width:90px;vertical-align:middle}
-.bar i{display:block;height:100%;background:var(--acc)}
-.row{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
-.info{font-size:12px;line-height:1.65;color:var(--mute)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{padding:5px 7px;text-align:left;border-bottom:1px solid var(--line2);white-space:nowrap}
+th{color:var(--mute);font-weight:500;font-size:12px}
+tbody tr{cursor:pointer;transition:background-color .15s} tbody tr:hover{background:var(--raise)} tr.sel{background:var(--sig-tint)} tr.sel td:first-child{font-weight:600;color:#fff}
+.bar{display:inline-block;height:6px;background:var(--line2);border-radius:4px;overflow:hidden;width:90px;vertical-align:middle}
+.bar i{display:block;height:100%;background:var(--blue);transition:width .4s var(--ease)}
+.row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.info{font-size:13px;line-height:1.6;color:var(--mute)}
 .info b{color:var(--text)}
-.thought{font-size:14px;color:var(--text);margin:4px 0 8px;font-style:italic}
+.thought{font:italic 400 18px/1.35 var(--serif);color:var(--text);margin:4px 0 10px}
 .need{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:6px}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:4px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-right:5px;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
 .scroll{overflow-x:auto}
-.hint{font-size:11px;color:var(--mute);margin-top:6px}
-dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:12px;max-width:720px;width:calc(100% - 32px);padding:22px 26px;line-height:1.6}
-dialog::backdrop{background:rgba(0,0,0,.65)}
-dialog h3{margin:16px 0 4px;font-size:15px}
-dialog p{margin:0;color:#c9d1d9}
+.hint{font-size:12px;line-height:1.5;color:var(--mute);margin-top:6px}
+.legacy{color:var(--mute);font-size:11.5px;font-style:italic}
+table.wrap td{white-space:normal}
+@media(max-width:600px){#roster td:nth-child(n+5),#popHead th:nth-child(n+5){display:none}}
+
+/* dialogs */
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:16px;max-width:760px;width:calc(100% - 32px);padding:26px 30px;line-height:1.6}
+dialog[open]{animation:pop .32s var(--ease)}
+dialog::backdrop{background:rgba(4,6,14,.7);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+dialog[open]::backdrop{animation:fade .32s ease-out}
+.dtitle{font:400 32px/1.1 var(--serif);letter-spacing:-.01em;text-transform:none;color:var(--text);margin:0}
+.dtitle em{color:var(--sig)}
+dialog h3{margin:22px 0 6px;font:600 16px/1.3 var(--sans);color:var(--text)}
+dialog.dash h3{font:400 24px/1.15 var(--serif);margin:28px 0 8px}
+dialog.dash h3.small{font:600 14px var(--sans)}
+dialog details{margin-top:18px;border-top:1px solid var(--line2);padding-top:12px} dialog summary{cursor:pointer;color:var(--sig);font-weight:500}
+dialog p{margin:0;color:var(--text2)}
+#guide p{font-size:15.5px;line-height:1.65;max-width:68ch}
+#guide p.lede{font:400 21px/1.4 var(--serif);color:var(--text2);margin:10px 0 4px}
 #pyBanner{position:fixed;z-index:50;top:12px;left:50%;transform:translateX(-50%);max-width:min(720px,calc(100% - 24px));background:#3a2a05;border:1px solid #d29922;color:#ffe6a8;border-radius:10px;padding:10px 16px;font-size:13px;line-height:1.5;box-shadow:0 8px 28px rgba(0,0,0,.5)}
 #pyBanner[hidden]{display:none}
 #pyBanner code{background:rgba(0,0,0,.35);padding:1px 5px;border-radius:4px}
 dialog.dash{max-width:1200px}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0}
-.card{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.card b{display:block;font-size:20px}.card span{font-size:11px;color:var(--mute)}
-.matrix td,.matrix th{text-align:center;padding:3px 6px;font-size:11px;border:1px solid #21262d}
+.dnav{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.dnav button{font-size:12.5px;padding:4px 10px;border-radius:999px}
+/* summary figures: a ruled strip, not a wall of boxes */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));margin:16px 0 4px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.card{padding:12px 14px 12px 0;border-right:1px solid var(--line2);margin-right:14px}
+.card:last-child{border-right:0}
+.card b{display:block;font:400 30px/1.1 var(--serif)}.card span{font-size:12px;color:var(--mute)}
+.matrix td,.matrix th{text-align:center;padding:3px 6px;font-size:12px;border:1px solid var(--line2)}
 .matrix th:first-child{text-align:left}
-.matrix td.ok{background:#12361f;color:#7ee787}.matrix td.now{background:#0d2a4a;color:#79c0ff}
-.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px}
-.model{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.6;color:var(--mute)}
+.matrix td.ok{background:#0f2e1e;color:#7ee787}.matrix td.now{background:#0d2742;color:#79c0ff}
+.models{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.model{background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6;color:var(--mute)}
 .model b{color:var(--text)}
+svg text{font-family:var(--sans)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}}
+@keyframes fade{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  dialog[open],.menu[open]>div{animation:fade .2s ease-out}
+  #toast.show{animation:none;opacity:1}
+  .bar i,tbody tr{transition:none}
+}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap"><!-- non-blocking: offline the world still starts, in the fallback faces -->
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-<dialog id="guide">
-  <h2 style="font-size:18px;text-transform:none;letter-spacing:0;color:var(--text)">📘 How this world works</h2>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V7M17 16v-8"/></symbol><symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/></symbol><symbol id="i-build" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 21v-4h6v4M8.5 7h1M14.5 7h1M8.5 11h1M14.5 11h1"/></symbol><symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.2a3 3 0 0 1 5.7 1.1c0 2-2.9 2.6-2.9 4"/><path d="M12 17.5h.01"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol><symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol><symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M10 14 20 4M18 13.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5.5"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol><symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2a2.6 2.6 0 0 0-2.8-1.5c-1.5.2-2.4 1-2.4 2.1 0 2.8 5.3 1.5 5.3 4.4 0 1.1-1 2-2.6 2.1a2.8 2.8 0 0 1-2.9-1.5M12 6v1.6M12 16.4V18"/></symbol><symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></symbol><symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol><symbol id="i-paper" viewBox="0 0 24 24"><path d="M14 3H6.5a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V7.5z"/><path d="M14 3v4.5h4.5M8.5 12.5h7M8.5 16h5"/></symbol><symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M9.5 2.5v3M14.5 2.5v3M9.5 18.5v3M14.5 18.5v3M2.5 9.5h3M2.5 14.5h3M18.5 9.5h3M18.5 14.5h3"/></symbol></svg>
+<dialog id="guide" aria-labelledby="guideTitle">
+  <h2 id="guideTitle" class="dtitle" tabindex="-1">How this world <em>works</em></h2>
+  <p class="lede">10 tiny neural networks live on this planet as students. Every lesson, exam and choice you see comes from real PyTorch networks whose weights change while you watch: no language model, nothing scripted. Source, tests and docs: <a href="https://github.com/andrewsavio/AI-World" target="_blank" rel="noopener" style="color:var(--acc)">github.com/andrewsavio/AI-World</a>.</p>
   <h3>Are these AIs like ChatGPT or Gemini?</h3>
-  <p>No, but they are built on the same basic idea: a <b>neural network</b>, which is lots of tiny "neurons" joined by adjustable connections. ChatGPT and Gemini are huge language models (LLMs) with hundreds of billions of connections, trained on trillions of words using thousands of GPUs. Each AI here starts with about 10–20 connections. That's small enough for you to watch every connection change as it learns.</p>
+  <p>No, but they are built on the same basic idea: a <b>neural network</b>, which is lots of tiny "neurons" joined by adjustable connections. ChatGPT and Gemini have hundreds of billions of connections. Each student here starts with about 10–20, small enough for you to watch every connection change as it learns.</p>
   <h3>What are they learning?</h3>
-  <p>Every subject is a map covered in <span style="color:#58a6ff">blue</span> and <span style="color:#ff7b72">red</span> dots, and the AI has to learn the rule that tells them apart. <b>School</b>: straight lines. <b>University</b>: circles, XOR and waves. <b>Research Institute</b>: rings, flowers, checkerboards and spirals, which are open problems nobody has solved yet. <b>Internet Lab</b>: <i>real data from the real world</i> (see below). Nobody ever tells them the rule. They have to work it out from examples.</p>
+  <p>Each subject is a map of <span style="color:#58a6ff">blue</span> and <span style="color:#ff7b72">red</span> dots, and the student must learn the rule that separates them, from examples alone. Levels 1–4 build up from straight lines to rings and checkerboards. From Level 5 the objective is <b>quantum computing</b>: a small exact simulator of two qubits produces the data, and the students learn superposition, interference, entanglement and Grover's search from measured outcomes.</p>
   <h3>How do they learn?</h3>
-  <p><b>Guess → check → nudge.</b> One lesson is one dot. The AI guesses blue or red, compares its guess with the true answer, then nudges every connection a tiny bit so that next time its guess will be a little better. This method is called <i>backpropagation with gradient descent</i>, and it's the same method used to train real LLMs. You can watch this happen in the <b>"Watch one lesson"</b> panel.</p>
+  <p><b>Guess → check → nudge.</b> One lesson is one dot: the student guesses, compares with the true answer, then nudges every connection a little so the next guess is better (<i>backpropagation with gradient descent</i>, the same method used to train real LLMs). Watch it step by step in <b>🔍 Watch one lesson</b>, next to the planet.</p>
+  <h3>Who decides what they do?</h3>
+  <p>They do. Each student has needs, a personality and likes it learns from experience: good outcomes (passing, progress, discoveries) make an activity more attractive next time. That is <i>reinforcement learning</i> (a second network trained with REINFORCE). Click a student to see <b>why</b> it chose what it's doing.</p>
+  <h3>Honest limits</h3>
+  <p>Each student maps a few numbers to a yes/no answer. It cannot read, reason about physics or invent anything new to humanity: its discoveries are real quantum mechanics that physicists already know, new only to the AI World. The students use no internet.</p>
+  <details><summary>More: exams, getting stuck, the Quantum Lab, buildings, the seven levels, time and saving</summary>
   <h3>Exams</h3>
-  <p>Exams use dots the AI has <b>never seen before</b>. Passing proves it understood the rule rather than memorising the answers. Machine-learning people call this a <i>test set</i>.</p>
+  <p>Exams use dots the student has <b>never seen before</b>, so passing proves it understood the rule rather than memorising answers (a <i>test set</i>). Experiment data is noisy, so the pass mark is set just below what a simple reference method (copy the answer of the 7 most similar examples) manages on the same data.</p>
   <h3>When they get stuck</h3>
-  <p>They can grow new neurons (a bigger brain), go to the <b>Library</b> to read a paper another AI published, or, at the <b>Research Institute</b>, invent a brand-new way of seeing the map, such as "distance from the centre". The first AI to invent something gets a 🌍 <b>World First</b>.</p>
-  <h3>Free will</h3>
-  <p>Nobody gives them orders. Each AI has <b>needs</b> (energy, fun, friends), a <b>personality</b> (diligent, curious, social) and <b>likes and dislikes it learns from experience</b>. After every activity it asks itself "how did that feel?". Passing an exam, making progress or discovering something feels good, while failing or getting exhausted feels bad, and it adjusts its taste for that activity. This is <i>reinforcement learning</i>, in its simplest form. Then it scores every option and rolls weighted dice. It <b>chooses its own subjects</b> (curious AIs go for hard ones), can <b>give up</b> on a subject that's too hard, wander off, go online, or <b>invent brand-new puzzles</b> for the others. It isn't consciousness, but no two AIs live the same life. Click an AI to see its likes and <b>why</b> it chose what it's doing.</p>
-  <h3>🌐 The Internet Lab: their window to the real world</h3>
-  <p>When an AI decides to go online, it explores on its own. It picks a city, asks Wikipedia for real places nearby (a campus, a park, a museum…) and makes up a <b>hypothesis</b> about one, for example <i>"can air pressure and wind speed tell when it rains at this museum?"</i>. It then downloads 3 months of real hourly weather for that exact spot from Open-Meteo and tests the idea. Confirmed hypotheses become new subjects for everyone. Rejected ones are reported honestly in the news. The AIs can also download every earthquake of the last 30 days from USGS.</p>
-  <p>Real data is messy, so the pass mark is set just below what a simple reference method (copy the answer of the 7 most similar examples) manages on the same data.</p>
-  <p><b>Honest limits:</b> their brains only see two numbers at a time, so they can't read or understand text. They only use Wikipedia to find a place's location. Their internet is also <b>read-only on purpose</b>: they download public data but never post, sign up, send messages or buy anything, and nothing about you is sent. Switch it off any time with the 🌐 button.</p>
-  <h3>📜 The syllabus: seven levels</h3>
-  <p>Students move up like pupils through school. <b>Level 1 Foundations</b> (straight lines) → <b>2 Shapes</b> → <b>3 Curves &amp; Logic</b> (ellipse, XOR, waves) → <b>4 Patterns</b> (rings, checkerboards, plus a real-world dataset) → <b>5 Mastery</b> (flower, spiral) → <b>6 Invention</b> (create a new puzzle or discover a new sense) → <b>7 Open research</b>. To be <b>promoted</b>, a student must pass every subject of its level and meet that level's extra requirement. Then it moves on to the next level, and so on. The order follows <i>curriculum learning</i> (easy before hard), the dataset order of TensorFlow Playground, UNESCO's education levels and Bloom's taxonomy. Press <b>📜 Syllabus</b> to read the levels and see who is where.</p>
-  <h3>🛠 Tech stack</h3>
-  <p>• <b>One HTML file</b> opened in your browser: no install, no server, no account.<br>
-     • <b>Brains:</b> <b>Python + PyTorch</b> (file <code>brain.py</code>, served by <code>server.py</code>). Each student has a <i>skill brain</i> (a neural network trained with backpropagation) and a <i>decision brain</i> (a neural network trained with reinforcement learning from the world's rewards). The page has no brain of its own: it needs the Python server (start-world.bat).<br>
-     • <b>Decisions:</b> needs + personality (a "utility AI", as in The Sims) + learned likes (reinforcement learning) + a weighted dice roll.<br>
-     • <b>3D world:</b> three.js (WebGL) on your graphics chip: smooth terrain, shiny sea, a day and night cycle, atmosphere glow and real shadows when you look inside a building. Instancing, merged meshes and automatic resolution scaling keep Intel graphics fast.<br>
-     • <b>Brain diagrams and charts:</b> HTML Canvas 2D.<br>
-     • <b>Internet:</b> the browser's built-in <code>fetch()</code> calling three free public APIs with no keys: Wikipedia, Open-Meteo and USGS.<br>
-     • <b>Web server:</b> <code>server.py</code> (Python standard library). It serves the page and hosts the PyTorch brains.<br>
-     • <b>Memory:</b> the students' networks live in the Python server. Reloading the page starts a new world.</p>
-  <p style="margin-top:18px;text-align:right"><button id="guideClose" style="background:#238636;border-color:#2ea043">Enter the world →</button></p>
+  <p>They can grow new neurons, read a paper another student published in the <b>Library</b>, or invent a new way of seeing the map at the <b>Research Institute</b>, such as "distance from the centre". The first to invent something gets a 🌍 <b>World First</b>.</p>
+  <h3>The Quantum Lab</h3>
+  <p>A student designs its own experiment: a small two-qubit circuit with two settings, plus a choice of what to measure. A confirmed experiment becomes that student's own subject. From Level 6 students search for circuits with clear patterns and share them; it counts as teaching when another student passes one. Subjects marked <span class="legacy">legacy</span> come from an earlier version that used public web data.</p>
+  <h3>Buildings</h3>
+  <p>Coins from exams, promotions and discoveries found new buildings: a <b>Data Centre</b> (more lessons a second, upgradable), a <b>Data Lab</b> (more experiments of their own), a <b>Lecture Hall</b> and a <b>Hall of Discoveries</b>.</p>
+  <h3>The seven levels</h3>
+  <p><b>1 Foundations</b> → <b>2 Shapes</b> → <b>3 Curves &amp; Logic</b> → <b>4 Patterns</b> (plus an experiment of its own) → <b>5 Qubits</b> → <b>6 Entanglement &amp; algorithms</b> (plus a circuit another student learns from) → <b>7 Quantum research</b> (teach others 5 times). Easy before hard, as in <i>curriculum learning</i>. Press <b>📜 Syllabus</b> to see who is where.</p>
+  <h3>Time and saving</h3>
+  <p>The world runs on your computer's clock, so students sleep at night. At night the lesson panel replays the last real lesson. The world saves itself every 2 minutes and continues next time.</p>
+  <h3>Tech stack</h3>
+  <p>One HTML page (three.js, no build step) served by <code>server.py</code> (Python standard library), which also runs the brains in <code>brain.py</code> (PyTorch, CPU): a skill brain per student trained by backpropagation and a decision brain trained by REINFORCE. The quantum data comes from an exact two-qubit state-vector simulator. Automated tests run with pytest on GitHub Actions.</p>
+  <h3>Keyboard</h3>
+  <p><b>P</b> pause · <b>D</b> dashboard · <b>S</b> syllabus · <b>B</b> buildings · <b>H</b> this guide · <b>←</b> <b>→</b> previous / next student · <b>Esc</b> close. Links: add <code>#dashboard</code>, <code>#syllabus</code> or <code>#student=Ada</code> to the address.</p>
+  </details>
+  <p style="margin-top:18px;text-align:right"><button id="guideClose" style="background:#1a7f37;border-color:#2ea043;color:#fff">Enter the world →</button></p>
 </dialog>
 
+<dialog id="buildDlg" class="dash">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 class="dtitle">New buildings for the <em>town</em></h2><button id="buildClose">Close</button></div>
+  <div id="buildBody"></div>
+</dialog>
 <dialog id="dash" class="dash">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 style="font-size:18px;text-transform:none;letter-spacing:0;color:var(--text);margin:0">📊 Dashboard: what every model has learned</h2><button id="dashClose">Close</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 class="dtitle">What every student has <em>learned</em></h2><button id="dashClose">Close</button></div>
   <div id="dashBody"></div>
 </dialog>
 <div id="pyBanner" role="status"></div>
 <header>
-  <h1>🌍 AI World Tycoon</h1>
-  <span class="stat">Day <b id="day">1</b></span>
-  <span class="stat">💰 <b id="coins">0</b></span>
-  <span class="stat">World firsts <b id="wfCount">0</b></span>
-  <span class="stat">Papers <b id="papers">0</b></span>
-  <span class="stat">🧮 <b id="pyStat">brains: connecting…</b></span>
-  <button id="btnCompute"></button>
-  <button id="btnWeb" class="on"></button>
-  <button id="btnSyll">📜 Syllabus</button>
-  <button id="btnDash">📊 Dashboard</button>
-  <button id="btnStop" style="display:none" title="Shuts the whole world down">⏹ Stop world</button>
-  <button id="btnPause">⏸ Pause</button>
-  <button id="btnGuide">📘 How it works</button>
+  <h1>AI World <em>Tycoon</em></h1>
+  <div class="stats" aria-label="World at a glance">
+  <span class="stat" title="A world day is an Earth day: the clock is your computer's local time"><svg class="i" aria-hidden="true"><use href="#i-sun"/></svg>Day <b id="day">1</b></span>
+  <span class="stat" title="Coins the class earned from exams, promotions and discoveries; spent on buildings"><svg class="i" aria-hidden="true"><use href="#i-coin"/></svg><b id="coins">0</b></span>
+  <span class="stat" title="How far the students are through the seven-level syllabus, on average (Level 7 includes teaching others)"><svg class="i" aria-hidden="true"><use href="#i-compass"/></svg>World score <b><span id="score">0</span>%</b></span>
+  <span class="stat" title="Times a student was the first in the AI World to solve a subject or invent a sense"><svg class="i" aria-hidden="true"><use href="#i-star"/></svg>World firsts <b id="wfCount">0</b></span>
+  <span class="stat" title="New senses (ways of seeing a map) students invented and published for the others to read"><svg class="i" aria-hidden="true"><use href="#i-paper"/></svg>Papers <b id="papers">0</b></span>
+  <span class="stat" title="The students' brains run in Python with PyTorch"><svg class="i" aria-hidden="true"><use href="#i-cpu"/></svg><b id="pyStat">connecting…</b></span>
+  </div>
+  <nav aria-label="Explore">
+  <button id="btnDash" title="Who's ahead and why, the world score and who learned what (D)"><svg class="i" aria-hidden="true"><use href="#i-chart"/></svg>Dashboard</button>
+  <button id="btnSyll" title="The seven levels and who is where (S)"><svg class="i" aria-hidden="true"><use href="#i-cap"/></svg>Syllabus</button>
+  <button id="btnBuild" title="Found new buildings with the coins the students earn (B)"><svg class="i" aria-hidden="true"><use href="#i-build"/></svg>Buildings</button>
+  <button id="btnGuide" title="How this world works (H)" aria-label="How it works"><svg class="i" aria-hidden="true"><use href="#i-help"/></svg>Guide</button>
+  <button id="btnPause" title="Pause or resume the world (P)" aria-label="Pause"><svg class="i" aria-hidden="true"><use href="#i-pause"/></svg></button>
+  <a href="https://github.com/andrewsavio/AI-World" target="_blank" rel="noopener" title="Source code, tests and docs">GitHub<svg class="i" aria-hidden="true"><use href="#i-ext"/></svg></a>
+  <details class="menu" id="worldMenu"><summary><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg>World</summary><div>
+    <button id="btnWeb" class="on"></button>
+    <button id="btnSave" title="Save the world now. It also saves itself every 2 minutes and when you close the tab.">Save now</button>
+    <button id="btnStop" style="display:none" title="Saves the day, then shuts the whole world down">Save &amp; stop the world</button>
+    <button id="btnNew" class="danger" title="Start a brand-new world. The current one is kept as a backup in the saves folder.">Start a new world…</button>
+  </div></details>
+  </nav>
 </header>
 <main>
   <div class="col">
     <div class="panel">
-      <h2>World: drag to rotate · scroll to zoom · click a building to look inside · click an AI to read its mind</h2>
+      <h2>The planet</h2>
       <div id="worldWrap"><div id="world"></div>
         <div class="hud tl" id="hudClock">🕒 --:--</div>
-        <div class="hud tr"><select id="quality" title="Graphics quality"><option value="auto">Quality: Auto</option><option value="high">Quality: High</option><option value="low">Quality: Low</option></select><button id="btnFull" title="Full screen">⛶</button></div>
-        <div class="hud bl" id="hudAgent"></div></div>
+        <div class="hud tr"><select id="quality" title="Graphics quality" aria-label="Graphics quality"><option value="auto">Quality: Auto</option><option value="high">Quality: High</option><option value="low">Quality: Low</option></select><button id="btnFull" title="Full screen" aria-label="Full screen">⛶</button></div>
+        <div class="hud bl" id="hudAgent"></div><div id="toast" aria-hidden="true"></div></div>
+      <div class="hint">Drag to rotate · scroll to zoom · click a building to look inside · click a student to read its mind</div>
       <div id="places"></div>
     </div>
     <div class="two">
-      <div class="panel"><h2>🗞 World news</h2><div id="news" class="feed"></div></div>
-      <div class="panel"><h2>💭 Thoughts: what they decide and why</h2><div id="thoughts" class="feed"></div></div>
+      <div class="panel"><h2>World news</h2><div id="news" class="feed" role="log" aria-live="polite"></div></div>
+      <div class="panel"><h2>Thoughts: what they decide and why</h2><div id="thoughts" class="feed" role="log"></div></div>
     </div>
     <div class="panel scroll">
       <h2>Population</h2>
-      <table><thead><tr><th>AI</th><th>Level</th><th>Doing</th><th>Subject</th><th>Degrees</th><th>Practice score</th><th>Brain</th><th>Senses</th></tr></thead><tbody id="roster"></tbody></table>
+      <div class="hint" style="margin:0 0 6px">Click a student, or tab to it and press Enter, to see its mind and lessons.</div>
+      <table><thead id="popHead"><tr><th>AI</th><th>Level</th><th>Doing</th><th>Subject</th><th>Degrees</th><th>Practice score</th><th>Brain</th><th>Senses</th></tr></thead><tbody id="roster"></tbody></table>
     </div>
   </div>
   <div class="col">
+    <div class="panel hero">
+      <h2>Watch one <em>lesson</em></h2>
+      <p class="sub">How a neural network learns: the same four steps, thousands of times a second.</p>
+      <div id="lesson"><div id="lessonHead"></div>
+        <ol class="steps" id="lessonSteps" hidden>
+          <li><span>1</span><div><b>Question</b><span id="ls1"></span></div></li>
+          <li><span>2</span><div><b>Guess</b><span id="ls2"></span></div></li>
+          <li><span>3</span><div><b>Check</b><span id="ls3"></span></div></li>
+          <li><span>4</span><div><b>Nudge</b><span id="ls4"></span></div></li>
+        </ol></div>
+    </div>
     <div class="panel">
       <h2>Mind of <span id="mindName"></span></h2>
       <div id="mind" class="info"></div>
     </div>
     <div class="panel">
-      <h2>🔍 Watch one lesson</h2>
-      <div id="lesson" class="info"></div>
-    </div>
-    <div class="panel">
       <h2>Neural brain: every circle is a neuron, every line a connection</h2>
-      <canvas id="brain" width="410" height="270"></canvas>
-      <div class="hint">Blue line = "pushes towards blue", red = "pushes towards red", thicker = stronger. Hover the map below and the neurons light up for that spot.</div>
+      <div style="position:relative"><canvas id="brain" width="410" height="270" role="img" aria-label="Skill brain diagram"></canvas><canvas id="signal" width="410" height="270" aria-hidden="true" style="position:absolute;inset:0;width:100%;pointer-events:none"></canvas></div>
+      <div class="hint">Blue line = "pushes towards blue", red = "pushes towards red". Strong connections are bold and weak ones fade. While a lesson is shown, watch it travel in time with the four steps: the senses light up (question), a pulse runs forward (guess), the answer flashes green or red (check), and a gold wave runs back through the connections it adjusts (nudge: backpropagation). Hover the map below and the neurons light up for that spot.</div>
     </div>
     <div class="panel">
       <h2>What it currently believes the map looks like</h2>
       <div class="row">
-        <canvas id="map" width="200" height="200" style="cursor:crosshair;border-radius:4px"></canvas>
+        <canvas id="map" width="200" height="200" style="cursor:crosshair;border-radius:4px" role="img" aria-label="Map of the student's guesses"></canvas>
         <div class="info" style="flex:1;min-width:150px" id="mapInfo"></div>
       </div>
     </div>
     <div class="panel">
       <h2>Learning curve (current subject)</h2>
-      <canvas id="chart" width="410" height="100"></canvas>
-      <div class="hint">Line = practice score while studying. Dots = exam results. Dashed = pass mark.</div>
+      <canvas id="chart" width="410" height="100" role="img" aria-label="Learning curve"></canvas>
+      <div class="hint">Line = practice score while studying. Dots = exam results (green passed, red failed). Dashed = pass mark. Faint line = 50%, the score of random guessing.</div>
     </div>
   </div>
 </main>
@@ -175,6 +298,7 @@ dialog.dash{max-width:1200px}
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 
 const TAU = Math.PI * 2, rnd = (a = -1, b = 1) => a + Math.random() * (b - a), pick = arr => arr[Math.random() * arr.length | 0];
 const clamp = v => Math.max(0, Math.min(1, v));
@@ -195,9 +319,48 @@ const SKILLS = [
   {name: 'Waves',          level: 3, tier: 'University', f: (x, y) => y > 0.5 * Math.sin(3 * x)},
   {name: 'Rings',          level: 4, tier: 'University', f: (x, y) => Math.floor(Math.hypot(x, y) * 3) % 2 === 0},
   {name: 'Checkerboard',   level: 4, tier: 'University', f: (x, y) => (Math.floor(x * 2 + 2) + Math.floor(y * 2 + 2)) % 2 === 0},
-  {name: 'Flower',         level: 5, tier: 'Research',   f: (x, y) => Math.hypot(x, y) < 0.5 + 0.25 * Math.sin(5 * Math.atan2(y, x))},
-  {name: 'Spiral',         level: 5, tier: 'Research',   f: (x, y) => ((Math.atan2(y, x) + 3 * Math.PI * Math.hypot(x, y)) % TAU + TAU) % TAU < Math.PI},
+  {name: 'Flower',         level: 4, tier: 'Research',   f: (x, y) => Math.hypot(x, y) < 0.5 + 0.25 * Math.sin(5 * Math.atan2(y, x))},
+  {name: 'Spiral',         level: 4, tier: 'Research',   f: (x, y) => ((Math.atan2(y, x) + 3 * Math.PI * Math.hypot(x, y)) % TAU + TAU) % TAU < Math.PI},
 ];
+// ================= quantum computing: the objective of Levels 5-7 =================
+// A tiny, exact simulator of two qubits (a state vector of 4 complex amplitudes). The students never see these formulas: they
+// only get settings (a, b) and the measured outcome, and have to learn the pattern from examples, the way experimenters did.
+const R2 = Math.SQRT1_2, cm = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]], ca = (a, b) => [a[0] + b[0], a[1] + b[1]];
+const GATE = {H: () => [[[R2, 0], [R2, 0]], [[R2, 0], [-R2, 0]]], X: () => [[[0, 0], [1, 0]], [[1, 0], [0, 0]]],
+  RY: t => [[[Math.cos(t / 2), 0], [-Math.sin(t / 2), 0]], [[Math.sin(t / 2), 0], [Math.cos(t / 2), 0]]],
+  RZ: t => [[[Math.cos(t / 2), -Math.sin(t / 2)], [0, 0]], [[0, 0], [Math.cos(t / 2), Math.sin(t / 2)]]],
+  RX: t => [[[Math.cos(t / 2), 0], [0, -Math.sin(t / 2)]], [[0, -Math.sin(t / 2)], [Math.cos(t / 2), 0]]]};
+function runCircuit(ops, a, b) { // ops: [gate, qubit, 'a'|'b'] or ['CNOT', control, target]; amplitude index bit 0 = q0, bit 1 = q1
+  const st = [[1, 0], [0, 0], [0, 0], [0, 0]];
+  for (const [g, q, prm] of ops) {
+    if (g === 'CNOT') { for (let i = 0; i < 4; i++) if ((i >> q & 1) && !(i >> prm & 1)) { const j = i | 1 << prm; [st[i], st[j]] = [st[j], st[i]]; } continue; }
+    const m = GATE[g](prm === 'a' ? a : b);
+    for (let i = 0; i < 4; i++) if (!(i >> q & 1)) { const j = i | 1 << q, v0 = st[i], v1 = st[j]; st[i] = ca(cm(m[0][0], v0), cm(m[0][1], v1)); st[j] = ca(cm(m[1][0], v0), cm(m[1][1], v1)); }
+  }
+  return st;
+}
+const amp2 = (st, i) => st[i][0] ** 2 + st[i][1] ** 2;
+const OBS = {'qubit 0 reads 1': st => amp2(st, 1) + amp2(st, 3), 'qubit 1 reads 1': st => amp2(st, 2) + amp2(st, 3), 'the two qubits agree': st => amp2(st, 0) + amp2(st, 3),
+  'the qubits are entangled': st => { const d = ca(cm(st[0], st[3]), cm(st[1], st[2]).map(v => -v)); return 2 * Math.hypot(d[0], d[1]); }}; // concurrence
+const circuitText = ops => ops.map(([g, q, prm]) => g === 'CNOT' ? `CNOT(q${q}→q${prm})` : `${g}${prm ? `(${prm})` : ''}·q${q}`).join(' → ');
+const qc = (ops, obs) => (x, y) => OBS[obs](runCircuit(ops, Math.PI * x, Math.PI * y)) > 0.5;
+const QUANTUM = [
+  {name: 'Superposition', level: 5, f: qc([['RY', 0, 'a'], ['RZ', 0, 'b']], 'qubit 0 reads 1'),
+    about: 'Rotate a qubit by a around Y and by b around Z: does it read 1 more often than 0? (The phase b turns out not to matter for this measurement.)'},
+  {name: 'Interference', level: 5, f: qc([['RY', 0, 'a'], ['H', 0], ['RZ', 0, 'b'], ['H', 0]], 'qubit 0 reads 1'),
+    about: 'A qubit rotated by a, split by H, given a phase b and recombined by H, like light in an interferometer: does it read 1?'},
+  {name: 'Measurement basis', level: 5, f: qc([['RY', 0, 'a'], ['RZ', 0, 'b'], ['H', 0]], 'qubit 0 reads 1'),
+    about: 'A qubit with angles a and b, measured in the X basis instead of the usual one: does it read 1 (the "−" state)?'},
+  {name: 'Entanglement', level: 6, f: qc([['RY', 0, 'a'], ['RY', 1, 'b'], ['CNOT', 0, 1]], 'the qubits are entangled'),
+    about: 'Rotate two qubits by a and b, then apply CNOT: are they strongly entangled (concurrence above 0.5)?'},
+  {name: 'Bell correlations', level: 6, f: qc([['H', 0], ['CNOT', 0, 1], ['RY', 0, 'a'], ['RY', 1, 'b']], 'the two qubits agree'),
+    about: 'An entangled Bell pair read by two detectors turned to angles a and b: do the two results agree more often than not?'},
+  {name: 'Grover search', level: 6, f: (x, y) => { const k = Math.round((x + 1) * 6), N = 2 ** (2 + (y + 1) * 4); return Math.sin((2 * k + 1) * Math.asin(1 / Math.sqrt(N))) ** 2 > 0.5; },
+    about: "Grover's quantum search with k iterations (0 to 12) over N items (4 to 1,024): does it find the marked item more than half the time?"},
+  {name: 'Decoherence', level: 6, f: (x, y) => { const t = (x + 1) * 2.5, g = (y + 1) * 0.3; return (1 + Math.exp(-g * t) * Math.cos(2 * t)) / 2 > 0.55; },
+    about: 'A qubit in superposition precesses for a time t while noise of strength γ erodes its phase: is it still mostly in its "+" state?'},
+].map(q => ({...q, tier: 'Internet', quantum: true, labels: ['no', 'yes']})); // studied in the Quantum Lab
+const NEED_EXP = 'an experiment of its own from the Quantum Lab';
 // The syllabus: seven levels. A student is promoted when it has passed every subject of its level and met the extra requirement
 // (if any). Sources: easy-to-hard ordering (Bengio et al., "Curriculum Learning", ICML 2009), the dataset order of TensorFlow
 // Playground (linear → circle → XOR → spiral), UNESCO's ISCED levels for the education stage and the revised Bloom's taxonomy
@@ -206,12 +369,17 @@ const SYLLABUS = [
   {n: 1, name: 'Foundations', edu: 'Primary (ISCED 1)', think: 'Remember', skills: ['Left vs Right', 'Top vs Bottom', 'Diagonal'], goal: 'Split the map in two with one straight line'},
   {n: 2, name: 'Shapes', edu: 'Lower secondary (ISCED 2)', think: 'Understand', skills: ['Stripe', 'Circle', 'Diamond'], goal: 'Recognise simple closed shapes'},
   {n: 3, name: 'Curves & Logic', edu: 'Upper secondary (ISCED 3)', think: 'Apply', skills: ['Ellipse', 'XOR', 'Waves'], goal: 'Use new senses to solve non-linear puzzles'},
-  {n: 4, name: 'Patterns', edu: 'Bachelor (ISCED 6)', think: 'Analyse', skills: ['Rings', 'Checkerboard'], real: true, goal: 'Find repeating structure, then test it on real-world data'},
-  {n: 5, name: 'Mastery', edu: 'Master (ISCED 7)', think: 'Evaluate', skills: ['Flower', 'Spiral'], goal: 'Solve the hardest classic patterns'},
-  {n: 6, name: 'Invention', edu: 'Doctoral (ISCED 8)', think: 'Create', skills: [], create: true, goal: 'Create a new puzzle or discover a new sense'},
-  {n: 7, name: 'Open research', edu: 'Beyond the degree', think: 'Create', skills: [], open: true, goal: 'No more gates: keep exploring and inventing'}];
+  {n: 4, name: 'Patterns', edu: 'Bachelor (ISCED 6)', think: 'Analyse', skills: ['Rings', 'Checkerboard'], real: true, goal: 'Find repeating structure, then design and pass an experiment of its own in the Quantum Lab'},
+  {n: 5, name: 'Qubits', edu: 'Master (ISCED 7)', think: 'Evaluate', skills: ['Superposition', 'Interference', 'Measurement basis'], goal: 'Learn how a single qubit behaves: superposition, interference, measurement'},
+  {n: 6, name: 'Entanglement & algorithms', edu: 'Doctoral (ISCED 8)', think: 'Create', skills: ['Entanglement', 'Bell correlations', 'Grover search', 'Decoherence'], create: true, goal: 'Two qubits, quantum search and noise; then discover a circuit another student learns from'},
+  {n: 7, name: 'Quantum research', edu: 'Beyond the degree', think: 'Create', skills: [], open: true, goal: 'Teach the world: 5 times, another student learns from your quantum discoveries'}];
+const TEACH_GOAL = 5;
 const sample = (n, f) => Array.from({length: n}, () => { const x = rnd(), y = rnd(); return [x, y, +f(x, y)]; });
-SKILLS.forEach(s => Object.assign(s, {train: sample(600, s.f), test: sample(300, s.f), firstBy: null, unlocked: true, labels: ['red', 'blue']}));
+const CLASSIC = SKILLS.length; // the first subjects are defined in code; everything after them is restored from the save
+SKILLS.push(...QUANTUM);
+SKILLS.forEach(s => Object.assign(s, {train: sample(600, s.f), test: sample(300, s.f), firstBy: null, unlocked: true, labels: s.labels ?? ['red', 'blue']}));
+// a fair pass mark for each quantum map: just below a simple nearest-neighbours method, at most 92%
+for (const q of QUANTUM) q.pass = Math.min(0.92, Math.round((knnAccuracy(q.train, q.test) - 0.03) * 100) / 100);
 const PASS = {School: 0.95, University: 0.95, Research: 0.9};
 const passOf = s => s.pass ?? PASS[s.tier];
 const REWARD = {School: 10, University: 30, Research: 80, Internet: 60};
@@ -224,28 +392,22 @@ const FEATURES = [
 ];
 const published = FEATURES.map((_, i) => i < 2 ? 'nature' : null);
 
-// ================= places for the real-data experiments =================
-const WORLD_CITIES = [['Mumbai', 19.08, 72.88], ['Delhi', 28.61, 77.21], ['Chennai', 13.08, 80.27], ['Bengaluru', 12.97, 77.59], ['London', 51.51, -0.13], ['Paris', 48.86, 2.35],
-  ['Singapore', 1.35, 103.82], ['Tokyo', 35.68, 139.69], ['New York', 40.71, -74.01], ['Sydney', -33.87, 151.21], ['São Paulo', -23.55, -46.63], ['Cairo', 30.04, 31.24],
-  ['Nairobi', -1.29, 36.82], ['Reykjavik', 64.15, -21.94], ['Mexico City', 19.43, -99.13], ['Moscow', 55.76, 37.62], ['Beijing', 39.90, 116.41], ['Cape Town', -33.92, 18.42],
-  ['Lima', -12.05, -77.04], ['Vancouver', 49.28, -123.12]];
 const CORE_ABOUT = {'Left vs Right': 'Blue on the right half, red on the left (a straight line)', 'Top vs Bottom': 'Blue in the top half, red in the bottom half', 'Diagonal': 'Blue above a slanted line', 'Stripe': 'Blue in a vertical band down the middle', 'Circle': 'Blue inside a circle', 'Diamond': 'Blue inside a diamond (a rotated square)', 'Ellipse': 'Blue inside a flattened circle',
   'XOR': 'Blue where x and y have the same sign (opposite corners)', 'Waves': 'Blue above a wavy line', 'Rings': 'Alternating blue and red rings around the centre',
   'Flower': 'Blue inside a five-petal flower shape', 'Checkerboard': 'Blue and red squares like a chessboard', 'Spiral': 'Two interleaved spiral arms'};
 
-// ================= the internet: read-only exploration of real public data =================
-// Their brains only understand two numbers at a time, so "searching" means: read random Wikipedia articles, notice which
-// ones are real places, invent a hypothesis about that place's weather, download it and test it. Read-only GET requests
-// to free, keyless public APIs: no accounts, no posting, nothing about the user is sent.
-const QUAKES = {name: 'Earthquake depth', host: 'USGS', what: 'real earthquakes from the last 30 days',
-  url: () => 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson',
-  axes: ['longitude', 'latitude'], labels: ['shallow', 'deep (≥30 km)'],
-  parse: j => j.features.map(f => { const [lon, lat, depth] = f.geometry.coordinates; return [lon, lat, +(depth >= 30)]; })};
-const WEATHER_VARS = {temperature_2m: 'temperature', relative_humidity_2m: 'humidity', surface_pressure: 'air pressure', wind_speed_10m: 'wind speed', cloud_cover: 'cloud cover'};
-const MAX_WEB = 14; // ponytail: cap keeps the subject list readable; raise it for an ever-growing world
+// ================= the Quantum Lab: experiments the students design themselves =================
+// No internet: every subject stays on the objective. A student builds its own random two-qubit circuit with two settings (a, b),
+// picks what to measure, runs it 1,500 times in the simulator and tests whether the settings decide the outcome. The lab cannot
+// invent new physics: anything found is a pattern of real quantum mechanics, new to the AI World but known to physicists.
+const maxOwnWeb = () => BUILD.DataLab ? 6 : 4; // ponytail: each student keeps a few experiments of its own (more once the Data Lab exists)
 let webOn = true, webBusy = false, webNext = 0;
 const webTried = new Set();
-const webReady = () => webOn && !webBusy && frame >= webNext && SKILLS.filter(s => s.web).length < MAX_WEB;
+const webReady = () => webOn && !webBusy && frame >= webNext;
+// Real-world subjects belong to the student who found them: nobody picks from another student's downloads.
+const ownWeb = a => SKILLS.map((_, i) => i).filter(i => SKILLS[i].web && SKILLS[i].owner === a.id);
+// A student only goes looking when it has no unfinished real-world subject of its own, so the internet can't swallow it.
+const wantsWeb = a => webReady() && ownWeb(a).length < maxOwnWeb() && ownWeb(a).every(i => a.passed.includes(i));
 function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
 // Reference method used to set a fair pass mark on messy real data: vote of the 7 nearest training points.
 function knnAccuracy(train, test, k = 7) {
@@ -258,7 +420,7 @@ function knnAccuracy(train, test, k = 7) {
   return ok / test.length;
 }
 function makeWebSkill(src, rows) {
-  if (rows.length < 150) throw new Error(`only ${rows.length} usable measurements`);
+  if (rows.length < 100) throw new Error(`only ${rows.length} usable examples`);
   const share = rows.filter(r => r[2]).length / rows.length;
   if (share < 0.08 || share > 0.92) throw new Error(`it is almost always "${src.labels[share < 0.5 ? 0 : 1]}", nothing to learn`);
   // scale both measurements to −1…1, the same range as the classroom maps
@@ -270,53 +432,61 @@ function makeWebSkill(src, rows) {
   return {name: src.name, tier: 'Internet', train, test, pass: Math.round((ref - 0.03) * 100) / 100, base, ref, n: rows.length,
     firstBy: null, unlocked: true, level: 4, web: src, labels: src.labels, axes: src.axes};
 }
-async function getJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`the server answered ${res.status}`);
-  return res.json();
-}
-function learnFrom(a, src, rows) {
+function learnFrom(a, src, rows) { // returns whether the search found something learnable
   rows = rows.filter(r => r.length === 3 && r.every(Number.isFinite));
   try {
     const s = makeWebSkill(src, rows);
+    s.owner = a.id; s.quantum = src.host === 'Quantum Lab';
     SKILLS.push(s); syncSkill(s); coins += 40; feel(a, 'browse', 1);
     think(a, '🌐', src.hypothesis ? `Hypothesis confirmed: ${src.hypothesis}! New subject: ${s.name}` : `Got ${s.n.toLocaleString()} ${src.what}! New subject: ${s.name}`);
-    news(`🌐 ${a.name} ${src.hypothesis ? `confirmed a hypothesis (${src.hypothesis}) using` : 'downloaded'} ${s.n.toLocaleString()} ${src.what} from ${src.host}. New subject "${s.name}": blue = ${s.labels[1]}, red = ${s.labels[0]}. A simple reference method scores ${pct(s.ref)}, so the pass mark is ${pct(s.pass)}. +40💰`, 'web');
+    news(`${s.quantum ? '⚛️' : '🌐'} ${a.name} ${src.hypothesis ? `confirmed a hypothesis (${src.hypothesis}) using` : 'downloaded'} ${s.n.toLocaleString()} ${src.what} from ${s.quantum ? 'the ' : ''}${src.host}. New subject "${s.name}", its own to study: blue = ${s.labels[1]}, red = ${s.labels[0]}. A simple reference method scores ${pct(s.ref)}, so the pass mark is ${pct(s.pass)}. +40💰`, 'web');
+    return true;
   } catch (e) {
     feel(a, 'browse', -0.1);
     think(a, '📡', `${src.hypothesis ? 'Hypothesis rejected' : `Couldn't learn from ${src.host}`}: ${e.message}`);
     news(`📡 ${a.name} tested "${src.name}"${src.hypothesis ? ` (${src.hypothesis})` : ''}: ${e.message}.`);
+    return false;
   }
 }
+const POOL = q => [['H', q], ['X', q], ['RY', q, 'a'], ['RY', q, 'b'], ['RZ', q, 'a'], ['RZ', q, 'b'], ['RX', q, 'a'], ['RX', q, 'b']];
+function randomCircuit() { // 3 to 5 gates on two qubits, using both settings a and b
+  for (;;) {
+    const ops = Array.from({length: 3 + (Math.random() * 3 | 0)}, () => Math.random() < 0.25 ? ['CNOT', ...(Math.random() < 0.5 ? [0, 1] : [1, 0])] : pick(POOL(Math.random() < 0.5 ? 0 : 1)));
+    const used = ops.map(o => o[2]);
+    if (used.includes('a') && used.includes('b')) return ops;
+  }
+}
+// What to measure is the student's own choice, and it learns to choose: UCB1 over its record of which measurements gave a
+// learnable pattern (good results so far, plus a bonus for measurements it has rarely tried).
 async function goOnline(a) {
-  if (!webReady()) return think(a, '📡', !webOn ? 'The internet is switched off.' : webBusy ? "Someone else is online, I'll wait." : 'Our world already holds as many real datasets as it can study.');
+  if (!wantsWeb(a)) return think(a, '⚛️', !webOn ? 'The Quantum Lab is closed.' : webBusy ? "The lab is busy, I'll wait." : 'I still have an experiment of my own to finish first.');
   webBusy = true;
+  let obs = null, ok = false;
   try {
-    if (!webTried.has('quakes') && Math.random() < 0.4) {
-      webTried.add('quakes');
-      think(a, '🌐', `Downloading ${QUAKES.what} from ${QUAKES.host}…`);
-      return learnFrom(a, QUAKES, QUAKES.parse(await getJSON(QUAKES.url())));
-    }
-    const [city, clat, clon] = pick(WORLD_CITIES);
-    const j = await getJSON(`https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${clat}|${clon}&gsradius=10000&gslimit=20&format=json&origin=*`);
-    const pages = shuffle((j.query?.geosearch ?? []).map(p => ({title: String(p.title).slice(0, 60), lat: p.lat, lon: p.lon})));
-    think(a, '📖', `Looked up places near ${city} on Wikipedia: ${pages.slice(0, 3).map(p => `"${p.title}"`).join(', ')}…`);
-    const place = pages.find(p => Number.isFinite(p.lat) && Number.isFinite(p.lon) && Math.abs(p.lat) <= 90 && Math.abs(p.lon) <= 180 && !webTried.has(p.title));
-    if (!place) return think(a, '📖', 'Interesting reading, but none of it was a place I could measure.');
-    webTried.add(place.title);
-    const vars = shuffle(Object.keys(WEATHER_VARS)).slice(0, 2), [n1, n2] = vars.map(v => WEATHER_VARS[v]);
-    think(a, '📍', `"${place.title}" (near ${city}) is a real place! Can ${n1} and ${n2} tell when it rains there?`);
-    const h = (await getJSON(`https://api.open-meteo.com/v1/forecast?latitude=${place.lat.toFixed(3)}&longitude=${place.lon.toFixed(3)}&hourly=${vars.join(',')},precipitation&past_days=92&forecast_days=1`)).hourly;
-    learnFrom(a, {name: `Rain at ${place.title}`, host: 'Wikipedia + Open-Meteo', what: `hours of real weather at ${place.title}`, axes: [n1, n2], labels: ['dry', 'raining'], hypothesis: `${n1} + ${n2} predict rain at ${place.title}`},
-      h.time.map((_, i) => [h[vars[0]][i], h[vars[1]][i], +(h.precipitation[i] > 0)]));
-  } catch (e) { think(a, '📡', `The connection failed: ${e.message}`); }
-  finally { webBusy = false; webNext = frame + 1800; }
+    const goal = gate(a).needs.includes(NEED_EXP) ? 'design an experiment I can learn from, to finish my level' : 'find a quantum effect I have not studied yet';
+    const stats = a.webStats.obs ??= {}, n = Object.values(stats).reduce((m, t) => m + t[1], 0);
+    const ucb = o => { const [won, tries] = stats[o] ?? [0, 0]; return (won + 1) / (tries + 2) + 0.5 * Math.sqrt(Math.log(n + 2) / (tries + 1)) + rnd(0, 0.01); };
+    obs = Object.keys(OBS).reduce((best, o) => ucb(o) > ucb(best) ? o : best);
+    let ops;
+    do ops = randomCircuit(); while (webTried.has(circuitText(ops) + obs));
+    const txt = circuitText(ops);
+    webTried.add(txt + obs);
+    think(a, '🎯', `My goal: ${goal}. I'll build ${txt} and check whether ${obs}, for different settings a and b.`);
+    const runs = Array.from({length: 1500}, () => { const x = rnd(), y = rnd(); return [x, y, OBS[obs](runCircuit(ops, Math.PI * x, Math.PI * y))]; });
+    const mid = runs.map(r => r[2]).sort((u, v) => u - v)[750];
+    ok = learnFrom(a, {name: `${txt}: ${obs}?`, host: 'Quantum Lab', what: 'runs of its circuit', axes: ['setting a', 'setting b'], labels: ['no', 'yes'],
+      hypothesis: `settings a and b decide whether ${obs} in ${txt}`}, runs.map(([x, y, v]) => [x, y, +(v > mid + 1e-9)]));
+  } finally {
+    webBusy = false; webNext = frame + (BUILD.DataLab ? 900 : 1800);
+    if (obs) { const [won, tries] = a.webStats.obs[obs] ?? [0, 0]; a.webStats.obs[obs] = [won + ok, tries + 1]; }
+  }
 }
 
 const canSave = location.protocol.startsWith('http');
 
 // ================= the brain: a tiny neural network (tanh hidden layers, sigmoid output) =================
 const NAMES = ['Ada', 'Alan', 'Grace', 'Hedy', 'Marie', 'Nikola', 'Rosalind', 'Kurt', 'Emmy', 'Srini'];
+const COLORS = ['#ff7b72', '#ffa657', '#f2cc60', '#56d364', '#39c5cf', '#58a6ff', '#bc8cff', '#f778ba', '#f0f6fc', '#b08463']; // ten hues that stay apart
 let coins = 0, computeLvl = 1, paused = false, frame = 0, selected = 0, probe = [0.3, 0.3];
 // ================= the Python brains (brain.py, PyTorch) =================
 // Every student's neural networks live in Python and learn there; this page only asks: "train agent 3 on subject 5", "give me
@@ -360,6 +530,7 @@ async function pyStudyTick() {
       const a = agents[r.id], job = jobs.find(j => j.id === r.id);
       if (a.skill !== job.skill) continue; // it moved on to another subject meanwhile
       a.conf = r.conf; a.lesson = r.lesson; a.steps += r.steps;
+      a.spent[job.skill] = (a.spent[job.skill] ?? 0) + r.steps; // lessons spent on this subject, across every attempt
       afterStudy(a);
     }
   } catch (e) { pyLost(e); }
@@ -386,7 +557,7 @@ const PY_MESSAGE = {
 function showPyBanner() {
   const b = $('pyBanner');
   b.hidden = PY.online;
-  $('pyStat').textContent = PY.online ? 'brains: PyTorch' : PY.why === 'connecting' || PY.why === 'loading' ? 'brains: connecting…' : 'brains: OFFLINE';
+  $('pyStat').textContent = PY.online ? 'PyTorch' : PY.why === 'connecting' || PY.why === 'loading' ? 'connecting…' : 'brains OFFLINE';
   if (!PY.online) b.innerHTML = PY_MESSAGE[PY.why] ?? PY_MESSAGE.noserver;
 }
 async function pyConnect() { // runs for the life of the page: connects, and reconnects if Python goes away
@@ -398,12 +569,14 @@ async function pyConnect() { // runs for the life of the page: connects, and rec
         else if (info.engine) {
           PY.info = info; PY.misses = 0;
           if (!PY.online) {
-            if (!PY.everOnline || PY.dirty || info.brains !== agents.length) await pySyncAll();
+            if (!PY.everOnline) await startWorld();
+            else if (PY.dirty || info.brains !== agents.length) await pySyncAll();
             PY.online = true;
-            news(PY.everOnline ? '🐍 The Python brains are back. The world continues.' : `🐍 The students' neural brains now run in Python: ${info.engine} on the ${info.device.toUpperCase()}. Each also has a decision brain that learns from the world's rewards.`, 'web');
+            news(PY.everOnline ? '🐍 The Python brains are back. The world continues.' : PY.restored ? `💾 Welcome back! The world continues from its save of ${new Date(PY.restored).toLocaleString()}, brains and all.` : `🐍 The students' neural brains now run in Python: ${info.engine} on the ${info.device.toUpperCase()}. Each also has a decision brain that learns from the world's rewards.`, 'web');
             PY.everOnline = true;
           }
         } else PY.why = info.error ? 'notorch' : 'loading';
+        if (info?.stopping && PY.online) return stopWorld(); // the tray icon asked to stop: save the day first
       } catch { PY.why = 'noserver'; if (PY.online) PY.misses++; }
       if (PY.online && PY.misses >= 3) pyLost(new Error('no answer'));
     }
@@ -411,16 +584,70 @@ async function pyConnect() { // runs for the life of the page: connects, and rec
     await new Promise(r => setTimeout(r, PY.online ? 3000 : 1500));
   }
 }
+// ================= saving: the world survives closing the tab =================
+// The page keeps the world (students, subjects, news); Python keeps the brains' weights. A save stores both, in saves/.
+// It happens every 2 minutes, when the tab closes, with the 💾 button and before stopping. Opening the page loads the last save.
+const RUNTIME = new Set(['v', 'busy', 'path', 'place', 'spot', 'arrived', 'timer', 'act', 'start']); // where it stands right now: rebuilt on load
+const feedItems = el => [...$(el).children].slice(0, 40).map(d => [d.textContent, d.className]);
+function worldState() {
+  return {version: 1, savedAt: Date.now(), born, frame, coins, computeLvl, puzzles, webOn, webNext, selected, levelFirst, published, webTried: [...webTried], loggedDay, scoreHistory, statsSince, built: Object.keys(OUTER).filter(k => BUILD[k]),
+    skills: SKILLS.map(({f, train, test, ...meta}) => meta), // the dots themselves are saved by Python
+    agents: agents.map(a => ({...Object.fromEntries(Object.entries(a).filter(([k]) => !RUNTIME.has(k))), confHist: a.confHist.map(v => +v.toFixed(3))})),
+    news: feedItems('news'), thoughts: feedItems('thoughts')};
+}
+function applySave({page: p, skills}) {
+  ({born, frame, coins, computeLvl, puzzles, webOn, webNext, selected, loggedDay = 0, scoreHistory = [], statsSince = Date.now()} = p);
+  const want = NAMES.indexOf(decodeURIComponent(location.hash).split('=')[1]); if (want >= 0) selected = want; // #student=Name wins over the saved choice
+  Object.assign(levelFirst, p.levelFirst);
+  p.published.forEach((who, i) => published[i] = who);
+  p.webTried.forEach(t => webTried.add(t));
+  (p.built ?? []).forEach(k => OUTER[k] && addBuilding(k, true));
+  SKILLS.length = CLASSIC;
+  p.skills.forEach((meta, i) => { const data = skills[i]; if (i < CLASSIC) Object.assign(SKILLS[i], meta, data, {level: SKILLS[i].level}); else SKILLS.push({...meta, ...data}); });
+  const missing = QUANTUM.filter(q => !SKILLS.some(x => x.name === q.name)); // a world saved before the quantum track existed
+  SKILLS.push(...missing);
+  for (const b of placeList) b.occ.fill(null);
+  p.agents.forEach((saved, i) => Object.assign(agents[i], saved, {color: agents[i].color, act: 'none', place: null, path: [], arrived: true, timer: 0, spot: -1, start: null, busy: false}));
+  for (const el of ['news', 'thoughts']) $(el).replaceChildren(...p[el].map(([text, cls]) => { const d = document.createElement('div'); d.textContent = text; d.className = cls; return d; }));
+  return missing;
+}
+async function startWorld() { // first contact with Python: continue the saved world, or begin a new one
+  const r = await pyCall('/world/load', {});
+  if (r.page && r.brains) {
+    const added = applySave(r);
+    if (added.length) await pyCall('/brain/skills', {skills: added.map(q => ({id: SKILLS.indexOf(q), train: q.train, test: q.test}))});
+    PY.restored = r.page.savedAt;
+  }
+  else await pySyncAll();
+}
+let leaving = false;
+async function saveWorld() {
+  if (!PY.online || leaving) return false;
+  try { await pyCall('/world/save', {page: worldState()}); $('btnSave').textContent = `Saved at ${clock()}`; return true; }
+  catch { $('btnSave').textContent = 'Save failed: try again'; return false; }
+}
+async function stopWorld() {
+  await saveWorld();
+  leaving = true;
+  await fetch(API + '/shutdown', {method: 'POST'}).catch(() => {});
+  document.body.innerHTML = '<p style="padding:40px;font:16px system-ui;color:#eaeefa">⏹ The day is saved and the AI World has stopped. Start it again with start-world.bat or the tray launcher: it continues where it left off.</p>';
+}
+setInterval(() => { logDay(); saveWorld(); }, 120000);
+addEventListener('pagehide', () => { // closing the tab: a last quick save (keepalive lets it finish after the page is gone)
+  if (PY.online && !leaving) fetch(API + '/world/save', {method: 'POST', body: JSON.stringify({page: worldState()}), keepalive: true}).catch(() => {});
+});
 function makeAgent(id) {
   const hidden = [2 + (Math.random() * 3 | 0)];
   if (Math.random() < 0.5) hidden.push(2 + (Math.random() * 3 | 0));
-  const a = {id, name: NAMES[id], color: `hsl(${id * 36},70%,58%)`, lr: rnd(0.02, 0.08),
+  const a = {id, name: NAMES[id], color: COLORS[id], lr: rnd(0.02, 0.08),
     p: {diligence: rnd(0.5, 1), curiosity: Math.random(), social: rnd(0.2, 1)},
     energy: rnd(0.7, 1), fun: rnd(0.6, 1), social: rnd(0.5, 1),
     feats: [0, 1], sizes: [2, ...hidden, 1], passed: [], skill: -1,
     conf: 0.5, bestConf: 0, stuck: 0, steps: 0, nextCheck: CHECK_EVERY, examAfter: 0, lastExam: 0,
     level: 1, created: 0, confHist: [], exams: [], sampleN: 0, wantsPaper: false, firsts: 0, log: [], why: [], lesson: null,
     taste: Object.fromEntries(Object.keys(ACT).map(k => [k, 0])), reward: 0, struggles: 0, dropped: -1, start: null,
+    impact: 0, lp: {}, webStats: {}, reading: [],
+    time: {}, spent: {}, cost: {}, tries: {}, examsTaken: 0, examsPassed: 0, firstTry: 0, promos: [], // for the "who's ahead, and why" dashboard // times others learned from its inventions · learning progress per subject · its search record · articles it read
     act: 'none', place: null, spot: -1, path: [], arrived: true, timer: 0, thought: 'Just woke up…', emoji: '👶'};
   return a;
 }
@@ -460,31 +687,43 @@ function selfImprove(a) {
 }
 function readPaper(a) {
   const pub = missingFeats(a).filter(i => published[i]);
-  if (pub.length && (a.wantsPaper || Math.random() < a.p.curiosity * 0.4)) {
+  if (pub.length && (a.wantsPaper || a.place === 'Lecture' || Math.random() < a.p.curiosity * 0.4)) {
     const fi = pick(pub);
     addFeature(a, fi);
     a.reward += 0.5;
     think(a, '📚', `I learned to sense "${FEATURES[fi].name}" from ${published[fi]}'s paper!`);
     news(`📚 ${a.name} read ${published[fi]}'s paper and can now sense "${FEATURES[fi].name}".`);
+    const author = agents.find(o => o.name === published[fi]);
+    if (author && author !== a) credit(author, `${a.name} learned the "${FEATURES[fi].name}" sense from ${author.name}'s paper`);
   } else think(a, '📚', pub.length ? 'Interesting, but not what I need right now.' : 'Nothing new in the Library yet.');
   a.wantsPaper = false;
+}
+
+// Teaching is what levels 6 and 7 are about: an invention only counts when another student actually learns from it.
+function credit(author, what) {
+  author.impact++; author.reward += 1;
+  news(`🏫 ${what}. ${author.name} has now taught others ${author.impact} time${author.impact > 1 ? 's' : ''}.`, 'wf');
 }
 
 // ================= school life =================
 const LEVEL = {School: 0, University: 1, Research: 2, Internet: 2}; // where a subject is taught, and how it is rewarded
 const levelFirst = {};
 const weightedPick = w => { let r = Math.random() * w.reduce((x, y) => x + y), i = 0; while ((r -= w[i]) > 0 && i < w.length - 1) i++; return i; };
-// Free choice of subject, inside the syllabus: a student studies subjects up to its own level (curious ones sometimes peek one level up).
+// Choosing a subject, with an objective: first what its level still needs for promotion, then whatever it has been improving at
+// fastest ("learning progress", the signal behind curiosity-driven curricula: Oudeyer & Kaplan 2007, Matiisen et al. 2017),
+// plus a little randomness to keep exploring. Subjects it never tried get an optimistic guess so they are tried at least once.
+// Real-world subjects are only ever its own (it found them online); puzzles invented by others are open to everyone.
 function enroll(a) {
-  const cap = a.level + (Math.random() < a.p.curiosity * 0.25 ? 1 : 0);
-  const avail = SKILLS.map((s, i) => i).filter(i => SKILLS[i].level <= cap && !a.passed.includes(i) && i !== a.dropped);
+  const g = gate(a), cap = a.level + (Math.random() < a.p.curiosity * 0.25 ? 1 : 0);
+  const avail = SKILLS.map((s, i) => i).filter(i => SKILLS[i].level <= cap && !a.passed.includes(i) && i !== a.dropped && (!SKILLS[i].web || SKILLS[i].owner === a.id));
   a.dropped = -1;
   if (!avail.length) { a.skill = -1; return; }
-  const bias = s => (s.level === a.level ? 1 : s.level < a.level ? 0.4 : -0.3) + (s.web ? 0.4 * a.taste.browse : 0);
-  a.skill = avail[weightedPick(avail.map(i => Math.exp((bias(SKILLS[i]) + rnd(0, 0.4)) / 0.3)))];
-  const s = SKILLS[a.skill];
+  const needed = s => g.L.skills.includes(s.name) || (s.web && g.needs.includes(NEED_EXP));
+  const score = i => { const s = SKILLS[i]; return (needed(s) ? 1 : s.level === a.level ? 0.3 : s.level < a.level ? 0 : -0.5) + 6 * (a.lp[i] ?? 0.08); };
+  a.skill = avail[weightedPick(avail.map(i => Math.exp((score(i) + rnd(0, 0.3)) / 0.3)))];
+  const s = SKILLS[a.skill], why = needed(s) ? 'my level needs it' : a.lp[a.skill] > 0.03 ? 'I was making good progress on it' : s.level > a.level ? "it's from the next level, but I want to try" : "I'm curious about it";
   Object.assign(a, {conf: 0.5, bestConf: 0, stuck: 0, struggles: 0, confHist: [], exams: [], examAfter: a.steps + 3000, lastExam: a.steps});
-  think(a, '🎒', `Level ${a.level}: I choose to learn ${s.name} at the ${BUILD[s.tier].label}${s.level > a.level ? '. It is from the next level, but I want to try!' : '.'}`);
+  think(a, '🎒', `Level ${a.level}: I choose ${s.name} at the ${BUILD[s.tier].label}, because ${why}.`);
   a.enrollSteps = a.steps;
 }
 // What is still missing before this student may leave its level?
@@ -492,14 +731,36 @@ function gate(a) {
   const L = SYLLABUS[a.level - 1], needs = [];
   for (const name of L.skills) if (!a.passed.includes(SKILLS.findIndex(s => s.name === name))) needs.push(name);
   const skillsDone = !needs.length;
-  if (L.real && webOn && !a.passed.some(i => SKILLS[i].web)) needs.push('a real-data subject');
-  if (L.create && !a.created) needs.push('create a puzzle or discover a new sense');
+  if (L.real && webOn && !a.passed.some(i => SKILLS[i].web)) needs.push(NEED_EXP);
+  if (L.create && !a.impact) needs.push('invent something another student learns from');
   return {L, needs, skillsDone, ready: !needs.length && !L.open};
+}
+// How far through the seven levels a student is (0..1): finished levels plus the share of its current level's requirements met.
+// At Level 7 the remaining part is teaching: TEACH_GOAL times another student learned from its inventions.
+// ponytail: a student's skill brain holds one subject at a time (one output), so this measures syllabus progress, not how much
+// it still remembers of old subjects; a brain with one output per subject would be needed to measure retention.
+function progress(a) {
+  const g = gate(a), L = g.L;
+  if (L.open) return (6 + Math.min(1, a.impact / TEACH_GOAL)) / 7;
+  const total = L.skills.length + (L.real ? 1 : 0) + (L.create ? 1 : 0);
+  return (a.level - 1 + (total ? Math.max(0, 1 - g.needs.length / total) : 0)) / 7;
+}
+const worldScore = () => Math.round(agents.reduce((n, a) => n + progress(a), 0) / agents.length * 100);
+// A line per day in saves/history.csv, so a week of learning can be plotted and checked.
+let loggedDay = 0, scoreHistory = [], statsSince = Date.now(); // statsSince: when the dashboard counters started
+function logDay() {
+  if (!PY.online || day() === loggedDay) return;
+  loggedDay = day();
+  const row = {date: new Date().toISOString().slice(0, 10), day: loggedDay, world_score: worldScore(), levels: agents.map(a => a.level).join(' '),
+    degrees: agents.reduce((n, a) => n + a.passed.length, 0), real_world_subjects: SKILLS.filter(s => s.web).length, puzzles,
+    times_taught: agents.reduce((n, a) => n + a.impact, 0), avg_like_of_studying: +(agents.reduce((n, a) => n + a.taste.study, 0) / agents.length).toFixed(2)};
+  scoreHistory.push({day: loggedDay, score: row.world_score});
+  pyCall('/world/log', {row}).catch(() => {}); // a missing log line must never pause the world
 }
 function checkPromotion(a) {
   const g = gate(a);
   if (!g.ready) return;
-  a.level++; coins += 100 * a.level; a.reward += 1.5; a.fun = clamp(a.fun + 0.3);
+  a.level++; a.promos.push({level: a.level, lessons: a.steps, at: Date.now()}); coins += 100 * a.level; a.reward += 1.5; a.fun = clamp(a.fun + 0.3);
   const next = SYLLABUS[a.level - 1];
   think(a, '🎓', `I finished Level ${a.level - 1} and I'm promoted to Level ${a.level}: ${next.name}!`);
   news(`🎓 ${a.name} completed Level ${a.level - 1} (${g.L.name}) and is promoted to Level ${a.level}: ${next.name}. +${100 * a.level}💰`, a.level >= 4 ? 'wf' : '');
@@ -520,9 +781,13 @@ async function exam(a) {
   const s = SKILLS[a.skill];
   const acc = (await pyCall('/brain/exam', {id: a.id, skill: a.skill})).acc;
   a.exams.push({n: a.sampleN, acc}); a.lastExam = a.steps;
+  a.examsTaken++; a.tries[a.skill] = (a.tries[a.skill] ?? 0) + 1;
   if (acc >= passOf(s)) {
+    a.examsPassed++; if (a.tries[a.skill] === 1) a.firstTry++;
+    a.cost[a.skill] = a.spent[a.skill] ?? 0; // lessons it needed to pass this subject
     a.passed.push(a.skill);
     coins += REWARD[s.tier]; a.fun = clamp(a.fun + 0.3); a.reward += 1;
+    if (s.by != null && s.by !== a.id) credit(agents[s.by], `${a.name} solved ${s.name}`);
     think(a, '🎉', `I passed ${s.name} with ${pct(acc)}!`);
     if (!s.firstBy) {
       s.firstBy = a.name;
@@ -531,16 +796,16 @@ async function exam(a) {
     } else news(`✅ ${a.name} passed ${s.name} (${pct(acc)}).`);
     a.skill = -1;
   } else {
-    a.fun = clamp(a.fun - 0.15); a.examAfter = a.steps + 8000; a.reward -= 0.4;
+    a.fun = clamp(a.fun - 0.15); a.examAfter = a.steps + 8000; a.reward -= 0.2;
     think(a, '😞', `Only ${pct(acc)} on ${s.name} (need ${pct(passOf(s))}). More practice…`);
   }
 }
 
 // ================= free will: needs + personality + learned likes + a weighted dice roll =================
-const EMOJI = {study: '📖', sleep: '😴', play: '⚽', chat: '💬', read: '📚', exam: '📝', wander: '🚶', browse: '🌐', create: '🧩', none: '👶'};
-const ACT = {study: 'Studying', sleep: 'Sleeping', play: 'Playing', chat: 'Chatting', read: 'Reading papers', exam: 'Taking an exam', wander: 'Exploring', browse: 'Going online', create: 'Inventing a puzzle', none: 'Waking up'};
+const EMOJI = {study: '📖', sleep: '😴', play: '⚽', chat: '💬', read: '📚', exam: '📝', wander: '🚶', browse: '⚛️', create: '🔭', none: '👶'};
+const ACT = {study: 'Studying', sleep: 'Sleeping', play: 'Playing', chat: 'Chatting', read: 'Reading papers', exam: 'Taking an exam', wander: 'Exploring', browse: 'Running a quantum experiment', create: 'Searching for a new circuit', none: 'Waking up'};
 const PLACE_OF = {sleep: 'Dorm', play: 'Park', chat: 'Park', read: 'Library', exam: 'Exam', browse: 'Internet', create: 'Research'};
-const DUR = {study: 600, sleep: 2500, play: 300, chat: 300, read: 240, exam: 150, wander: 260, browse: 260, create: 300, none: 0};
+const DUR = {study: 1500, sleep: 6000, play: 750, chat: 750, read: 600, exam: 375, wander: 650, browse: 650, create: 750, none: 0};
 // Reinforcement learning, simplest form: after each activity the AI asks "how did that feel?" and moves its taste for
 // that activity a little towards the answer. Over time every AI develops its own likes and dislikes.
 function feel(a, act, reward) {
@@ -550,29 +815,38 @@ function feel(a, act, reward) {
 function reflect(a) {
   const st = a.start;
   if (!st || a.act === 'none' || a.act === 'browse') return; // judged later: when the download finishes / when the advice is tested
-  let r = a.reward + 0.5 * ((a.energy - st.energy) + (a.fun - st.fun) + (a.social - st.social));
-  if (a.act === 'study' && a.skill === st.skill) r += 6 * (a.conf - st.conf); // the joy of making progress
+  // Reward = learning first (exam results, promotions, discoveries, teaching: a.reward) plus progress while studying. A need counts
+  // only as much as it was missing: sleeping when exhausted feels good, napping when rested is worth almost nothing.
+  const need = k => (a[k] - st[k]) * (1.2 - st[k]);
+  let r = a.reward + 0.6 * (need('energy') + need('fun') + need('social'));
+  if (a.act === 'study' && a.skill === st.skill && a.skill >= 0) {
+    const gain = a.conf - st.conf;
+    r += 10 * gain; // the joy of making progress
+    a.lp[a.skill] = 0.6 * (a.lp[a.skill] ?? 0.08) + 0.4 * Math.abs(gain); // learning progress on this subject, for choosing what to study
+  }
   feel(a, a.act, r);
 }
-// Self-made challenges: an AI combines two senses it knows into a secret rule and posts it as a new subject.
+// Discoveries (Level 6 and up): a student searches for a two-qubit circuit whose outcome makes a clear, learnable pattern and shares
+// it as a subject for everyone. It counts as teaching when another student passes it. Honest label: new to the AI World only.
 const MAX_PUZZLES = 40;
 let puzzles = 0;
 function inventPuzzle(a) {
-  if (puzzles >= MAX_PUZZLES) return think(a, '🧩', 'There are plenty of puzzles already.');
-  for (let tries = 0; tries < 20; tries++) {
-    const i = pick(a.feats), j = pick(a.feats), times = Math.random() < 0.5, c = rnd(-0.3, 0.3), fi = FEATURES[i].f, fj = FEATURES[j].f;
-    if (i === j) continue;
-    const f = times ? (x, y) => fi(x, y) * fj(x, y) > c : (x, y) => fi(x, y) - fj(x, y) > c;
-    const train = sample(600, f), share = train.filter(p => p[2]).length / train.length;
+  if (puzzles >= MAX_PUZZLES) return think(a, '⚛️', 'There are plenty of circuits to study already.');
+  for (let tries = 0; tries < 30; tries++) {
+    const ops = randomCircuit(), obs = pick(Object.keys(OBS)), f = qc(ops, obs);
+    const train = sample(600, f), test = sample(300, f), share = train.filter(r => r[2]).length / train.length;
     if (share < 0.25 || share > 0.75) continue;
-    const rule = `${FEATURES[i].name} ${times ? '×' : '−'} ${FEATURES[j].name} > ${c.toFixed(2)}`;
-    SKILLS.push({name: `${a.name}'s puzzle #${++puzzles}`, level: 6, tier: 'Research', f, train, test: sample(300, f), firstBy: null, unlocked: true, labels: ['red', 'blue'], rule});
+    const ref = knnAccuracy(train, test);
+    if (ref < 0.8) continue; // only clear patterns are worth sharing
+    const rule = `${circuitText(ops)}: ${obs}`;
+    SKILLS.push({name: `${a.name}'s circuit #${++puzzles}`, level: 6, tier: 'Internet', quantum: true, f, train, test, pass: Math.min(0.92, Math.round((ref - 0.03) * 100) / 100),
+      firstBy: null, unlocked: true, labels: ['no', 'yes'], rule, by: a.id});
     syncSkill(SKILLS.at(-1));
     a.reward += 1; coins += 30; a.created++;
-    think(a, '🧩', `I invented a new puzzle! Secret rule: ${rule}`);
-    return news(`🧩 ${a.name} invented a brand-new puzzle for everyone (secret rule: ${rule}). +30💰`, 'wf');
+    think(a, '⚛️', `I discovered a circuit with a clear pattern: ${rule}`);
+    return news(`⚛️ ${a.name} discovered a quantum circuit for everyone to study: ${rule}. New to the AI World (physicists may know it already). +30💰`, 'wf');
   }
-  think(a, '🧩', 'My puzzle ideas were all too easy or unfair. Maybe later.');
+  think(a, '⚛️', 'None of my circuits made a clear enough pattern. Maybe later.');
 }
 function decide(a) {
   checkPromotion(a);
@@ -584,22 +858,22 @@ function decide(a) {
   const s = a.skill >= 0 ? SKILLS[a.skill] : null, ready = s && a.conf >= passOf(s) - 0.02;
   const opts = [];
   if (s) opts.push(['study', a.p.diligence * a.energy * (0.3 + a.fun) * 2, `I want to get better at ${s.name}`]);
-  opts.push(['sleep', (1 - a.energy) ** 2 * 3, "I'm getting sleepy…"]);
+  opts.push(['sleep', (1 - a.energy) ** 2 * 3 + (isNight() ? 4 : 0), isNight() ? "It's night. Time to sleep." : "I'm getting sleepy…"]);
   opts.push(['play', (1 - a.fun) ** 2 * 2.5, 'So much studying… I need to play!']);
   opts.push(['chat', (1 - a.social) ** 2 * 2.5 * a.p.social, 'I miss my friends']);
   opts.push(['read', a.wantsPaper ? 2.2 : 0.15 * a.p.curiosity, a.wantsPaper ? 'Maybe someone already figured this out. To the Library!' : "Let's see what others have discovered"]);
   if (s && a.steps >= a.examAfter) opts.push(['exam', ready ? 3 : a.steps - a.lastExam > 40000 ? 0.5 : 0, ready ? `I feel ready for the ${s.name} exam!` : "Let's test myself"]);
-  if (webReady()) opts.push(['browse', 0.3 + 0.6 * a.p.curiosity + (!s ? 1.6 : 0) + (!SKILLS.some(k => k.web) ? 0.4 : 0), !s ? "I've learned everything here… what's out on the internet?" : "Let's see what the real world is like"]);
-  if (a.level >= 6 && puzzles < MAX_PUZZLES) opts.push(['create', 0.5 * a.p.curiosity, 'I want to invent a puzzle nobody has seen before']);
+  if (wantsWeb(a)) opts.push(['browse', 0.1 + 0.3 * a.p.curiosity + (!s ? 1.6 : 0), !s ? "I've learned everything here… time for my own experiments" : "Let's design a quantum experiment of my own"]);
+  if (a.level >= 6 && puzzles < MAX_PUZZLES) opts.push(['create', 0.5 * a.p.curiosity, 'I want to discover a circuit nobody here has seen']);
   const g = gate(a); // when the exams are done but something else blocks promotion, steer towards it
   if (g.skillsDone && !g.ready) for (const o of opts) {
-    if (o[0] === 'browse' && g.needs.includes('a real-data subject')) o[1] += 1.2;
-    if (o[0] === 'create' && g.L.create && !a.created) o[1] += 1.2;
+    if (o[0] === 'browse' && g.needs.includes(NEED_EXP)) o[1] += 1.2;
+    if (o[0] === 'create' && (g.L.create && !a.impact || g.L.open && a.impact < TEACH_GOAL)) o[1] += 1.2;
   }
   opts.push(['wander', 0.3 * a.p.curiosity, "I wonder what's over there…"]);
   // The decision brain (Python, PyTorch) adds what it has learned from reward to the world's built-in instincts.
   const state = [a.energy, a.fun, a.social, a.p.diligence, a.p.curiosity, a.p.social, s ? 1 : 0, s ? a.conf : 0, Math.min(1, a.struggles / 5), Math.min(1, a.passed.length / 10),
-    a.wantsPaper ? 1 : 0, Math.min(1, a.firsts / 3), Math.min(1, a.level / 7), webReady() ? 1 : 0];
+    a.wantsPaper ? 1 : 0, Math.min(1, a.firsts / 3), Math.min(1, a.level / 7), wantsWeb(a) ? 1 : 0];
   a.busy = true;
   pyCall('/policy/act', {id: a.id, state, prior: Object.fromEntries(opts.map(o => [o[0], o[1] / 0.35]))}).then(r => {
     a.why = Object.entries(r.probs).sort((x, y) => y[1] - x[1]); a.resid = r.resid;
@@ -608,17 +882,19 @@ function decide(a) {
 }
 function live(a) {
   const doing = a.arrived ? a.act : 'walk';
+  a.time[doing] = (a.time[doing] ?? 0) + 1; // where its time goes (frames)
   const friends = a.place && agents.some(o => o !== a && o.place === a.place && o.arrived);
-  a.energy = clamp(a.energy + (doing === 'sleep' ? 0.0015 : doing === 'study' || doing === 'exam' ? -0.0006 : -0.0003));
-  a.fun = clamp(a.fun + (doing === 'play' ? 0.004 : doing === 'chat' ? 0.002 : doing === 'study' || doing === 'exam' ? -0.0005 : -0.0001));
-  a.social = clamp(a.social + (doing === 'chat' && friends ? 0.004 : friends ? 0.0004 : -0.0003));
+  // ponytail: rates are per frame and were scaled by 0.4 when walking slowed to a natural pace (activities last 2.5x longer to match)
+  a.energy = clamp(a.energy + (doing === 'sleep' ? 0.0015 : doing === 'study' || doing === 'exam' ? -0.0006 : -0.0003) * 0.4);
+  a.fun = clamp(a.fun + (doing === 'play' ? 0.004 : doing === 'chat' ? 0.002 : doing === 'wander' && a.place === 'Hall' ? 0.002 : doing === 'study' || doing === 'exam' ? -0.0005 : -0.0001) * 0.4);
+  a.social = clamp(a.social + (doing === 'chat' && friends ? 0.004 : friends ? 0.0004 : -0.0003) * 0.4);
   if (a.energy < 0.05 && a.act !== 'sleep') return choose(a, 'sleep', 'Too tired… must… sleep…');
   if (!a.arrived) return;
   if (a.busy) return; // waiting for its Python brain
   if (doing === 'study' && a.skill >= 0) study(a, STUDY_STEPS * computeLvl);
   if (doing === 'sleep' && a.skill >= 0) study(a, 3); // "dreaming": slow replay of lessons
   if (a.skill >= 0 && frame % 30 === 0) { a.confHist.push(a.conf); a.sampleN++; if (a.confHist.length > 200) a.confHist.shift(); }
-  if (--a.timer <= 0 || (doing === 'sleep' && a.energy > 0.97)) {
+  if (--a.timer <= 0 || (doing === 'sleep' && a.energy > 0.97 && !isNight())) {
     if (a.act === 'exam' && a.skill >= 0) { a.busy = true; exam(a).catch(e => think(a, '📡', `The exam was interrupted: ${e.message}`)).finally(() => { a.busy = false; reflect(a); decide(a); }); return; }
     if (a.act === 'read') readPaper(a);
     if (a.act === 'browse') goOnline(a);
@@ -631,74 +907,169 @@ function live(a) {
 // ================= UI helpers =================
 const $ = id => document.getElementById(id), pct = v => (v * 100).toFixed(0) + '%';
 const doingText = a => `${a.emoji} ${a.arrived ? ACT[a.act] : 'Walking'} ${a.place ? (a.arrived ? 'at ' : 'to ') + BUILD[a.place].label : ''}`;
-const esc = t => String(t).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`); // model and Wikipedia text is shown as text, never as HTML
+const esc = t => String(t).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`); // text from the world is shown as text, never as HTML
 const agents = NAMES.map((_, i) => makeAgent(i));
-const day = () => (frame / 600 | 0) + 1;
+// Time runs like on Earth: the clock is your computer's local time and a world day lasts 24 hours, turning over at midnight.
+let born = Date.now(); // when this world began (kept in the save)
+const midnight = t => { const d = new Date(t); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); };
+const day = () => Math.round((midnight(Date.now()) - midnight(born)) / 864e5) + 1;
+const isNight = () => { const h = new Date().getHours(); return h >= 22 || h < 6; }; // students sleep through the real night
+const clock = (d = new Date()) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 function feed(el, msg, cls) {
   const d = document.createElement('div');
-  d.textContent = `Day ${day()} — ${msg}`;
+  d.textContent = `Day ${day()} · ${clock()} — ${msg}`;
   if (cls) d.className = cls;
   $(el).prepend(d);
   while ($(el).children.length > 80) $(el).lastChild.remove();
 }
-const news = (msg, cls) => feed('news', msg, cls);
+const news = (msg, cls) => { feed('news', msg, cls); if (cls === 'wf') toast(msg); };
+function toast(msg) { // promotions, world firsts and new buildings: the moments worth stopping for (also in the news feed for screen readers)
+  const t = $('toast'); t.textContent = msg.replace(/\s*\+\d+💰\.?$/, ''); t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+}
 function think(a, emoji, text) {
   a.emoji = emoji; a.thought = text;
-  a.log.unshift(`Day ${day()}: ${emoji} ${text}`); a.log.length = Math.min(a.log.length, 6);
+  a.log.unshift(`Day ${day()} ${clock()}: ${emoji} ${text}`); a.log.length = Math.min(a.log.length, 6);
+  const same = [...$('thoughts').children].slice(0, 12).find(d => d.dataset.t === emoji + text);
+  if (same) { const who = new Set([...same.dataset.who.split(','), a.name]); same.dataset.who = [...who].join(',');
+    same.textContent = `Day ${day()} · ${clock()} — ${[...who].join(', ')}: ${emoji} "${text}"`; $('thoughts').prepend(same); return; }
   feed('thoughts', `${a.name}: ${emoji} "${text}"`);
+  Object.assign($('thoughts').firstChild.dataset, {t: emoji + text, who: a.name});
 }
-const computeCost = () => 60 * 2 ** (computeLvl - 1);
-$('btnWeb').onclick = () => { webOn = !webOn; news(webOn ? '🌐 Internet connection switched ON.' : '📴 Internet connection switched OFF. The AIs can only learn from what is already in the world.'); updateUI(); };
-$('btnPause').onclick = () => { paused = !paused; $('btnPause').textContent = paused ? '▶ Resume' : '⏸ Pause'; };
-$('btnGuide').onclick = () => $('guide').showModal();
+const MAX_COMPUTE = 5; // ponytail: compute is CPU time in Python; each level adds about 1,500 lessons a second per studying student
+const computeCost = () => 500 * 2 ** (computeLvl - 1); // the first one builds the Data Centre
+$('btnWeb').onclick = () => { webOn = !webOn; news(webOn ? '⚛️ The Quantum Lab is open for experiments.' : '⚛️ The Quantum Lab is closed: no new experiments until it opens again (Level 4 students need one of their own to be promoted).'); updateUI(); };
+$('btnPause').onclick = () => { paused = !paused; $('btnPause').innerHTML = paused ? '<svg class="i" aria-hidden="true"><use href="#i-play"/></svg>Resume' : '<svg class="i" aria-hidden="true"><use href="#i-pause"/></svg>'; $('btnPause').setAttribute('aria-label', paused ? 'Resume' : 'Pause'); };
+const openGuide = () => { $('guide').showModal(); $('guide').scrollTop = 0; $('guideTitle').focus(); };
+$('btnGuide').onclick = openGuide;
 if (canSave) $('btnStop').style.display = '';
-$('btnStop').onclick = async () => {
-  if (!confirm('Stop the AI World? The students stop living.')) return;
-  await fetch(API + '/shutdown', {method: 'POST'}).catch(() => {});
-  document.body.innerHTML = '<p style="padding:40px;font:16px system-ui;color:#e6edf3">⏹ The AI World has been stopped. Start it again with start-world.bat or the tray launcher.</p>';
+$('btnStop').onclick = () => confirm('Save the day and stop the AI World? Next time it continues from here.') && stopWorld();
+$('btnSave').onclick = saveWorld;
+$('btnNew').onclick = async () => {
+  if (!PY.online || !confirm('Start a brand-new world? The current one is kept as a backup in the saves folder.')) return;
+  leaving = true;
+  await pyCall('/world/new', {});
+  location.reload();
 };
-$('btnSyll').onclick = () => { renderDashboard(); $('dash').showModal(); $('syllabus')?.scrollIntoView(); };
-$('btnDash').onclick = () => { renderDashboard(); $('dash').showModal(); };
+const openDash = at => { renderDashboard(); $('dash').showModal(); $('dash').scrollTop = 0; if (at) $(at)?.scrollIntoView(); };
+$('btnSyll').onclick = () => openDash('d-syllabus');
+$('btnDash').onclick = () => openDash();
+$('dashBody').onclick = e => { const go = e.target.closest('[data-go]')?.dataset.go; if (go) $(go)?.scrollIntoView({behavior: 'smooth'}); };
 $('dashClose').onclick = () => $('dash').close();
 function syllabusHtml() {
-  return `<h3 id="syllabus">📜 Syllabus: the levels (a student is promoted when it finishes one)</h3>
-  <table><tr><th>Level</th><th>Name</th><th>Education stage · thinking</th><th>Subjects (students who passed)</th><th>Also needed</th><th>Students here</th></tr>
+  return `<h3 id="d-syllabus">Syllabus: the levels (a student is promoted when it finishes one)</h3>
+  <div class="scroll"><table class="wrap"><tr><th>Level</th><th>Name</th><th>Education stage · thinking</th><th>Subjects (students who passed)</th><th>Also needed</th><th>Students here</th></tr>
   ${SYLLABUS.map(L => `<tr><td>${L.n}</td><td><b>${esc(L.name)}</b><br><span class="hint">${esc(L.goal)}</span></td><td>${esc(L.edu)}<br><span class="hint">${esc(L.think)}</span></td>
     <td>${L.skills.map(n => { const i = SKILLS.findIndex(s => s.name === n); return `${esc(n)} (${agents.filter(a => a.passed.includes(i)).length}/${agents.length})`; }).join(' · ') || '–'}</td>
-    <td>${L.real ? 'pass a real-data subject' : L.create ? 'create a puzzle or discover a new sense' : '–'}</td>
-    <td>${esc(agents.filter(a => a.level === L.n).map(a => a.name).join(', ') || '–')}</td></tr>`).join('')}</table>
+    <td>${L.real ? 'pass an experiment of its own from the Quantum Lab' : L.create ? 'invent something another student learns from' : L.open ? `goal: teach others ${TEACH_GOAL} times` : 'nothing extra'}</td>
+    <td>${esc(agents.filter(a => a.level === L.n).map(a => a.name).join(', ') || 'nobody')}</td></tr>`).join('')}</table></div>
   <p class="hint">Easy before hard (curriculum learning), in the teaching order used by TensorFlow Playground. Education stages follow UNESCO's ISCED and the thinking column follows the revised Bloom's taxonomy.</p>
   <h3>All subjects in detail</h3>
-  <table><tr><th>Level</th><th>Subject</th><th>What the student must learn</th><th>Pass mark</th><th>Passed by</th></tr>
-  ${SKILLS.map((s, i) => `<tr><td>${s.level}</td><td>${s.web ? '🌐 ' : s.rule ? '🧩 ' : ''}${esc(s.name)}</td><td>${esc(CORE_ABOUT[s.name] ?? (s.web ? `Real data (${s.web.host}): ${s.web.axes.join(' + ')} → ${s.labels[1]}` : `Secret rule made by a student: ${s.rule}`))}</td><td>${pct(passOf(s))}</td><td>${agents.filter(a => a.passed.includes(i)).length}/${agents.length}</td></tr>`).join('')}</table>`;
+  <div class="scroll"><table class="wrap"><tr><th>Level</th><th>Subject</th><th>What the student must learn</th><th>Pass mark</th><th>Passed by</th></tr>
+  ${SKILLS.map((s, i) => `<tr><td>${s.level}</td><td>${s.quantum ? '⚛️ ' : s.web ? '🌐 ' : s.rule ? '🧩 ' : ''}${esc(s.name)}</td><td>${esc(CORE_ABOUT[s.name] ?? s.about ?? (s.web ? `${s.quantum ? 'Its own experiment' : 'Legacy: public data from before the Quantum Lab'} (${s.web.host}): ${s.web.axes.join(' + ')} → ${s.labels[1]}` : `Secret rule made by a student: ${s.rule}`))}</td><td>${pct(passOf(s))}</td><td>${agents.filter(a => a.passed.includes(i)).length}/${agents.length}</td></tr>`).join('')}</table></div>`;
 }
-function renderDashboard() {
+// ---- "Who's ahead, and why": every student uses the same code; these numbers show where they differ.
+const ACT_COLOR = {study: '#58a6ff', exam: '#d29922', sleep: '#6e7681', play: '#f778ba', chat: '#7ee787', read: '#d2a8ff', browse: '#79c0ff', create: '#f2cc60', wander: '#a5d6ff', walk: '#e3b341', none: '#3a4566'};
+const isLegacy = s => s.web && !s.quantum; // subjects from the old web search, kept so saved degrees stay valid
+const progressKey = a => a.level * 1000 + a.passed.length;
+const studyShare = a => { const t = Object.values(a.time).reduce((x, y) => x + y, 0); return t ? (a.time.study ?? 0) / t : null; };
+const perDegree = a => { const c = Object.values(a.cost); return c.length ? c.reduce((x, y) => x + y, 0) / c.length : null; };
+const firstTryRate = a => a.examsPassed ? a.firstTry / a.examsPassed : null;
+const fmtK = n => n == null ? 'not yet' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(Math.round(n));
+const pctOr = v => v == null ? 'not yet' : pct(v);
+function whyNote(lead, last) { // the biggest measured differences between the leader and the student furthest behind
+  const facts = [
+    [studyShare(lead), studyShare(last), v => pct(v), 'of its time studying', true],
+    [perDegree(lead), perDegree(last), fmtK, 'lessons needed per subject passed', false],
+    [firstTryRate(lead), firstTryRate(last), v => pct(v), 'of its exams passed on the first try', true],
+    [connections(lead), connections(last), v => String(v), 'connections in its skill brain', true],
+    [lead.lr, last.lr, v => v.toFixed(3), 'learning rate', null],
+    [lead.p.curiosity, last.p.curiosity, v => pct(v), 'curiosity', null],
+    [lead.p.diligence, last.p.diligence, v => pct(v), 'diligence', null]]
+    .filter(([x, y]) => x != null && y != null && Math.max(x, y) > 0)
+    .map(f => ({f, gap: Math.abs(f[0] - f[1]) / Math.max(Math.abs(f[0]), Math.abs(f[1]))}))
+    .sort((u, v) => v.gap - u.gap).slice(0, 3);
+  if (!facts.length) return '';
+  return `<p class="hint" style="font-size:13px;color:var(--text)">🔎 <b>${esc(lead.name)}</b> (Level ${lead.level}, ${lead.passed.length} degrees) vs <b>${esc(last.name)}</b> (Level ${last.level}, ${last.passed.length} degrees), biggest measured differences: ${facts.map(({f: [x, y, fmt, what]}) => `${esc(lead.name)} ${fmt(x)} vs ${fmt(y)} ${what}`).join('; ')}.</p>
+  <p class="hint">These are correlations between 10 students, not proof of cause. A twin experiment (two copies that differ in one thing) would show cause.</p>`;
+}
+function raceHtml() {
+  const order = [...agents].sort((x, y) => progressKey(y) - progressKey(x)), since = new Date(statsSince).toLocaleString();
+  const dot = a => `<span class="dot" style="background:${a.color}"></span>${esc(a.name)}`;
+  // [header, value or null, counted since statsSince]; a column nobody has a value for yet is left out
+  const COLS = [['Level', a => 'L' + a.level], ['Degrees', a => a.passed.length], ['Lessons', a => fmtK(a.steps)],
+    ['Lessons / subject', a => perDegree(a) == null ? null : fmtK(perDegree(a)), 1], ['First-try passes', a => firstTryRate(a) == null ? null : pct(firstTryRate(a)), 1],
+    ['Exams passed', a => a.examsTaken ? `${a.examsPassed}/${a.examsTaken}` : null, 1], ['Studying', a => studyShare(a) == null ? null : pct(studyShare(a)), 1],
+    ['Learning rate', a => a.lr.toFixed(3)], ['Brain', a => `${a.sizes.join('-')} · ${connections(a)}`], ['Senses', a => a.feats.length],
+    ['Diligent', a => pct(a.p.diligence)], ['Curious', a => pct(a.p.curiosity)]].filter(([, f]) => agents.some(a => f(a) != null));
+  const NOT_YET = `<span class="legacy" title="Counting started ${esc(since)}">not yet</span>`;
+  const board = `<p class="hint">Columns marked * count only since ${esc(since)}, when these counters were added; progress made earlier (levels, degrees, lessons) is real but not in them.</p>
+    <div class="scroll"><table><tr><th>#</th><th>Student</th>${COLS.map(([h, , since]) => `<th>${h}${since ? '*' : ''}</th>`).join('')}</tr>
+    ${order.map((a, i) => `<tr><td>${i + 1}</td><td>${dot(a)}</td>${COLS.map(([, f]) => `<td>${f(a) ?? NOT_YET}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  // subject race: lessons each student needed to pass each subject (fewer = learned faster); the fastest in each column is green
+  const cols = SKILLS.map((_, i) => i).filter(i => agents.some(a => a.cost[i] != null));
+  const race = cols.length ? `<div class="scroll"><table class="matrix"><tr><th>Lessons needed to pass</th>${cols.map(i => `<th title="${esc(SKILLS[i].name)}">${esc(SKILLS[i].name.length > 13 ? SKILLS[i].name.slice(0, 12) + '…' : SKILLS[i].name)}</th>`).join('')}</tr>
+    ${order.map(a => `<tr><th>${dot(a)}</th>${cols.map(i => { const v = a.cost[i], best = Math.min(...agents.map(o => o.cost[i] ?? Infinity)); return v == null ? '<td></td>' : `<td class="${v === best ? 'ok' : ''}">${fmtK(v)}</td>`; }).join('')}</tr>`).join('')}</table></div>`
+    : `<p class="hint">The subject race fills in as students pass subjects (counting since ${esc(since)}).</p>`;
+  // where the time goes
+  const acts = Object.keys(ACT_COLOR);
+  const bars = order.map(a => { const t = acts.reduce((n, k) => n + (a.time[k] ?? 0), 0); return `<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:90px">${dot(a)}</span><span style="flex:1;display:flex;height:12px;border-radius:6px;overflow:hidden;background:#1c2540">${t ? acts.map(k => a.time[k] ? `<i title="${k}: ${pct(a.time[k] / t)}" style="width:${a.time[k] / t * 100}%;background:${ACT_COLOR[k]}"></i>` : '').join('') : ''}</span><span class="hint" style="width:48px;margin:0">${pctOr(studyShare(a))}</span></div>`; }).join('');
+  const legend = acts.filter(k => k !== 'none').map(k => `<span style="margin-right:10px"><span class="dot" style="background:${ACT_COLOR[k]}"></span>${k === 'browse' ? 'experiments' : k}</span>`).join('');
+  // promotion timeline: level against lessons, one line per student (promotions recorded since the counters started)
+  const W = 640, H = 170, maxL = Math.max(1, ...agents.map(a => a.steps)), X = v => 34 + v / maxL * (W - 50), Yl = l => H - 22 - (l - 1) / 6 * (H - 40);
+  const lines = agents.map(a => { const pts = [...a.promos.map(q => [q.lessons, q.level]), [a.steps, a.level]]; if (pts.length === 1) pts.unshift([0, Math.max(1, a.level - a.promos.length)]);
+    return `<polyline fill="none" stroke="${a.color}" stroke-width="2" points="${pts.map(([x, l]) => `${X(x)},${Yl(l)}`).join(' ')}"/><circle cx="${X(a.steps)}" cy="${Yl(a.level)}" r="4" fill="${a.color}"><title>${esc(a.name)}: Level ${a.level}</title></circle>`; }).join('')
+    + agents.map((a, i) => `<text x="${Math.min(W - 60, X(a.steps) + 6)}" y="${Yl(a.level) - 6 - (agents.slice(0, i).filter(o => o.level === a.level && Math.abs(X(o.steps) - X(a.steps)) < 50).length * 11)}" fill="${a.color}" font-size="10">${esc(a.name)}</text>`).join('');
+  const timeline = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;background:#0b0f1c;border:1px solid var(--line);border-radius:8px">
+    ${[1, 2, 3, 4, 5, 6, 7].map(l => `<line x1="34" x2="${W - 16}" y1="${Yl(l)}" y2="${Yl(l)}" stroke="#1c2540"/><text x="8" y="${Yl(l) + 4}" fill="#97a3c2" font-size="10">L${l}</text>`).join('')}
+    <text x="${W - 16}" y="${H - 6}" fill="#97a3c2" font-size="10" text-anchor="end">lessons →</text>${lines}</svg>`;
+  return `${whyNote(order[0], order.at(-1))}${board}
+  <h3 class="small">Subject race</h3>${race}<div class="hint">Fewer lessons = learned it faster. Green = fastest in that subject.</div>
+  <h3 class="small">Where the time goes</h3>${bars}<div class="hint">${legend}</div>
+  <h3 class="small">Promotion timeline</h3>${timeline}<div class="hint">Each line is a student: level against lessons studied. Promotions are recorded since ${esc(since)}; earlier ones show as a single jump.</div>`;
+}
+function scoreChart() { // one point per day from saves/history.csv's numbers, plus today
+  const pts = [...scoreHistory.filter(p => p.day !== day()), {day: day(), score: worldScore()}], W = 640, H = 140, n = Math.max(1, pts.length - 1);
+  const xy = pts.map((p, i) => [24 + i / n * (W - 48), H - 20 - p.score / 100 * (H - 40)]);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;background:#0b0f1c;border:1px solid var(--line);border-radius:8px">
+    <line x1="24" x2="${W - 24}" y1="${H - 20}" y2="${H - 20}" stroke="#263150"/><text x="24" y="14" fill="#97a3c2" font-size="11">100% = every student has finished Level 7, including teaching</text>
+    <polyline fill="none" stroke="#58a6ff" stroke-width="2.5" points="${xy.map(p => p.join(',')).join(' ')}"/>
+    ${xy.map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="4" fill="#58a6ff"/><text x="${x}" y="${y - 8}" fill="#eaeefa" font-size="11" text-anchor="middle">${pts[i].score}%</text><text x="${x}" y="${H - 5}" fill="#97a3c2" font-size="10" text-anchor="middle">Day ${pts[i].day}</text>`).join('')}</svg>`;
+}
+let dashHtml = '';
+function renderDashboard(live) { // live refreshes skip while the pointer or focus is inside, so reading and tooltips aren't interrupted
+  if (live && ($('dash').matches(':hover') || $('dashBody').contains(document.activeElement))) return;
   const degrees = agents.reduce((n, a) => n + a.passed.length, 0);
   const card = (big, small) => `<div class="card"><b>${big}</b><span>${small}</span></div>`;
   const cell = (a, i) => a.passed.includes(i) ? '<td class="ok">✓</td>' : a.skill === i ? `<td class="now">${pct(a.conf)}</td>` : '<td></td>';
   const short = n => esc(n.length > 13 ? n.slice(0, 12) + '…' : n);
-  $('dashBody').innerHTML = `
-  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(`L${Math.max(...agents.map(a => a.level))}`, 'highest level reached')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(published.filter(Boolean).length - 2, 'new senses discovered and published')}${card(SKILLS.filter(s => s.web).length, 'real datasets from the internet')}${card(PY.online ? 'PyTorch' : 'offline', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'Python brains not connected')}</div>
+  const html = `
+  <div class="cards">${card(`${SKILLS.filter(s => s.firstBy).length}/${SKILLS.length}`, 'subjects solved by someone')}${card(degrees, 'degrees earned in total')}${card(`L${Math.max(...agents.map(a => a.level))}`, 'highest level reached')}${card(agents.reduce((n, a) => n + a.firsts, 0), 'world firsts')}${card(published.filter(Boolean).length - 2, 'new senses discovered and published')}${card(SKILLS.filter(s => s.web && s.quantum).length, 'Quantum Lab experiments of their own')}${SKILLS.some(isLegacy) ? card(SKILLS.filter(isLegacy).length, 'legacy data subjects (from before the Quantum Lab)') : ''}${card(PY.online ? 'PyTorch' : 'offline', PY.online ? `brain engine · ${PY.info.lessons.toLocaleString()} lessons · ${PY.info.policy_updates.toLocaleString()} decision-brain updates` : 'Python brains not connected')}</div>
+  <nav class="dnav" aria-label="Dashboard sections">${[['ahead', "Who's ahead"], ['score', 'World score'], ['syllabus', 'Syllabus'], ['learned', 'Who learned what'], ['students', 'The students']].map(([id, t]) => `<button data-go="d-${id}">${t}</button>`).join('')}</nav>
+  <h3 id="d-ahead">Who's ahead, and why</h3>${raceHtml()}
+  <h3 id="d-score">World score, day by day</h3>${scoreChart()}
   ${syllabusHtml()}
-  <h3>Who has learned what</h3>
-  <div class="scroll"><table class="matrix"><tr><th>AI</th>${SKILLS.map(s => `<th title="${esc(s.name)}">${s.web ? '🌐' : s.rule ? '🧩' : ''}${short(s.name)}</th>`).join('')}</tr>
+  <h3 id="d-learned">Who has learned what</h3>
+  <div class="scroll"><table class="matrix"><tr><th>AI</th>${SKILLS.map(s => `<th title="${esc(s.name)}">${s.quantum ? '⚛️' : s.web ? '🗄' : s.rule ? '🧩' : ''}${short(s.name)}</th>`).join('')}</tr>
   ${agents.map(a => `<tr><th><span class="dot" style="background:${a.color}"></span>${a.name}</th>${SKILLS.map((_, i) => cell(a, i)).join('')}</tr>`).join('')}
   <tr><th>first solved by</th>${SKILLS.map(s => `<td>${esc(s.firstBy ?? '')}</td>`).join('')}</tr></table></div>
-  <div class="hint">✓ = passed the exam · % = studying it right now (practice score) · empty = not learned yet</div>
-  <h3>The students</h3>
+  <div class="hint">✓ = passed the exam · % = studying it right now (practice score) · empty = not learned yet · ⚛️ quantum · 🧩 invented by a student · 🗄 legacy data subject</div>
+  <h3 id="d-students">The students</h3>
   <div class="models">
   ${agents.map(a => { const fav = Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1])[0]; return `<div class="model"><b><span class="dot" style="background:${a.color}"></span>${a.name}</b>${a.firsts ? ` · ★${a.firsts} world firsts` : ''}<br>
     Skill brain (PyTorch): ${a.sizes.join('-')} neurons, <b>${connections(a)}</b> connections${PY.online && PY.info?.policy?.[a.id] ? ` · decision brain: ${PY.info.policy[a.id].updates} updates, avg reward ${PY.info.policy[a.id].reward}` : ''}<br>
     Level ${a.level} (${esc(SYLLABUS[a.level - 1].name)}) · Now: ${esc(doingText(a))}<br>Degrees (${a.passed.length}): ${esc(a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet')}<br>
     Senses: ${esc(a.feats.map(i => FEATURES[i].name).join(', '))}<br>
-    Puzzles created or senses discovered: ${a.created} · likes ${fav ? `${EMOJI[fav[0]]} ${fav[0]}` : '–'} · ${a.steps.toLocaleString()} lessons</div>`; }).join('')}</div>`;
+    Puzzles created or senses discovered: ${a.created} · taught others: ${a.impact} · likes ${fav ? `${EMOJI[fav[0]]} ${fav[0]}` : 'nothing yet'} · ${a.steps.toLocaleString()} lessons</div>`; }).join('')}</div>
+  <p class="hint">This dashboard updates live whenever the pointer is outside it.</p>`;
+  if (html !== dashHtml) $('dashBody').innerHTML = dashHtml = html;
 }
 $('guideClose').onclick = () => $('guide').close();
 
 // ================= 3D world =================
 // Performance budget for Intel iGPUs: Lambert materials, no real-time shadows (blob shadows instead),
 // static buildings merged into one mesh per material, all scenery instanced, pixel ratio capped.
-const R = 18, FLOOR = 0.1, SPEED = 0.0048, RING_R = 11, ROAD_R = 4.7, Y = new THREE.Vector3(0, 1, 0);
+// WALK: walking speed in radians of the planet per second (about 1.2 town units a second: a brisk human walk at this scale)
+const R = 18, FLOOR = 0.1, WALK = 0.065, RING_R = 11, ROAD_R = 4.7, Y = new THREE.Vector3(0, 1, 0);
 const HUB = new THREE.Vector3(0, 0, 1), EAST = new THREE.Vector3(1, 0, 0), NORTH = new THREE.Vector3(0, 1, 0);
 const host = $('world');
 // Quality: Auto scales the render resolution to keep ~60 fps (what makes this usable on integrated graphics), High is sharp
@@ -712,6 +1083,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 host.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
 scene.background = new THREE.Color(0x070b14);
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
 const fit = () => { renderer.setPixelRatio(QUALITY.dpr); renderer.setSize(host.clientWidth, host.clientHeight); };
@@ -758,17 +1130,22 @@ const T = {
   grass: tex((x, s) => { x.fillStyle = '#5fa34a'; x.fillRect(0, 0, s, s); speckle(x, s, 900, () => `hsl(${95 + Math.random() * 25},45%,${30 + Math.random() * 25}%)`); }, 4, 4),
   asphalt: tex((x, s) => { x.fillStyle = '#4a4e55'; x.fillRect(0, 0, s, s); speckle(x, s, 700, () => `rgba(255,255,255,${Math.random() * 0.08})`); x.fillStyle = '#e8e2c8'; x.fillRect(s / 2 - 2, 0, 4, s / 2); x.fillStyle = '#d0d3d8'; x.fillRect(4, 0, 3, s); x.fillRect(s - 7, 0, 3, s); }),
 };
-const mat = (c, map) => new THREE.MeshLambertMaterial({color: c, map, flatShading: !map});
+// Physically based materials (roughness/metalness) with a soft studio environment for reflections; ENV_MATS lets the sky dim the
+// reflections at night. Instancing, merged meshes and auto-resolution keep it smooth on integrated graphics.
+const ENV_MATS = [];
+const pbr = o => { const m = new THREE.MeshStandardMaterial({roughness: 0.85, metalness: 0, ...o}); ENV_MATS.push(m); return m; };
+const mat = (c, map, o = {}) => pbr({color: c, map, flatShading: !map, ...o});
 const M = {
   brick: mat(0xffffff, T.brick), plaster: mat(0xffffff, T.plaster), stone: mat(0xd9d4c7), sand: mat(0xf0d9b0, T.plaster), white: mat(0xf2f2f2),
   slate: mat(0x5c6b7a), pastel: mat(0xcfe6f2, T.plaster), woodWall: mat(0xd9b48a, T.plaster), wood: mat(0x8a5a32), planks: mat(0xffffff, T.planks),
   tiles: mat(0xffffff, T.tiles), paving: mat(0xffffff, T.paving), grass: mat(0xffffff, T.grass), road: mat(0xffffff, T.asphalt),
   dark: mat(0x353b45), roof: mat(0x9c3b2e), blueRoof: mat(0x4a6582), greyRoof: mat(0x5a5f66), gold: mat(0xf2cc60), board: mat(0x24543a),
-  glass: new THREE.MeshLambertMaterial({color: 0x8fc4e8, emissive: 0x1a3550}), water: mat(0x4aa3df), leaf: mat(0x3c8f3e), trunk: mat(0x6b4a2b),
+  glass: pbr({color: 0x8fc4e8, emissive: 0x1a3550, roughness: 0.08, metalness: 0.4}), water: mat(0x4aa3df, undefined, {roughness: 0.2}), leaf: mat(0x3c8f3e), trunk: mat(0x6b4a2b),
   screen: new THREE.MeshBasicMaterial({color: 0x5fe3ff, toneMapped: false}), lamp: new THREE.MeshBasicMaterial({color: 0xffe2a0, toneMapped: false}),
   led: new THREE.MeshBasicMaterial({color: 0x3fb950, toneMapped: false}), beacon: new THREE.MeshBasicMaterial({color: 0xff4040, toneMapped: false}),
   shadow: new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2}),
 };
+Object.assign(M.gold, {roughness: 0.3, metalness: 0.85}); Object.assign(M.dark, {roughness: 0.45, metalness: 0.35}); Object.assign(M.road, {roughness: 0.95});
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d).translate(0, h / 2, 0);
 const pyramid = (side, h) => new THREE.ConeGeometry(side / Math.SQRT2, h, 4).rotateY(Math.PI / 4).translate(0, h / 2, 0);
 const cyl = (rt, rb, h, seg = 12) => new THREE.CylinderGeometry(rt, rb, h, seg).translate(0, h / 2, 0);
@@ -793,7 +1170,7 @@ function canvasLabel(text, color, bg, W = 256) {
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
   const draw = t => {
     const x = c.getContext('2d'); x.clearRect(0, 0, W, 64);
-    x.font = '600 28px system-ui';
+    x.font = '600 28px "Schibsted Grotesk", system-ui';
     while (x.measureText(t).width > W - 36 && t.length > 4) t = t.slice(0, -2) + '…';
     const w = x.measureText(t).width + 28;
     x.fillStyle = bg; x.beginPath(); x.roundRect(W / 2 - w / 2, 8, w, 48, 24); x.fill();
@@ -803,7 +1180,7 @@ function canvasLabel(text, color, bg, W = 256) {
   draw(text);
   return {tex, draw};
 }
-function label(text, color = '#e6edf3', scale = 1, wide = false, bg = 'rgba(13,17,23,.8)') {
+function label(text, color = '#eaeefa', scale = 1, wide = false, bg = 'rgba(13,17,23,.8)') {
   const W = wide ? 512 : 256, {tex, draw} = canvasLabel(text, color, bg, W);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({map: tex, transparent: true, toneMapped: false}));
   s.scale.set(W / 256 * 2.4 * scale, 0.6 * scale, 1);
@@ -813,15 +1190,20 @@ function label(text, color = '#e6edf3', scale = 1, wide = false, bg = 'rgba(13,1
 }
 
 // --- buildings: paved plot, textured floor, full back/side walls with windows, half-height front wall (dollhouse cut-away) ---
+const plot = (pw, pd) => [part(new THREE.BoxGeometry(pw, 0.08, pd).translate(0, FLOOR - 0.04, 0), M.paving),
+  part(new THREE.CylinderGeometry(Math.SQRT1_2, Math.SQRT1_2 * 1.5, 1, 4, 1).rotateY(Math.PI / 4).scale(pw, 1, pd).translate(0, FLOOR - 0.58, 0), M.grass)];
 function room(w, d, wall, floor, h = 1.2) {
   const t = 0.1, gap = 1.0, seg = (w - gap) / 2, fh = 0.45;
-  const g = group(part(new THREE.BoxGeometry(w + 1.4, 1, d + 1.4).translate(0, FLOOR - 0.5, 0), M.paving),
+  const g = group(...plot(w + 1.4, d + 1.4),
     part(box(w, 0.02, d), floor, 0, FLOOR, 0),
     part(box(w, h, t), wall, 0, FLOOR, -d / 2 + t / 2), part(box(t, h, d), wall, -w / 2 + t / 2, FLOOR, 0), part(box(t, h, d), wall, w / 2 - t / 2, FLOOR, 0),
     part(box(seg, fh, t), wall, -(gap + seg) / 2, FLOOR, d / 2 - t / 2), part(box(seg, fh, t), wall, (gap + seg) / 2, FLOOR, d / 2 - t / 2),
     part(box(w + 0.06, 0.06, t + 0.06), M.white, 0, FLOOR + h, -d / 2 + t / 2));
-  for (let x = -w / 2 + 0.8; x < w / 2 - 0.5; x += 1.15) g.add(part(box(0.55, 0.45, 0.04), M.glass, x, FLOOR + 0.5, -d / 2 - 0.01));
-  for (let z = -d / 2 + 0.7; z < d / 2 - 0.5; z += 1.1) for (const sx of [-1, 1]) g.add(part(box(0.04, 0.45, 0.55), M.glass, sx * (w / 2 + 0.01), FLOOR + 0.5, z));
+  for (let x = -w / 2 + 0.8; x < w / 2 - 0.5; x += 1.15) g.add(part(box(0.55, 0.45, 0.04), M.glass, x, FLOOR + 0.5, -d / 2 - 0.02),
+    part(box(0.64, 0.54, 0.03), M.white, x, FLOOR + 0.455, -d / 2 - 0.005), part(box(0.72, 0.04, 0.1), M.white, x, FLOOR + 0.44, -d / 2 - 0.05));
+  for (let z = -d / 2 + 0.7; z < d / 2 - 0.5; z += 1.1) for (const sx of [-1, 1]) g.add(part(box(0.04, 0.45, 0.55), M.glass, sx * (w / 2 + 0.02), FLOOR + 0.5, z),
+    part(box(0.03, 0.54, 0.64), M.white, sx * (w / 2 + 0.005), FLOOR + 0.455, z), part(box(0.1, 0.04, 0.72), M.white, sx * (w / 2 + 0.05), FLOOR + 0.44, z));
+  g.add(part(box(w + 0.08, 0.13, 0.05), M.stone, 0, FLOOR, -d / 2 - 0.02), part(box(0.05, 0.13, d + 0.08), M.stone, -w / 2 - 0.02, FLOOR, 0), part(box(0.05, 0.13, d + 0.08), M.stone, w / 2 + 0.02, FLOOR, 0));
   return g;
 }
 function deskGrid(g, deskMat, extra) {
@@ -878,6 +1260,8 @@ function buildInternet() {
     for (let k = 0; k < 4; k++) g.add(part(box(0.5, 0.03, 0.01), M.led, x, FLOOR + 0.2 + k * 0.2, -d / 2 + 0.48));
   }
   const spots = deskGrid(g, M.white, (x, z) => g.add(part(box(0.32, 0.2, 0.03), M.screen, x, FLOOR + 0.3, z - 0.08)));
+  for (const [r, y] of [[0.32, 1.0], [0.26, 0.82], [0.2, 0.64], [0.14, 0.46]]) g.add(part(cyl(r, r, 0.05, 18), M.gold, -2.25, FLOOR + y, 1.15));
+  g.add(part(cyl(0.025, 0.025, 0.6, 6), M.gold, -2.25, FLOOR + 0.46, 1.15), part(cyl(0.36, 0.36, 0.06, 18), M.dark, -2.25, FLOOR + 1.12, 1.15));
   // satellite dish on a mast behind the building: this is where the AIs reach the real internet
   const dish = part(new THREE.SphereGeometry(0.6, 14, 6, 0, TAU, 0, Math.PI / 3).rotateX(Math.PI).translate(0, 0.6, 0), M.white, w / 2 - 0.4, FLOOR + 2.2, -d / 2 - 0.4);
   dish.rotation.x = -0.7;
@@ -895,7 +1279,8 @@ function buildDorm() {
   return {g, spots, w, d, roof: gableRoof(w, d, M.blueRoof)};
 }
 function buildPark() {
-  const g = group(part(new THREE.CylinderGeometry(3.3, 3.3, 1, 28).translate(0, FLOOR - 0.52, 0), M.paving),
+  const g = group(part(new THREE.CylinderGeometry(3.3, 3.3, 0.08, 28).translate(0, FLOOR - 0.06, 0), M.paving),
+    part(new THREE.CylinderGeometry(3.3, 4.6, 1, 28).translate(0, FLOOR - 0.6, 0), M.grass),
     part(new THREE.CylinderGeometry(2.8, 2.8, 0.03, 28).translate(0, FLOOR, 0), M.grass),
     part(cyl(0.6, 0.7, 0.3), M.stone, 0, FLOOR), part(cyl(0.5, 0.5, 0.31), M.water, 0, FLOOR), part(cyl(0.08, 0.12, 0.7, 6), M.stone, 0, FLOOR),
     part(new THREE.SphereGeometry(0.15, 8, 6), M.water, 0, FLOOR + 0.75));
@@ -908,23 +1293,77 @@ function buildPark() {
   const spots = Array.from({length: 10}, (_, i) => { const a = i / 10 * TAU, x = Math.cos(a) * 1.4, z = Math.sin(a) * 1.4; return {x, z, yaw: Math.atan2(-x, -z)}; });
   return {g, spots, w: 6.6, d: 6.6, round: true, roof: null};
 }
+function buildDataCentre() {
+  const w = 5.2, d = 3.4, g = room(w, d, M.slate, M.tiles);
+  for (const z of [-1.1, 0.1]) for (const x of [-2, -1, 0, 1, 2]) { // two rows of server racks with blinking lights
+    g.add(part(box(0.6, 1.05, 0.45), M.dark, x, FLOOR, z));
+    for (let k = 0; k < 5; k++) g.add(part(box(0.45, 0.025, 0.01), M.led, x, FLOOR + 0.15 + k * 0.18, z + 0.23));
+  }
+  const spots = [-2, -1, 0, 1, 2].map(x => ({x, z: 1.15, yaw: Math.PI}));
+  [-1.5, 1.5].forEach(x => spots.push({x, z: 1.4, yaw: Math.PI}));
+  while (spots.length < 10) spots.push({...spots[spots.length % 5], z: 1.45});
+  const roof = group(part(box(w + 0.2, 0.12, d + 0.2), M.dark, 0, FLOOR + 1.2));
+  for (const x of [-1.6, 0, 1.6]) roof.add(part(cyl(0.38, 0.38, 0.25, 14), M.white, x, FLOOR + 1.32, 0));
+  return {g, spots, w, d, roof};
+}
+function buildLecture() {
+  const w = 5.6, d = 3.8, g = room(w, d, M.plaster, M.planks);
+  g.add(part(box(3.2, 0.8, 0.05), M.board, 0, FLOOR + 0.35, -d / 2 + 0.12), part(box(0.5, 0.55, 0.35), M.wood, 0, FLOOR, -d / 2 + 0.75));
+  const spots = deskGrid(g, M.wood);
+  for (const x of [-2.4, -1.2, 0, 1.2, 2.4]) g.add(part(cyl(0.08, 0.08, 1.2, 8), M.white, x, FLOOR, d / 2 + 0.45));
+  return {g, spots, w, d, roof: gableRoof(w, d, M.roof)};
+}
+function buildDataLab() {
+  const w = 5.4, d = 3.6, g = room(w, d, M.white, M.tiles);
+  const spots = deskGrid(g, M.white, (x, z) => g.add(part(box(0.3, 0.2, 0.03), M.screen, x, FLOOR + 0.3, z - 0.08), part(box(0.3, 0.2, 0.03), M.screen, x + 0.18, FLOOR + 0.3, z - 0.02)));
+  g.add(part(box(2.6, 0.7, 0.05), M.screen, 0, FLOOR + 0.35, -d / 2 + 0.12)); // a wall of charts
+  const roof = group(part(box(w + 0.2, 0.12, d + 0.2), M.slate, 0, FLOOR + 1.2), part(new THREE.SphereGeometry(0.9, 14, 7, 0, TAU, 0, Math.PI / 2), M.white, 1.4, FLOOR + 1.3, -0.4));
+  return {g, spots, w, d, roof};
+}
+function buildHall() {
+  const w = 5.8, d = 3.8, g = room(w, d, M.stone, M.tiles), spots = [];
+  for (const z of [-0.8, 0.7]) for (const x of [-2.1, -0.7, 0.7, 2.1]) { // pedestals with golden trophies: the world's discoveries
+    g.add(part(box(0.4, 0.45, 0.4), M.white, x, FLOOR, z), part(new THREE.IcosahedronGeometry(0.14, 0), M.gold, x, FLOOR + 0.62, z));
+    spots.push({x: x + 0.45, z: z + 0.1, yaw: -Math.PI / 2});
+  }
+  spots.push({x: -0.1, z: 1.4, yaw: Math.PI}, {x: 0.6, z: 1.4, yaw: Math.PI});
+  for (const x of [-2.6, -1.3, 1.3, 2.6]) g.add(part(cyl(0.11, 0.11, 1.2, 10), M.white, x, FLOOR, d / 2 + 0.45));
+  const ped = part(new THREE.CylinderGeometry(0.6, 0.6, w + 0.4, 3).rotateZ(Math.PI / 2).rotateX(-Math.PI / 2).scale(1, 0.6, 1), M.stone, 0, FLOOR + 1.55, d / 2 + 0.3);
+  return {g, spots, w, d, roof: group(part(box(w + 0.4, 0.15, d + 1.1), M.stone, 0, FLOOR + 1.2, 0.3), ped)};
+}
+// Buildings the students can add later. They stand on an outer ring, in the gaps between the first buildings, each with its own
+// street. "unlock" says when the class has earned the right to build it; the coins pay for it.
+const OUTER = {
+  DataCentre: {label: 'Data Centre', icon: '🖥️', make: buildDataCentre, color: '#56d364', slot: 0, cost: () => computeCost(),
+    when: 'a student reaches Level 4', unlocked: () => agents.some(a => a.level >= 4),
+    effect: () => `More compute: every studying student does about ${(STUDY_STEPS * 60 * (computeLvl + 1)).toLocaleString()} lessons a second instead of ${(STUDY_STEPS * 60 * computeLvl).toLocaleString()}.`},
+  DataLab: {label: 'Data Lab', icon: '📈', make: buildDataLab, color: '#79c0ff', slot: 2, cost: () => 1000,
+    when: '3 experiments of their own have been confirmed', unlocked: () => SKILLS.filter(s => s.web).length >= 3,
+    effect: () => 'Students can run experiments twice as often and keep up to 6 experiments of their own.'},
+  Lecture: {label: 'Lecture Hall', icon: '🏛️', make: buildLecture, color: '#d2a8ff', slot: 4, cost: () => 1500,
+    when: 'a student reaches Level 5', unlocked: () => agents.some(a => a.level >= 5),
+    effect: () => 'Reading becomes a lecture: anyone who attends always learns a published sense it is missing, and the inventor gets teaching credit (Levels 6 and 7).'},
+  Hall: {label: 'Hall of Discoveries', icon: '🏆', make: buildHall, color: '#f2cc60', slot: 5, cost: () => 2000,
+    when: '5 world firsts', unlocked: () => agents.reduce((n, a) => n + a.firsts, 0) >= 5,
+    effect: () => 'A museum of the world\'s discoveries: wandering students visit it, and a visit is fun.'},
+};
 const BUILD = {
   Park:       {label: 'Town Park',          icon: '🌳', make: buildPark,       color: '#7ee787'},
   School:     {label: 'School',             icon: '🏫', make: buildSchool,     color: '#3fb950'},
   University: {label: 'University',         icon: '🎓', make: buildUniversity, color: '#58a6ff'},
   Research:   {label: 'Research Institute', icon: '🔬', make: buildResearch,   color: '#bc8cff'},
-  Internet:   {label: 'Internet Lab',       icon: '🌐', make: buildInternet,   color: '#79c0ff'},
+  Internet:   {label: 'Quantum Lab',        icon: '⚛️', make: buildInternet,   color: '#79c0ff'},
   Library:    {label: 'Paper Library',      icon: '📚', make: buildLibrary,    color: '#f778ba'},
   Exam:       {label: 'Exam Hall',          icon: '📝', make: buildExam,       color: '#d29922'},
   Dorm:       {label: 'Dormitory',          icon: '🛏️', make: buildDorm,       color: '#a5d6ff'},
 };
 const ringKeys = Object.keys(BUILD).filter(k => k !== 'Park');
 const ringAt = th => polar(ROAD_R, th);
-for (const [key, b] of Object.entries(BUILD)) {
-  const spec = b.make();
-  const i = ringKeys.indexOf(key);
-  b.theta = i < 0 ? 0 : i / ringKeys.length * TAU;
-  Object.assign(b, spec, {key, dir: i < 0 ? HUB.clone() : polar(RING_R, b.theta), lw: spec.w + (spec.round ? 0 : 1.4), ld: spec.d + (spec.round ? 0 : 1.4)});
+const OUTER_R = 20.5, slotTheta = slot => (slot + 0.5) / ringKeys.length * TAU; // outer plots sit between two inner buildings
+function placeBuilding(key, b, theta, ringR) {
+  const spec = b.make(), centre = ringR === 0;
+  b.theta = theta;
+  Object.assign(b, spec, {key, dir: centre ? HUB.clone() : polar(ringR, b.theta), lw: spec.w + (spec.round ? 0 : 1.4), ld: spec.d + (spec.round ? 0 : 1.4)});
   const g = new THREE.Group();
   g.add(bake(spec.g));
   if (spec.roof) { b.roofMesh = bake(group(spec.roof)); g.add(b.roofMesh); }
@@ -938,7 +1377,7 @@ for (const [key, b] of Object.entries(BUILD)) {
   g.add(b.tag);
   g.position.copy(b.dir).multiplyScalar(R);
   g.up.copy(b.dir);
-  if (i >= 0) g.lookAt(g.position.clone().add(HUB.clone().addScaledVector(b.dir, -HUB.dot(b.dir)))); // door faces the park (direction along the ground, so the building stays upright)
+  if (!centre) g.lookAt(g.position.clone().add(HUB.clone().addScaledVector(b.dir, -HUB.dot(b.dir)))); // door faces the park (direction along the ground, so the building stays upright)
   else g.quaternion.setFromUnitVectors(Y, b.dir);
   world.add(g);
   g.updateMatrixWorld(true);
@@ -950,8 +1389,51 @@ for (const [key, b] of Object.entries(BUILD)) {
   b.spotFwd = b.spots.map(s => new THREE.Vector3(Math.sin(s.yaw), 0, Math.cos(s.yaw)).applyQuaternion(g.quaternion));
   b.door = g.localToWorld(new THREE.Vector3(0, FLOOR, b.d / 2 + 0.9)).normalize();
   if (b.dishAt) b.dishWorld = g.localToWorld(b.dishAt.clone());
+  return b;
 }
+for (const [key, b] of Object.entries(BUILD)) { const i = ringKeys.indexOf(key); placeBuilding(key, b, i < 0 ? 0 : i / ringKeys.length * TAU, i < 0 ? 0 : RING_R); }
 const placeList = Object.values(BUILD);
+// Founding a building: it rises out of the ground over a few seconds, gets its street, and changes how the students live.
+function addBuilding(key, instant = false) {
+  if (BUILD[key]) return;
+  const b = placeBuilding(key, {...OUTER[key]}, slotTheta(OUTER[key].slot), OUTER_R);
+  BUILD[key] = b; placeList.push(b);
+  const street = new THREE.Mesh(ribbon(Array.from({length: 16}, (_, i) => slerpDir(ringAt(b.theta), b.door, i / 15)), 1.0), M.road);
+  street.receiveShadow = true; world.add(street);
+  if (!instant) { b.rise = 0; b.g.scale.set(1, 0.01, 1); }
+  if (key === 'Lecture') PLACE_OF.read = 'Lecture';
+  if (key === 'Hall') PLACE_OF.wander = 'Hall';
+  renderPlaces();
+}
+function found(key) { // the 🏗 button: pay, build, celebrate
+  const o = OUTER[key];
+  if (key === 'DataCentre' && BUILD.DataCentre) { // already standing: upgrade it
+    if (computeLvl >= MAX_COMPUTE || coins < computeCost()) return;
+    coins -= computeCost(); computeLvl++;
+    news(`🖥️ The Data Centre was upgraded to level ${computeLvl}: studying students now do about ${(STUDY_STEPS * 60 * computeLvl).toLocaleString()} lessons a second.`, 'wf');
+  } else {
+    if (BUILD[key] || !o.unlocked() || coins < o.cost()) return;
+    coins -= o.cost();
+    if (key === 'DataCentre') computeLvl++;
+    addBuilding(key);
+    news(`🏗 The students founded the ${o.icon} ${o.label}! ${o.effect()}`, 'wf');
+  }
+  renderBuildDialog(); updateUI(); saveWorld();
+}
+function renderBuildDialog() {
+  $('buildBody').innerHTML = `<p class="hint" style="font-size:13px">The class has <b style="color:var(--text)">${coins.toLocaleString()} 💰</b>, earned from exams, promotions and discoveries. Spend it on buildings that change how the students live and learn.</p>
+  <div class="models">${Object.entries(OUTER).map(([key, o]) => {
+    const built = !!BUILD[key], dc = key === 'DataCentre', canUp = dc && built && computeLvl < MAX_COMPUTE;
+    const cost = dc ? computeCost() : o.cost(), open = o.unlocked();
+    const btn = built && !canUp ? `<b style="color:#7ee787">✓ Built${dc ? ` · level ${computeLvl} (max)` : ''}</b>`
+      : !open ? `<span>🔒 Unlocks when ${esc(o.when)}</span>`
+      : `<button data-build="${key}" ${coins < cost ? 'disabled' : ''}>${built ? `⚡ Upgrade to level ${computeLvl + 1}` : '🏗 Build'} · ${cost.toLocaleString()} 💰</button>`;
+    return `<div class="model"><b style="font-size:14px">${o.icon} ${esc(o.label)}</b>${dc && built ? ` · level ${computeLvl}` : ''}<br>${esc(o.effect())}<div style="margin-top:8px">${btn}</div></div>`;
+  }).join('')}</div>`;
+}
+$('btnBuild').onclick = () => { renderBuildDialog(); $('buildDlg').showModal(); };
+$('buildClose').onclick = () => $('buildDlg').close();
+$('buildBody').onclick = e => { const k = e.target.closest('button[data-build]')?.dataset.build; if (k) found(k); };
 // Ground height under a direction: flat building plots ramp down to the round planet.
 function surface(dir) {
   for (const b of placeList) {
@@ -982,16 +1464,16 @@ function vnoise(x, y, z) { // smooth value noise: natural-looking patches instea
     for (let k = 0; k < 3; k++) {
       const d = vertex(f + k), wl = waterLevel(d), n1 = vnoise(d.x * 5, d.y * 5, d.z * 5), n2 = vnoise(d.x * 24, d.y * 24, d.z * 24);
       if (isSea) c.setHSL(0.56 + 0.02 * n1, 0.65, Math.max(0.16, 0.5 - wl * 0.22 + 0.03 * n2));           // deeper = darker, shallows turquoise
-      else if (d.angleTo(HUB) < 0.82) c.setHSL(0.28, 0.45, 0.4 + 0.04 * n2);                                   // town lawns: even, mown
+      else if (d.angleTo(HUB) < 0.97) c.setHSL(0.28, 0.45, 0.4 + 0.04 * n2);                                   // town lawns: even, mown
       else if (wl > -0.28) c.setHSL(0.12, 0.48, 0.58 + 0.06 * n2);                                              // beaches
       else c.setHSL(0.24 + 0.06 * n1, 0.45, (n1 > 0.62 ? 0.24 : 0.33) + 0.09 * n2);                           // grassland and darker forest
       out.pos.push(d.x * radius, d.y * radius, d.z * radius); out.nrm.push(d.x, d.y, d.z); out.col.push(c.r, c.g, c.b);
     }
   }
   const mesh = (part, mat) => { const m = new THREE.BufferGeometry(); m.setAttribute('position', new THREE.Float32BufferAttribute(part.pos, 3)); m.setAttribute('normal', new THREE.Float32BufferAttribute(part.nrm, 3)); m.setAttribute('color', new THREE.Float32BufferAttribute(part.col, 3)); return new THREE.Mesh(m, mat); };
-  const ground = mesh(land, new THREE.MeshLambertMaterial({vertexColors: true}));
+  const ground = mesh(land, pbr({vertexColors: true, roughness: 1}));
   ground.receiveShadow = true;
-  world.add(ground, mesh(sea, new THREE.MeshPhongMaterial({vertexColors: true, shininess: 90, specular: 0x7f9fcf})),
+  world.add(ground, mesh(sea, pbr({vertexColors: true, roughness: 0.12, metalness: 0.15})),
     new THREE.Mesh(new THREE.SphereGeometry(R - 0.3, 32, 16), new THREE.MeshBasicMaterial({color: 0x08213a}))); // fills the hairline gap between land and sea
 }
 // atmosphere: a soft blue glow around the planet's edge (a Fresnel shader, one cheap draw call)
@@ -1045,12 +1527,13 @@ const OAK = [{geo: disc(0.55), mat: M.shadow, y: 0.05}, {geo: box(0.12, 0.5, 0.1
 const HOUSE = [{geo: disc(0.75), mat: M.shadow, y: 0.05}, {geo: box(0.9, 0.65, 0.75), mat: mat(0xffffff), y: 0, colors: [0xf2e3c6, 0xe8d0b0, 0xdfe6e9, 0xf6d6c6]}, {geo: pyramid(1.05, 0.5), mat: mat(0xffffff), y: 0.65, colors: [0x9c3b2e, 0x7a4b3a, 0x4a6582, 0x5a5f66]}];
 const TOWER = [{geo: disc(0.8), mat: M.shadow, y: 0.05}, {geo: box(0.9, 2.6, 0.9), mat: mat(0xffffff), y: 0, colors: [0x7fb7e6, 0x9aa5b1, 0xb8c4d0]}];
 const LAMP = [{geo: cyl(0.025, 0.035, 1.1, 6), mat: M.dark, y: 0}, {geo: box(0.16, 0.05, 0.16), mat: M.lamp, y: 1.1}];
+const outerDirs = Object.values(OUTER).map(o => polar(OUTER_R, slotTheta(o.slot))); // future building plots stay clear
 function wildSpot(minAng = 0.9) {
   for (;;) {
     const d = new THREE.Vector3(rnd(), rnd(), rnd());
     if (d.lengthSq() > 1 || d.lengthSq() < 0.01) continue;
     d.normalize();
-    if (!isWater(d) && d.angleTo(HUB) > minAng) return d;
+    if (!isWater(d) && d.angleTo(HUB) > minAng && outerDirs.every(o => d.angleTo(o) > 0.3)) return d;
   }
 }
 const nearRoad = th => ringKeys.some(k => Math.abs(((th - BUILD[k].theta + 3 * Math.PI) % TAU) - Math.PI) < 0.22);
@@ -1059,13 +1542,23 @@ for (let th = 0; th < TAU; th += TAU / 36) if (!nearRoad(th)) streetTrees.push({
 for (const k of ringKeys) {
   const th = BUILD[k].theta;
   lamps.push({d: polar(ROAD_R + 0.9, th - 0.17)}, {d: polar(ROAD_R + 0.9, th + 0.17)});
-  for (const off of [-0.6, 0, 0.6]) streetTrees.push({d: polar(RING_R + (off ? 0 : 1), th + Math.PI / ringKeys.length + off * 0.12), k: rnd(0.9, 1.2)});
+  const gap = th + Math.PI / ringKeys.length;
+  if (Object.values(OUTER).some(o => Math.abs(slotTheta(o.slot) - gap) < 0.01)) continue; // this gap is kept free for a future street
+  for (const off of [-0.6, 0, 0.6]) streetTrees.push({d: polar(RING_R + (off ? 0 : 1), gap + off * 0.12), k: rnd(0.9, 1.2)});
 }
 instances(OAK, [...streetTrees, ...Array.from({length: 120}, () => ({d: wildSpot(), k: rnd(0.7, 1.3)}))]);
 instances(PINE, Array.from({length: 200}, () => ({d: wildSpot(1.0), k: rnd(0.7, 1.4)})));
 instances(HOUSE, Array.from({length: 70}, () => ({d: wildSpot(0.95), k: rnd(0.8, 1.1)})));
 instances(TOWER, Array.from({length: 12}, () => ({d: wildSpot(1.1), k: rnd(0.8, 1.3)})));
 instances(LAMP, lamps);
+const BUSH = [{geo: disc(0.32), mat: M.shadow, y: 0.05}, {geo: new THREE.IcosahedronGeometry(0.28, 1).scale(1, 0.75, 1), mat: mat(0xffffff), y: 0.2, colors: [0x3f8f3a, 0x4c9a45, 0x2f7a32, 0x5aa646]}];
+const FLOWER = [{geo: new THREE.IcosahedronGeometry(0.06, 0), mat: mat(0xffffff), y: 0.07, colors: [0xf2cc60, 0xff7b72, 0xf778ba, 0xffffff, 0xd2a8ff]}];
+const ROCK = [{geo: new THREE.DodecahedronGeometry(0.25, 0).scale(1, 0.6, 1), mat: mat(0xffffff), y: 0.04, colors: [0x8b8f94, 0x9aa0a6, 0x7a7f86]}];
+const bushes = [];
+for (const k of ringKeys) { const b = BUILD[k]; for (const sx of [-1, 1]) for (const z of [-0.9, 0.3, b.d / 2 + 0.55]) bushes.push({d: b.g.localToWorld(new THREE.Vector3(sx * (b.w / 2 + 0.95), FLOOR, z)).normalize(), k: rnd(0.8, 1.2)}); }
+instances(BUSH, bushes);
+instances(FLOWER, Array.from({length: 160}, () => ({d: polar(rnd(3.55, 3.95), rnd(0, TAU)), k: rnd(0.8, 1.3)})));
+instances(ROCK, Array.from({length: 45}, () => ({d: wildSpot(1.0), k: rnd(0.6, 1.6)})));
 const clouds = new THREE.Group();
 scene.add(clouds);
 {
@@ -1094,12 +1587,12 @@ const sunDisc = new THREE.Mesh(new THREE.SphereGeometry(4, 20, 12), new THREE.Me
 const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false}));
 sunGlow.scale.set(46, 46, 1);
 scene.add(sunDisc, moonDisc, sunGlow);
-const CYCLE = 7200, sunDir = new THREE.Vector3(), COL = {warm: new THREE.Color(0xff9a55), white: new THREE.Color(0xfff4e0), skyDay: new THREE.Color(0xdfefff), skyNight: new THREE.Color(0x24336b),
+const sunDir = new THREE.Vector3(), COL = {warm: new THREE.Color(0xff9a55), white: new THREE.Color(0xfff4e0), skyDay: new THREE.Color(0xdfefff), skyNight: new THREE.Color(0x24336b),
   bgDay: new THREE.Color(0x0b1830), bgNight: new THREE.Color(0x03050a), glassDay: new THREE.Color(0x1a3550), glassNight: new THREE.Color(0xffc866), lampDay: new THREE.Color(0x6b5a35), lampNight: new THREE.Color(0xffe9b0), glowDay: new THREE.Color(0x4f9cff), glowDusk: new THREE.Color(0xff8a4a)};
 const smooth = (a, b, v) => { const t = Math.max(0, Math.min(1, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
 let skyDay = 1;
 function updateSky() {
-  const th = (frame % CYCLE) / CYCLE * TAU;
+  const now = new Date(), hours = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600, th = (hours - 12) / 24 * TAU; // noon = sun overhead
   sunDir.set(Math.sin(th), 0.35, Math.cos(th)).normalize();
   const el = sunDir.dot(HUB), day = skyDay = smooth(-0.12, 0.3, el);   // how daylit the town is
   sun.color.copy(COL.warm).lerp(COL.white, smooth(0, 0.55, el));      // orange near the horizon
@@ -1110,9 +1603,9 @@ function updateSky() {
   sunDisc.position.copy(sunDir).multiplyScalar(170); sunGlow.position.copy(sunDisc.position); moonDisc.position.copy(sunDir).multiplyScalar(-170);
   atmosphere.uniforms.glow.value.copy(COL.glowDusk).lerp(COL.glowDay, smooth(0.0, 0.5, el)); atmosphere.uniforms.strength.value = 0.35 + 0.65 * day;
   M.glass.emissive.copy(COL.glassDay).lerp(COL.glassNight, 1 - day);   // windows light up at night
+  for (const m of ENV_MATS) m.envMapIntensity = 0.08 + 0.5 * day;      // reflections of the sky fade at night
   M.lamp.color.copy(COL.lampDay).lerp(COL.lampNight, 1 - day);
-  const hours = (12 + (frame % CYCLE) / CYCLE * 24) % 24;
-  $('hudClock').textContent = `${day > 0.5 ? '☀️' : el > -0.12 ? '🌇' : '🌙'} ${String(hours | 0).padStart(2, '0')}:${String((hours % 1) * 60 | 0).padStart(2, '0')}`;
+  $('hudClock').textContent = `${day > 0.5 ? '☀️' : el > -0.12 ? '🌇' : '🌙'} ${clock(now)}`;
 }
 // Auto quality: nudge the render resolution so frames stay near 60 fps; real shadows only while looking at one building.
 function adaptQuality(dt) {
@@ -1133,26 +1626,40 @@ world.add(beam);
 
 // --- avatars: hair, hands, shoes; legs and arms pivot at hip/shoulder so they can walk, sit, type, sleep and jump ---
 const SKIN = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac], HAIR = [0x2b1d14, 0x4a2f1b, 0x111111, 0x8a5a2b, 0xd9b26f];
-const torsoG = new THREE.CapsuleGeometry(0.2, 0.3, 4, 10), headG = new THREE.SphereGeometry(0.18, 14, 10), eyeG = new THREE.SphereGeometry(0.028, 6, 4);
-const hairG = new THREE.SphereGeometry(0.195, 14, 8, 0, TAU, 0, Math.PI * 0.55), handG = new THREE.SphereGeometry(0.045, 6, 4);
-const legG = new THREE.BoxGeometry(0.1, 0.28, 0.1).translate(0, -0.14, 0), shoeG = new THREE.BoxGeometry(0.11, 0.06, 0.16), armG = new THREE.CapsuleGeometry(0.04, 0.22, 2, 6).translate(0, -0.15, 0);
-const pants = mat(0x2f3a4a), shoes = mat(0x1d1d1d), avatarShadow = disc(0.3);
+// Human proportions, smooth (not flat) shading, and joints: hips, knees, shoulders, elbows and a neck, so the body can walk
+// with bending knees, sit on a chair with its shins down, swing its arms from the elbow and breathe while standing.
+const smoothMat = c => pbr({color: c, roughness: 0.7});
+const chestG = new THREE.CapsuleGeometry(0.15, 0.2, 6, 14), pelvisG = new THREE.CapsuleGeometry(0.13, 0.06, 4, 12), neckG = new THREE.CylinderGeometry(0.045, 0.05, 0.08, 10);
+const headG = new THREE.SphereGeometry(0.15, 20, 14).scale(1, 1.1, 1.02), eyeG = new THREE.SphereGeometry(0.022, 8, 6), noseG = new THREE.SphereGeometry(0.022, 8, 6).scale(1, 1, 1.3);
+const hairG = new THREE.SphereGeometry(0.162, 20, 10, 0, TAU, 0, Math.PI * 0.55).scale(1, 1.1, 1.05), handG = new THREE.SphereGeometry(0.036, 10, 8).scale(1, 1.2, 0.8);
+const thighG = new THREE.CapsuleGeometry(0.058, 0.13, 4, 10).translate(0, -0.1, 0), shinG = new THREE.CapsuleGeometry(0.046, 0.13, 4, 10).translate(0, -0.1, 0);
+const upperArmG = new THREE.CapsuleGeometry(0.04, 0.11, 4, 8).translate(0, -0.08, 0), foreArmG = new THREE.CapsuleGeometry(0.034, 0.1, 4, 8).translate(0, -0.07, 0);
+const shoeG = new THREE.CapsuleGeometry(0.045, 0.09, 4, 8).rotateX(Math.PI / 2).scale(1.05, 0.75, 1);
+const pants = smoothMat(0x2f3a4a), shoes = smoothMat(0x1d1d1d), avatarShadow = disc(0.3);
 function buildAvatar(color, skinHex, hairHex, name, scale = 0.6) {
-  const shirt = mat(new THREE.Color(color)), skin = mat(skinHex);
-  const leg = x => { const l = part(legG, pants, x, 0.3); l.add(part(shoeG, shoes, 0, -0.28, 0.03)); return l; };
-  const arm = x => { const l = part(armG, shirt, x, 0.84); l.add(part(handG, skin, 0, -0.32)); return l; };
-  const legL = leg(-0.08), legR = leg(0.08), armL = arm(-0.25), armR = arm(0.25);
-  const hat = group(part(box(0.44, 0.04, 0.44), M.dark), part(box(0.22, 0.1, 0.22), M.dark, 0, -0.08));
-  hat.position.y = 1.2; hat.visible = false;
-  const halo = part(new THREE.TorusGeometry(0.17, 0.025, 4, 16).rotateX(Math.PI / 2), M.gold, 0, 1.38); halo.visible = false;
-  const body = group(legL, legR, armL, armR, part(torsoG, shirt, 0, 0.58), part(headG, skin, 0, 1.02), part(hairG, mat(hairHex), 0, 1.04, -0.01),
-    part(eyeG, M.dark, -0.065, 1.04, 0.16), part(eyeG, M.dark, 0.065, 1.04, 0.16), hat, halo);
-  const tag = label(name, color, 0.8); tag.position.y = 1.75;
+  const shirt = smoothMat(new THREE.Color(color)), skin = smoothMat(skinHex), pants = smoothMat(new THREE.Color(color).lerp(new THREE.Color(0x1f2733), 0.78));
+  const leg = x => { // hip pivot → thigh → knee pivot → shin → shoe
+    const knee = group(part(shinG, pants), part(shoeG, shoes, 0, -0.21, 0.035)); knee.position.y = -0.2;
+    const hip = group(part(thighG, pants), knee); hip.position.set(x, 0.44, 0); hip.userData.knee = knee; return hip;
+  };
+  const arm = x => { // shoulder pivot → upper arm → elbow pivot → forearm → hand
+    const elbow = group(part(foreArmG, shirt), part(handG, skin, 0, -0.17)); elbow.position.y = -0.18;
+    const sh = group(part(upperArmG, shirt), elbow); sh.position.set(x, 0.86, 0); sh.userData.elbow = elbow; return sh;
+  };
+  const legL = leg(-0.075), legR = leg(0.075), armL = arm(-0.2), armR = arm(0.2);
+  const hat = group(part(box(0.38, 0.035, 0.38), M.dark), part(box(0.2, 0.09, 0.2), M.dark, 0, -0.07));
+  hat.position.y = 1.23; hat.visible = false;
+  const halo = part(new THREE.TorusGeometry(0.15, 0.022, 6, 20).rotateX(Math.PI / 2), M.gold, 0, 1.36); halo.visible = false;
+  const chest = part(chestG, shirt, 0, 0.7), head = group(part(headG, skin), part(hairG, smoothMat(hairHex), 0, 0.02, -0.012),
+    part(eyeG, M.dark, -0.052, 0.015, 0.135), part(eyeG, M.dark, 0.052, 0.015, 0.135), part(noseG, skin, 0, -0.02, 0.15));
+  head.position.y = 1.07;
+  const body = group(legL, legR, armL, armR, part(pelvisG, pants, 0, 0.47), chest, part(neckG, skin, 0, 0.94), head, hat, halo);
+  const tag = label(name, color, 0.8); tag.position.y = 1.7;
   const g = group(part(avatarShadow, M.shadow, 0, 0.02), body, tag);
   g.scale.setScalar(scale);
   g.traverse(o => { if (o.isMesh && o.material !== M.shadow) o.castShadow = true; });
   world.add(g);
-  return {g, body, legL, legR, armL, armR, hat, halo, tag};
+  return {g, body, chest, head, legL, legR, armL, armR, kneeL: legL.userData.knee, kneeR: legR.userData.knee, elbowL: armL.userData.elbow, elbowR: armR.userData.elbow, hat, halo, tag};
 }
 for (const a of agents) {
   const v = buildAvatar(a.color, SKIN[a.id % SKIN.length], HAIR[a.id % HAIR.length], a.name);
@@ -1162,7 +1669,7 @@ for (const a of agents) {
   a.v = {...v, dir: dorm.spotPos[a.id].clone().normalize(), fwd: dorm.spotFwd[a.id].clone()};
 }
 const ring = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.36, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xffffff, side: THREE.DoubleSide, toneMapped: false}));
-const bubble = label('', '#0d1117', 0.75, true, 'rgba(255,255,255,.94)');
+const bubble = label('', '#0b0f1c', 0.75, true, 'rgba(255,255,255,.94)');
 world.add(ring, bubble);
 
 // Walk out the door, to the ring road, around the ring, up the target's street, in the door, to a free seat.
@@ -1172,6 +1679,10 @@ function ringWalk(th0, th1) {
 }
 function choose(a, act, thought) {
   const from = a.arrived ? a.place : null, place = act === 'study' ? SKILLS[a.skill].tier : PLACE_OF[act] ?? null;
+  if (from && place === from && act === a.act && a.spot >= 0) { // carrying on with the same thing: stay put, quietly
+    Object.assign(a, {timer: DUR[act] * rnd(0.7, 1.3), reward: 0, start: {energy: a.energy, fun: a.fun, social: a.social, conf: a.conf, skill: a.skill}});
+    return;
+  }
   if (a.place && a.spot >= 0) BUILD[a.place].occ[a.spot] = null;
   const path = [];
   let th = thetaOf(a.v.dir);
@@ -1179,7 +1690,8 @@ function choose(a, act, thought) {
   if (place) {
     const b = BUILD[place];
     if (place !== from) path.push(...(place === 'Park' ? [ringAt(th)] : [...ringWalk(th, b.theta), b.door]));
-    a.spot = Math.max(0, b.occ.indexOf(null)); // ponytail: 10 seats for 10 AIs; add seats if the population grows
+    a.spot = b.occ.indexOf(null);
+    if (a.spot < 0) a.spot = Math.random() * b.occ.length | 0; // ponytail: 10 seats for 10 AIs; a full building shares a seat
     b.occ[a.spot] = a.id;
     path.push(b.spotPos[a.spot].clone().normalize());
   } else { a.spot = -1; path.push(ringAt(th), wildSpot(0.85).lerp(HUB, 0.35).normalize()); }
@@ -1191,12 +1703,18 @@ function choose(a, act, thought) {
 const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), look = new THREE.Vector3(), tmp = new THREE.Vector3();
 function updateAvatar(a, t) {
   const v = a.v;
+  const dt = Math.min(0.1, Math.max(0, (t - (v.lastT ?? t)) / 1000)); // seconds since the last update: walking speed doesn't depend on the screen's refresh rate
+  v.lastT = t;
   if (a.path.length) {
     const tgt = a.path[0], ang = v.dir.angleTo(tgt);
-    if (ang < 0.003) { v.dir.copy(tgt); a.path.shift(); if (!a.path.length) a.arrived = true; }
+    v.spd = Math.min(WALK, (v.spd ?? 0) + WALK * 2.5 * dt);                        // start walking gently
+    if (a.path.length === 1) v.spd = Math.min(v.spd, 0.012 + ang * 3);              // slow down before the destination
+    const step = v.spd * dt;
+    if (ang < 0.003 || step >= ang) { v.dir.copy(tgt); a.path.shift(); if (!a.path.length) { a.arrived = true; v.spd = 0; } }
     else {
-      qa.setFromUnitVectors(v.dir, tgt); qb.identity().slerp(qa, Math.min(1, SPEED / ang));
+      qa.setFromUnitVectors(v.dir, tgt); qb.identity().slerp(qa, step / ang);
       tmp.copy(v.dir); v.dir.applyQuaternion(qb).normalize(); v.fwd.subVectors(v.dir, tmp);
+      v.stride = (v.stride ?? 0) + step * R * 6;                                       // legs move with the ground covered: no moonwalking
     }
   }
   let pos, up, fwd = v.fwd;
@@ -1204,30 +1722,49 @@ function updateAvatar(a, t) {
   else ({pos, up} = surface(v.dir));
   look.copy(fwd).addScaledVector(up, -fwd.dot(up));
   if (look.lengthSq() < 1e-10) look.crossVectors(up, Y);
-  v.g.position.copy(pos); v.g.up.copy(up); v.g.lookAt(look.add(pos));
-  const ph = t * 0.01 + a.id * 1.7, pose = a.arrived ? a.act : 'walk';
-  v.body.rotation.set(0, 0, 0); v.body.position.set(0, 0, 0);
-  for (const limb of [v.legL, v.legR, v.armL, v.armR]) limb.rotation.set(0, 0, 0);
+  v.g.position.copy(pos); v.g.up.copy(up);
+  qa.copy(v.g.quaternion); v.g.lookAt(look.add(pos));                                  // turn towards where it is going…
+  if (v.turned) v.g.quaternion.copy(qa.slerp(v.g.quaternion, 1 - Math.exp(-8 * dt))); // …gradually, not instantly
+  v.turned = true;
+  const ph = t * 0.01 + a.id * 1.7, pose = a.arrived ? a.act : 'walk', sit = ['study', 'exam', 'read', 'browse'].includes(pose);
+  v.body.rotation.set(0, 0, 0); v.body.position.set(0, 0, 0); v.head.rotation.set(0, 0, 0); v.chest.scale.set(1, 1, 1);
+  for (const j of [v.legL, v.legR, v.armL, v.armR, v.kneeL, v.kneeR, v.elbowL, v.elbowR]) j.rotation.set(0, 0, 0);
+  v.elbowL.rotation.x = v.elbowR.rotation.x = -0.15;                                   // arms hang relaxed, slightly bent
   if (pose === 'walk') {
-    const s = Math.sin(ph * 1.6);
-    v.legL.rotation.x = s * 0.6; v.legR.rotation.x = -s * 0.6; v.armL.rotation.x = -s * 0.5; v.armR.rotation.x = s * 0.5;
-    v.body.position.y = Math.abs(s) * 0.04;
-  } else if (pose === 'study' || pose === 'exam' || pose === 'read' || pose === 'browse' || pose === 'ask' || pose === 'learn' || pose === 'kexam') {
-    v.legL.rotation.x = v.legR.rotation.x = -Math.PI / 2;
-    if (pose === 'study' || pose === 'browse') { v.armL.rotation.x = -1.3 + Math.sin(ph * 5) * 0.15; v.armR.rotation.x = -1.3 - Math.sin(ph * 5) * 0.15; }
-    else if (pose === 'exam') { v.armL.rotation.x = -0.7; v.armR.rotation.x = -1.3 + Math.sin(ph * 3) * 0.1; }
-    else { v.armL.rotation.x = v.armR.rotation.x = -1.0; }
+    const s = Math.sin(v.stride ?? 0), c = Math.cos(v.stride ?? 0), amp = Math.min(1, (v.spd ?? 0) / WALK);
+    v.legL.rotation.x = s * 0.5 * amp; v.legR.rotation.x = -s * 0.5 * amp;              // thighs swing
+    v.kneeL.rotation.x = (Math.max(0, -c) * 0.85 + 0.05) * amp;                          // the swinging leg bends at the knee
+    v.kneeR.rotation.x = (Math.max(0, c) * 0.85 + 0.05) * amp;
+    v.armL.rotation.x = -s * 0.4 * amp; v.armR.rotation.x = s * 0.4 * amp;              // arms swing opposite to the legs
+    v.elbowL.rotation.x = v.elbowR.rotation.x = -0.35;
+    v.body.position.y = Math.abs(c) * 0.025 * amp;                                       // a small bob at every step
+    v.body.rotation.y = s * 0.07 * amp; v.body.rotation.z = c * 0.025 * amp;             // hips sway
+    v.head.rotation.y = -s * 0.05 * amp;
+  } else if (sit) {
+    v.body.position.y = -0.14;                                                           // sits on the chair…
+    v.legL.rotation.x = v.legR.rotation.x = -Math.PI / 2;                                // …thighs forward…
+    v.kneeL.rotation.x = v.kneeR.rotation.x = Math.PI / 2;                               // …shins down
+    if (pose === 'study' || pose === 'browse') { v.armL.rotation.x = -0.9 + Math.sin(ph * 5) * 0.08; v.armR.rotation.x = -0.9 - Math.sin(ph * 5) * 0.08; v.elbowL.rotation.x = v.elbowR.rotation.x = -0.6; v.head.rotation.x = 0.25; }
+    else if (pose === 'exam') { v.armL.rotation.x = -0.6; v.armR.rotation.x = -0.8 + Math.sin(ph * 3) * 0.06; v.elbowL.rotation.x = v.elbowR.rotation.x = -0.7; v.head.rotation.x = 0.35; }
+    else { v.armL.rotation.x = v.armR.rotation.x = -0.7; v.elbowL.rotation.x = v.elbowR.rotation.x = -0.8; v.head.rotation.x = 0.3; } // reading: holding a paper
   } else if (pose === 'sleep') {
-    v.body.rotation.x = -Math.PI / 2; v.body.position.y = 0.55;
+    v.body.rotation.x = -Math.PI / 2; v.body.position.y = 0.5;
+    v.chest.scale.setScalar(1 + Math.sin(t * 0.0015 + a.id) * 0.02);                    // slow breathing
   } else if (pose === 'play') {
-    v.body.position.y = Math.abs(Math.sin(ph * 2)) * 0.35; v.armL.rotation.x = v.armR.rotation.x = -2.8 + Math.sin(ph * 4) * 0.3;
+    const j = Math.abs(Math.sin(ph * 2));
+    v.body.position.y = j * 0.3; v.kneeL.rotation.x = v.kneeR.rotation.x = (1 - j) * 0.6; v.legL.rotation.x = v.legR.rotation.x = -(1 - j) * 0.3;
+    v.armL.rotation.x = v.armR.rotation.x = -2.6 + Math.sin(ph * 4) * 0.3;
   } else if (pose === 'chat') {
-    v.armR.rotation.x = -0.8 + Math.sin(ph * 2) * 0.4; v.body.rotation.y = Math.sin(ph * 0.7) * 0.2;
+    v.armR.rotation.x = -0.6 + Math.sin(ph * 2) * 0.3; v.elbowR.rotation.x = -0.9; v.body.rotation.y = Math.sin(ph * 0.7) * 0.15; v.head.rotation.y = Math.sin(ph * 0.5) * 0.2;
+  } else {                                                                                // standing: breathing and a little weight shift
+    v.chest.scale.setScalar(1 + Math.sin(t * 0.002 + a.id) * 0.012);
+    v.body.rotation.z = Math.sin(t * 0.0007 + a.id) * 0.02; v.head.rotation.y = Math.sin(t * 0.0005 + a.id * 2) * 0.25;
   }
   v.hat.visible = a.level >= 4; // the graduation cap comes with Level 4
   v.halo.visible = a.firsts > 0;
   v.halo.rotation.y = t * 0.002;
   v.tag.userData.set(`${a.emoji} ${a.name}${a.firsts ? ' ★' + a.firsts : ''}`);
+  v.tag.visible = a.id === selected || camera.position.distanceTo(v.g.position) < 12; // no cloud of name tags in the overview
   if (a.id === selected) {
     ring.position.copy(pos); ring.quaternion.setFromUnitVectors(Y, up);
     bubble.position.copy(pos).addScaledVector(up, 1.6);
@@ -1260,7 +1797,8 @@ function focus(key) {
 }
 camera.position.copy(HUB).addScaledVector(NORTH, -0.45).normalize().multiplyScalar(R + 32);
 overview();
-$('places').innerHTML = `<button data-k="">🌍 Whole planet</button>` + placeList.map(b => `<button data-k="${b.key}">${b.icon} ${b.label} <span></span></button>`).join('');
+function renderPlaces() { $('places').innerHTML = `<button data-k="">🌍 Whole planet</button>` + placeList.map(b => `<button data-k="${b.key}">${b.icon} ${b.label} <span></span></button>`).join(''); }
+renderPlaces();
 $('places').onclick = e => { const k = e.target.closest('button')?.dataset.k; if (k === '') overview(); else if (k) focus(k); };
 
 // click an AI to inspect it, click a building to fly in and look inside (drags are ignored)
@@ -1291,28 +1829,54 @@ $('map').onmousemove = e => {
 };
 const actColor = v => v >= 0 ? `rgba(88,166,255,${0.15 + 0.85 * v})` : `rgba(255,123,114,${0.15 - 0.85 * v})`;
 const currentSkill = a => SKILLS[a.skill >= 0 ? a.skill : a.passed.at(-1) ?? 0];
+const srcOf = s => !s.web ? '' : s.quantum ? ' (its own Quantum Lab experiment)' : ` (legacy data from ${s.web.host})`;
+// ---- live signal flow: the shown lesson travels through the drawn brain, in step with the lesson panel's four-step beat
+let brainGeom = null, lessonOk = null, lessonLive = false;
+const sctx = $('signal').getContext('2d'), STEP_MS = 1200, still = matchMedia('(prefers-reduced-motion: reduce)');
+function drawSignal(now) {
+  sctx.clearRect(0, 0, 410, 270);
+  const g = brainGeom, beat = !$('lessonSteps').hidden && $('lessonSteps').firstElementChild.getAnimations()[0];
+  if (!g || !lessonLive || g.id !== selected || still.matches || !beat) return;
+  const ph = (beat.currentTime ?? now) % (4 * STEP_MS) / STEP_MS, step = ph | 0, f = ph - step, {pos, Wt, L, big} = g;
+  const ring = ([x, y], r, color, alpha) => { sctx.globalAlpha = alpha; sctx.strokeStyle = color; sctx.lineWidth = 2; sctx.beginPath(); sctx.arc(x, y, r, 0, TAU); sctx.stroke(); };
+  const strong = (l, fn) => { for (let i = 0; i < Wt[l].length; i++) for (let j = 0; j < Wt[l][i].length; j++) { const k = Math.abs(Wt[l][i][j]) / big[l]; if (k > 0.3) fn(i, j, k, Wt[l][i][j]); } };
+  const ease = t => 1 - (1 - t) ** 3;
+  if (step === 0) pos[0].forEach(p => ring(p, 9 + 6 * ease(f), '#5ee6d0', 1 - f)); // question: the senses read the spot
+  if (step === 1 || step === 3) { // guess runs forward, the nudge runs backward through the same connections
+    const back = step === 3, lf = (back ? 1 - f : f) * (L - 1), l = Math.min(L - 2, lf | 0), t = lf - l;
+    strong(l, (i, j, k, w) => {
+      const [x0, y0] = pos[l][j], [x1, y1] = pos[l + 1][i];
+      if (back) { sctx.globalAlpha = 0.55 * k; sctx.strokeStyle = '#f2cc60'; sctx.lineWidth = 0.6 + 2.4 * k; sctx.beginPath(); sctx.moveTo(x0, y0); sctx.lineTo(x1, y1); sctx.stroke(); }
+      sctx.globalAlpha = Math.min(1, 0.35 + k); sctx.fillStyle = back ? '#f2cc60' : w > 0 ? '#a5d6ff' : '#ffb3ad';
+      sctx.beginPath(); sctx.arc(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, (back ? 1.4 : 2.2) + 2.4 * k, 0, TAU); sctx.fill();
+    });
+  }
+  if (step === 2 && lessonOk != null) { const out = pos[L - 1][0], c = lessonOk ? '#56d364' : '#ff7b72'; ring(out, 10 + 10 * ease(f), c, 1 - f * 0.8); ring(out, 9, c, 1); } // check
+  sctx.globalAlpha = 1;
+}
 function drawBrain() {
   const a = agents[selected], s = currentSkill(a), v = PY.view?.id === a.id ? PY.view : null;
   if (!v) return; // waiting for Python's picture of this brain
   const acts = v.acts, sizes = v.sizes, feats = v.feats, Wt = v.W, L = sizes.length;
   bctx.clearRect(0, 0, 410, 270);
   const pos = sizes.map((n, l) => { const gap = Math.min(22, 240 / n), x = 60 + l * (320 / (L - 1)); return Array.from({length: n}, (_, i) => [x, 135 + (i - (n - 1) / 2) * gap]); });
-  for (let l = 0; l < L - 1; l++) for (let i = 0; i < sizes[l + 1]; i++) for (let j = 0; j < sizes[l]; j++) {
-    const w = Wt[l][i][j];
-    bctx.strokeStyle = w > 0 ? '#58a6ff' : '#ff7b72'; bctx.globalAlpha = Math.min(1, 0.1 + Math.abs(w) / 2); bctx.lineWidth = 0.4 + Math.min(3, Math.abs(w));
+  brainGeom = {id: a.id, pos, Wt, L, big: Wt.map(m => Math.max(1e-6, ...m.flat().map(Math.abs)))};
+  for (let l = 0; l < L - 1; l++) { const big = Math.max(1e-6, ...Wt[l].flat().map(Math.abs)); for (let i = 0; i < sizes[l + 1]; i++) for (let j = 0; j < sizes[l]; j++) {
+    const w = Wt[l][i][j], k = Math.abs(w) / big; // relative strength within its layer: weak links fade so the strong paths stand out
+    bctx.strokeStyle = w > 0 ? '#58a6ff' : '#ff7b72'; bctx.globalAlpha = 0.04 + 0.9 * k * k; bctx.lineWidth = 0.4 + 2.6 * k;
     bctx.beginPath(); bctx.moveTo(...pos[l][j]); bctx.lineTo(...pos[l + 1][i]); bctx.stroke();
-  }
+  } }
   bctx.globalAlpha = 1;
   pos.forEach((col, l) => col.forEach(([x, y], i) => {
     const val = l === L - 1 ? acts[l][i] * 2 - 1 : Math.max(-1, Math.min(1, acts[l][i]));
-    bctx.fillStyle = '#0d1117'; bctx.beginPath(); bctx.arc(x, y, 8, 0, TAU); bctx.fill();
-    bctx.fillStyle = actColor(val); bctx.strokeStyle = '#8b949e'; bctx.lineWidth = 1; bctx.beginPath(); bctx.arc(x, y, 8, 0, TAU); bctx.fill(); bctx.stroke();
-    bctx.fillStyle = '#8b949e'; bctx.font = '11px system-ui';
+    bctx.fillStyle = '#0b0f1c'; bctx.beginPath(); bctx.arc(x, y, 8, 0, TAU); bctx.fill();
+    bctx.fillStyle = actColor(val); bctx.strokeStyle = '#97a3c2'; bctx.lineWidth = 1; bctx.beginPath(); bctx.arc(x, y, 8, 0, TAU); bctx.fill(); bctx.stroke();
+    bctx.fillStyle = '#97a3c2'; bctx.font = '11px "Schibsted Grotesk", system-ui';
     if (l === 0) { bctx.textAlign = 'right'; bctx.fillText(FEATURES[feats[i]].name, x - 12, y + 4); }
     if (l === L - 1) { bctx.textAlign = 'left'; bctx.fillText(`${pct(acts[l][i])} ${s.labels[1]}`.slice(0, 16), x + 12, y + 4); }
     bctx.textAlign = 'left';
   }));
-  bctx.fillStyle = '#8b949e'; bctx.font = '10px system-ui';
+  bctx.fillStyle = '#97a3c2'; bctx.font = '10px "Schibsted Grotesk", system-ui';
   bctx.fillText('senses (inputs)', 4, 262); bctx.fillText('answer', 352, 262);
   const N = 40, cell = 200 / N;
   for (let gy = 0; gy < N; gy++) for (let gx = 0; gx < N; gx++) {
@@ -1320,12 +1884,12 @@ function drawBrain() {
     mctx.fillRect(gx * cell, gy * cell, cell + 0.5, cell + 0.5);
   }
   for (const [x, y, t] of s.test.slice(0, s.web ? 300 : 150)) {
-    mctx.fillStyle = t ? '#58a6ff' : '#ff7b72'; mctx.strokeStyle = '#0d1117';
+    mctx.fillStyle = t ? '#58a6ff' : '#ff7b72'; mctx.strokeStyle = '#0b0f1c';
     mctx.beginPath(); mctx.arc((x + 1) * 100, (1 - y) * 100, s.web ? 2 : 2.5, 0, TAU); mctx.fill(); mctx.stroke();
   }
   if (a.lesson) { mctx.strokeStyle = '#f2cc60'; mctx.lineWidth = 2; mctx.beginPath(); mctx.arc((a.lesson.x + 1) * 100, (1 - a.lesson.y) * 100, 6, 0, TAU); mctx.stroke(); mctx.lineWidth = 1; }
   mctx.strokeStyle = '#fff'; mctx.beginPath(); mctx.arc((probe[0] + 1) * 100, (1 - probe[1]) * 100, 4, 0, TAU); mctx.stroke();
-  if (s.axes) { mctx.fillStyle = 'rgba(13,17,23,.75)'; mctx.fillRect(0, 186, 200, 14); mctx.fillStyle = '#e6edf3'; mctx.font = '10px system-ui'; mctx.fillText(`→ ${s.axes[0]}   ↑ ${s.axes[1]}`, 4, 197); }
+  if (s.axes) { mctx.fillStyle = 'rgba(13,17,23,.75)'; mctx.fillRect(0, 186, 200, 14); mctx.fillStyle = '#eaeefa'; mctx.font = '10px "Schibsted Grotesk", system-ui'; mctx.fillText(`→ ${s.axes[0]}   ↑ ${s.axes[1]}`, 4, 197); }
   cctx.clearRect(0, 0, 410, 100);
   const yOf = v => 95 - v * 85, th = yOf(passOf(s)), h = a.confHist, n0 = a.sampleN - h.length, xOf = n => h.length < 2 ? 0 : (n - n0) / (h.length - 1) * 405;
   cctx.strokeStyle = '#d29922'; cctx.setLineDash([4, 4]); cctx.beginPath(); cctx.moveTo(0, th); cctx.lineTo(410, th); cctx.stroke(); cctx.setLineDash([]);
@@ -1333,24 +1897,31 @@ function drawBrain() {
   h.forEach((v, i) => { const x = xOf(n0 + i), y = yOf(v); i ? cctx.lineTo(x, y) : cctx.moveTo(x, y); });
   cctx.stroke(); cctx.lineWidth = 1;
   for (const e of a.exams) if (e.n >= n0) { cctx.fillStyle = e.acc >= passOf(s) ? '#3fb950' : '#ff7b72'; cctx.beginPath(); cctx.arc(Math.min(402, xOf(e.n)), yOf(e.acc), 4, 0, TAU); cctx.fill(); }
-  cctx.fillStyle = '#8b949e'; cctx.font = '11px system-ui'; cctx.fillText(`pass mark ${pct(passOf(s))}`, 4, th - 4); cctx.fillText('50%', 4, yOf(0.5) + 4);
+  cctx.strokeStyle = '#263150'; cctx.beginPath(); cctx.moveTo(0, yOf(0.5)); cctx.lineTo(410, yOf(0.5)); cctx.stroke();
+  cctx.fillStyle = '#97a3c2'; cctx.font = '11px "Schibsted Grotesk", system-ui'; cctx.fillText(`pass mark ${pct(passOf(s))}`, 4, th - 4); cctx.fillText('50% = guessing', 4, yOf(0.5) + 13);
+  const exam = a.exams.at(-1), label = (el, t) => el.getAttribute('aria-label') !== t && el.setAttribute('aria-label', t);
+  label($('brain'), `${a.name}'s skill brain: ${sizes.join('-')} neurons, ${connections(a)} connections, ${feats.length} senses (${feats.map(i => FEATURES[i].name).join(', ')}).`);
+  label($('map'), `${a.name}'s guess map for ${s.name}: practice score ${pct(a.conf)}.`);
+  label($('chart'), `Learning curve for ${s.name}: practice score ${pct(h.at(-1) ?? 0)}, pass mark ${pct(passOf(s))}${exam ? `, last exam ${pct(exam.acc)}` : ''}.`);
 }
 const bar = (v, c = '#58a6ff') => `<span><span class="bar"><i style="width:${v * 100}%;background:${c}"></i></span> ${pct(v)}</span>`;
 const colorWord = (s, t) => `<b style="color:${t ? '#58a6ff' : '#ff7b72'}">${s.labels[t].toUpperCase()}</b>`;
 function updateUI() {
   $('day').textContent = day(); $('coins').textContent = coins;
   $('wfCount').textContent = agents.reduce((n, a) => n + a.firsts, 0);
+  $('score').textContent = worldScore();
   $('papers').textContent = published.filter(Boolean).length - 2;
-  $('pyStat').textContent = PY.online ? 'brains: PyTorch' : 'brains: OFFLINE';
-  $('btnCompute').textContent = `⚡ Compute Lv${computeLvl + 1} (${computeCost()}💰)`;
-  $('btnCompute').disabled = coins < computeCost();
-  $('btnWeb').textContent = `🌐 Internet ${webOn ? 'ON' : 'OFF'} · ${SKILLS.filter(s => s.web).length} real datasets${webBusy ? ' · downloading…' : ''}`;
+  $('pyStat').textContent = PY.online ? 'PyTorch' : 'brains OFFLINE';
+  $('btnWeb').textContent = `Quantum Lab ${webOn ? 'open' : 'closed'} · ${SKILLS.filter(s => s.web).length} experiments${webBusy ? ' · running…' : ''}`;
   $('btnWeb').className = webOn ? 'on' : '';
   [...$('places').querySelectorAll('button[data-k] span')].forEach(sp => { const k = sp.parentElement.dataset.k, n = agents.filter(a => a.place === k && a.arrived).length; sp.textContent = n ? `· ${n}` : ''; });
   const doing = a => `${a.emoji} ${a.arrived ? ACT[a.act] : 'Walking'} ${a.place ? (a.arrived ? 'at ' : 'to ') + BUILD[a.place].label : ''}`;
-  $('roster').innerHTML = agents.map(a => `<tr data-id="${a.id}" class="${a.id === selected ? 'sel' : ''}"><td><span class="dot" style="background:${a.color}"></span>${a.name}${a.firsts ? ' ★' + a.firsts : ''}</td>
-      <td>L${a.level}</td><td>${doing(a)}</td><td>${a.skill >= 0 ? (SKILLS[a.skill].web ? '🌐 ' : '') + SKILLS[a.skill].name : a.passed.length ? '🎓 all done' : '—'}</td><td>${a.passed.length}</td>
-      <td>${a.skill >= 0 ? bar(a.conf) : ''}</td><td>${connections(a)} links</td><td>${a.feats.length}</td></tr>`).join('');
+  if ($('roster').children.length !== agents.length) $('roster').innerHTML = agents.map(a => `<tr data-id="${a.id}" tabindex="0" aria-label="${a.name}"></tr>`).join('');
+  agents.forEach((a, i) => { const tr = $('roster').children[i], html = `<td><span class="dot" style="background:${a.color}"></span>${a.name}${a.firsts ? ' ★' + a.firsts : ''}</td>
+      <td>L${a.level}</td><td>${doing(a)}</td><td>${a.skill >= 0 ? (SKILLS[a.skill].quantum ? '⚛️ ' : isLegacy(SKILLS[a.skill]) ? '<span class="legacy">legacy</span> ' : '') + SKILLS[a.skill].name : a.passed.length ? '🎓 all done' : '—'}</td><td>${a.passed.length}</td>
+      <td>${a.skill >= 0 ? bar(a.conf) : ''}</td><td title="connections in its skill brain">${connections(a)} links</td><td>${a.feats.length}</td>`;
+    tr.className = a.id === selected ? 'sel' : ''; tr.setAttribute('aria-selected', a.id === selected);
+    if (tr.dataset.h !== html) { tr.dataset.h = html; tr.innerHTML = html; } });
   const a = agents[selected];
   $('hudAgent').innerHTML = `<span>${a.emoji} <b>${esc(a.name)}</b> · ${esc(doingText(a))}</span><i>“${esc(a.thought)}”</i>`;
   $('mindName').textContent = a.name;
@@ -1360,31 +1931,55 @@ function updateUI() {
     <div class="need"><span>🤝 Friends</span>${bar(a.social, '#7ee787')}</div>
     <div class="need"><span>🎯 Practice score</span>${a.skill >= 0 ? bar(a.conf) : '—'}</div>
     <div style="margin-top:6px">Personality: diligent <b>${pct(a.p.diligence)}</b> · curious <b>${pct(a.p.curiosity)}</b> · social <b>${pct(a.p.social)}</b></div>
-    <div style="margin-top:6px"><b>Likes learned from experience</b>: ${Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1]).map(([k, v]) => `${EMOJI[k]} ${v >= 0 ? '+' : ''}${v.toFixed(2)}`).join(' · ')}</div>
-    ${PY.online && a.resid ? `<div style="margin-top:6px"><b>🧮 What its decision brain (PyTorch) has learned</b>: it nudges the built-in instincts towards ${Object.entries(a.resid).sort((x, y) => y[1] - x[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r >= 0 ? '+' : ''}${r.toFixed(2)})`).join(', ')} and away from ${Object.entries(a.resid).sort((x, y) => x[1] - y[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r.toFixed(2)})`).join(', ')}</div>` : ''}
+    <div style="margin-top:6px"><b>Likes learned from experience</b> <span title="−1 = has learned to dislike it, +1 = has learned to love it">(−1 dislike … +1 love)</span>: ${Object.entries(a.taste).filter(([k]) => k !== 'none').sort((x, y) => y[1] - x[1]).map(([k, v]) => `${EMOJI[k]} ${k} ${v >= 0 ? '+' : ''}${v.toFixed(2)}`).join(' · ')}</div>
+    ${PY.online && a.resid ? `<div style="margin-top:6px"><b>What its decision brain (PyTorch) has learned</b>: it nudges the built-in instincts towards ${Object.entries(a.resid).sort((x, y) => y[1] - x[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r >= 0 ? '+' : ''}${r.toFixed(2)})`).join(', ')} and away from ${Object.entries(a.resid).sort((x, y) => x[1] - y[1]).slice(0, 2).map(([k, r]) => `${EMOJI[k]} ${k} (${r.toFixed(2)})`).join(', ')}</div>` : ''}
     <div style="margin-top:6px"><b>Why it chose this</b>: chances it gave each option at its last decision:<br>${a.why.map(([k, p]) => `${EMOJI[k]} ${k} ${pct(p)}`).join(' · ') || '—'}</div>
-    <div style="margin-top:6px">📜 <b>Level ${a.level}: ${SYLLABUS[a.level - 1].name}</b> · ${(() => { const g = gate(a); return g.L.open ? 'no more gates, open research' : g.ready ? 'ready for promotion!' : `still needs: ${esc(g.needs.join(', '))}`; })()}</div>
-    <div style="margin-top:6px">Degrees: <b>${a.passed.map(i => SKILLS[i].name).join(', ') || 'none yet'}</b> · Lessons done: <b>${a.steps.toLocaleString()}</b></div>
+    <div style="margin-top:6px"><b>Level ${a.level}: ${SYLLABUS[a.level - 1].name}</b> · ${(() => { const g = gate(a); return g.L.open ? 'no more gates, open research' : g.ready ? 'ready for promotion!' : `still needs: ${esc(g.needs.join(', '))}`; })()}</div>
+    <div style="margin-top:6px">Degrees: <b>${a.passed.length}</b>${a.passed.length ? ` (latest: ${esc(a.passed.slice(-3).reverse().map(i => SKILLS[i].name).join(', '))}${a.passed.length > 3 ? '; all of them in the Dashboard' : ''})` : ' yet'} · Lessons done: <b>${a.steps.toLocaleString()}</b></div>
     <div style="margin-top:6px"><b>Recent memories</b><br>${a.log.map(esc).join('<br>')}</div>`;
-  const L = a.lesson, s = SKILLS[a.skill];
-  $('lesson').innerHTML = a.arrived && a.act === 'study' && L && s ? `
-    <b>${a.name}</b> is studying <b>${s.name}</b>${s.web ? ` (real data from ${s.web.host})` : ''}, about ${(STUDY_STEPS * computeLvl * 60).toLocaleString()} lessons a second. Its latest lesson:<br>
-    1️⃣ <b>Question:</b> ${s.axes ? `${s.axes[0]} ${L.x.toFixed(2)}, ${s.axes[1]} ${L.y.toFixed(2)} (scaled −1…1)` : `the spot (${L.x.toFixed(2)}, ${L.y.toFixed(2)})`}: ${colorWord(s, 1)} or ${colorWord(s, 0)}? <i>(yellow ring on the map)</i><br>
-    2️⃣ <b>Guess:</b> its brain is ${pct(L.out)} sure it's ${s.labels[1]} → ${colorWord(s, +(L.out > 0.5))}<br>
-    3️⃣ <b>Check:</b> the right answer is ${colorWord(s, L.t)} ${(L.out > 0.5) === !!L.t ? '✅' : '❌'}<br>
-    4️⃣ <b>Nudge:</b> it was off by ${Math.abs(L.t - L.out).toFixed(2)}, so it adjusted all ${connections(a)} connections a tiny bit (learning rate ${a.lr.toFixed(3)}) to be closer next time.`
-    : `${a.name} isn't studying right now (${a.arrived ? ACT[a.act].toLowerCase() : 'walking'}). Lessons only happen while an AI <b>chooses</b> to sit at a desk${a.act === 'sleep' ? ', although while asleep it slowly replays old lessons, a bit like dreaming' : ''}.`;
+  const studying = a.arrived && a.act === 'study' && a.lesson && SKILLS[a.skill];
+  if (studying) a.lastLesson = {skill: a.skill, L: a.lesson, at: Date.now()};
+  // not studying: show the most recent real lesson, this student's own or else anyone's
+  const saved = o => o.lastLesson ?? (o.lesson && o.skill >= 0 ? {skill: o.skill, L: o.lesson, at: null} : null); // worlds saved before lastLesson existed
+  const rec = saved(a) ?? agents.filter(o => o.lastLesson).sort((x, y) => y.lastLesson.at - x.lastLesson.at)[0]?.lastLesson;
+  const who = saved(a) ? a : agents.find(o => o.lastLesson === rec);
+  const L = rec?.L, s = SKILLS[rec?.skill], ago = rec?.at ? Math.round((Date.now() - rec.at) / 60000) : null;
+  const agoText = ago == null ? 'before the page opened' : ago < 1 ? 'less than a minute ago' : ago < 90 ? `${ago} min ago` : `${Math.round(ago / 60)} h ago`;
+  // only text changes: the step list stays in place so its beat keeps running
+  const put = (id, html) => { const el = $(id); if (el.innerHTML !== html) el.innerHTML = html; };
+  $('lessonSteps').hidden = !(L && s);
+  lessonLive = !!(L && s) && who === a; lessonOk = L ? (L.out > 0.5) === !!L.t : null;
+  if (L && s) {
+    put('lessonHead', studying ? `<b>${a.name}</b> is studying <b>${s.name}</b>${srcOf(s)}, about ${(STUDY_STEPS * computeLvl * 60).toLocaleString()} lessons a second. Its latest lesson:`
+      : `<b>${a.name}</b> isn't studying right now (${a.arrived ? ACT[a.act].toLowerCase() : 'walking'}${isNight() ? ': it is night in the world' : ''}). Replay of <b>${who.name}</b>'s last real lesson, ${agoText}, in <b>${s.name}</b>:`);
+    put('ls1', `${s.axes ? `${s.axes[0]} ${L.x.toFixed(2)}, ${s.axes[1]} ${L.y.toFixed(2)} (scaled −1…1)` : `the spot (${L.x.toFixed(2)}, ${L.y.toFixed(2)})`}: ${colorWord(s, 1)} or ${colorWord(s, 0)}? <i>(yellow ring on the map)</i>`);
+    put('ls2', `its brain is ${pct(L.out)} sure it's ${s.labels[1]}, so it answers ${colorWord(s, +(L.out > 0.5))}`);
+    put('ls3', `the right answer is ${colorWord(s, L.t)}: ${(L.out > 0.5) === !!L.t ? '<span class="right">correct</span>' : '<span class="wrong">wrong</span>'}`);
+    put('ls4', `it was off by ${Math.abs(L.t - L.out).toFixed(2)}, so it adjusted all ${connections(who)} connections a tiny bit (learning rate ${who.lr.toFixed(3)}) to be closer next time.`);
+  } else put('lessonHead', `${a.name} isn't studying right now (${a.arrived ? ACT[a.act].toLowerCase() : 'walking'}). Lessons only happen while an AI <b>chooses</b> to sit at a desk${a.act === 'sleep' ? ', although while asleep it slowly replays old lessons, a bit like dreaming' : ''}.`);
   const cs = currentSkill(a);
-  $('mapInfo').innerHTML = `<b>${cs.name}</b>${cs.web ? ` 🌐 ${cs.n.toLocaleString()} real measurements from ${cs.web.host}` : ''}<br>Background colour = the AI's guess for every spot. Dots = the real answers: <span style="color:#58a6ff">blue = ${cs.labels[1]}</span>, <span style="color:#ff7b72">red = ${cs.labels[0]}</span>. When the colours match the dots, it has learned the rule. The yellow ring is its latest lesson.${cs.web ? `<br>Reference method: ${pct(cs.ref)} · always guessing the common answer: ${pct(cs.base)}` : ''}`;
+  $('mapInfo').innerHTML = `<b>${cs.name}</b>${cs.web ? `${srcOf(cs)}: ${cs.n.toLocaleString()} measurements` : ''}<br>Background colour = the AI's guess for every spot. Dots = the real answers: <span style="color:#58a6ff">blue = ${cs.labels[1]}</span>, <span style="color:#ff7b72">red = ${cs.labels[0]}</span>. When the colours match the dots, it has learned the rule. The yellow ring is its latest lesson.${cs.web ? `<br>Reference method: ${pct(cs.ref)} · always guessing the common answer: ${pct(cs.base)}` : ''}`;
 }
 $('roster').onclick = e => { const tr = e.target.closest('tr'); if (tr) select(+tr.dataset.id, true); };
+$('roster').onkeydown = e => { const tr = e.target.closest('tr'); if (tr && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(+tr.dataset.id, true); } };
 
 news('The world is born. 10 baby AIs wake up in the Dormitory knowing only x and y.');
 pyConnect();
 setInterval(pyStudyTick, 100);
 setInterval(pyViewTick, 250);
-window.sim = {SYLLABUS, gate, checkPromotion, QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, renderDashboard, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); }, makeAgent, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
-$('guide').showModal();
+window.sim = {SYLLABUS, news, gate, checkPromotion, QUALITY, updateUI, drawBrain, pyStudyTick, PY, pyCall, renderDashboard, agents, SKILLS, published, BUILD, live, updateAvatar, goOnline, inventPuzzle, focus, overview, skipWebWait: () => webNext = 0, step: () => { frame++; for (const a of agents) live(a); }, makeAgent, addFeature, camera, get controls() { return controls; }}; // for poking around in devtools
+// deep links: #dashboard, #syllabus, #student=Ada (skip the guide); otherwise the guide greets first-time visitors
+const hash = decodeURIComponent(location.hash.slice(1));
+const linked = NAMES.indexOf(hash.split('=')[1]);
+if (hash === 'dashboard') openDash(); else if (hash === 'syllabus') openDash('d-syllabus'); else if (linked >= 0) select(linked, true); else openGuide();
+// keyboard shortcuts (ignored while typing, in a dialog, or with a modifier key)
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,select,textarea') || document.querySelector('dialog[open]')) return;
+  const k = e.key.toLowerCase(), act = {p: () => $('btnPause').click(), d: () => openDash(), s: () => openDash('d-syllabus'), b: () => $('btnBuild').click(), h: openGuide,
+    arrowright: () => select((selected + 1) % agents.length, true), arrowleft: () => select((selected + agents.length - 1) % agents.length, true)}[k];
+  if (act && !(k.startsWith('arrow') && e.target.closest('canvas,#world'))) { e.preventDefault(); act(); }
+});
+addEventListener('click', e => { if (!e.target.closest('#worldMenu summary') && (e.target.closest('#worldMenu button') || !e.target.closest('#worldMenu'))) $('worldMenu').open = false; });
 let renders = 0;
 // The simulation runs on its own timer, not on the drawing loop, so the world keeps living when its window is minimized
 // (the launcher starts the browser with background throttling disabled). If drawing has stopped, avatars still walk.
@@ -1398,7 +1993,10 @@ applyQuality();
   lastDraw = performance.now();
   for (const a of agents) updateAvatar(a, t);
   const inside = focused || camera.position.length() < R + 11;
-  for (const b of placeList) { if (b.roofMesh) b.roofMesh.visible = !inside; b.tag.visible = !inside; }
+  for (const b of placeList) {
+    if (b.roofMesh) b.roofMesh.visible = !inside; b.tag.visible = !inside;
+    if (b.rise != null) { b.rise = Math.min(1, b.rise + 0.004); b.g.scale.set(1, 0.01 + 0.99 * b.rise * b.rise * (3 - 2 * b.rise), 1); if (b.rise >= 1) b.rise = null; }
+  }
   beam.visible = webBusy;
   M.beacon.color.setHex(webBusy ? (t % 300 < 150 ? 0x79c0ff : 0x1f6feb) : (t % 1600 < 200 ? 0xff4040 : 0x400000));
   M.led.color.setHex(webBusy && t % 200 < 100 ? 0xa5f3b0 : 0x3fb950);
@@ -1409,8 +2007,9 @@ applyQuality();
   renderer.render(scene, camera);
   renders++;
   if (renders % 4 === 0) drawBrain();
+  drawSignal(t);
   if (renders % 15 === 0) updateUI(); // keep panels fresh even while paused
-  if (renders % 30 === 0 && $('dash').open) renderDashboard();
+  if (renders % 60 === 0 && $('dash').open) renderDashboard(true);
   requestAnimationFrame(loop);
 })();
 </script>

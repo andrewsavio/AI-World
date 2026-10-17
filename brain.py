@@ -8,9 +8,14 @@ Two kinds of brain live here, one per student:
 The world (index.html) decides when things happen and asks this module over HTTP (see server.py).
 Run `python brain.py` to self-test.
 """
+import csv
+import json
 import math
+import os
+import pathlib
 import random
 import threading
+import time
 
 import torch
 import torch.nn as nn
@@ -21,6 +26,7 @@ LOCK = threading.Lock()   # the HTTP server is multi-threaded, the brains are no
 BATCH = 32                # lessons per training step
 LR_SCALE = 24             # the world's learning rates were made for 1-lesson steps; mean-loss batches need a bigger step (tuned on the real subjects)
 GRID = 40
+SAVE_DIR = pathlib.Path(os.environ.get('AIWORLD_SAVES', pathlib.Path(__file__).parent / 'saves'))  # where the world is kept between sessions
 
 # ---------------------------------------------------------------- senses (input features)
 SENSES = [  # same order as FEATURES in index.html
@@ -251,21 +257,22 @@ class Brain:
         return {'sizes': self.sizes, 'feats': self.feats, 'W': [l.weight.tolist() for l in self.layers], 'acts': acts,
                 'grid': [round(v, 3) for v in grid.tolist()], 'lessons': self.lessons, 'params': sum(p.numel() for p in self.params())}
 
+    def state(self):
+        """This brain's weights, senses and architecture, as plain data."""
+        return {'sizes': self.sizes, 'feats': self.feats, 'lr': self.lr, 'lessons': self.lessons,
+                'state_dict': [l.state_dict() for l in self.layers]}
+
     def save(self, path):
         """Save this brain's weights, senses, and architecture state to disk."""
-        state = {
-            'sizes': self.sizes,
-            'feats': self.feats,
-            'lr': self.lr,
-            'lessons': self.lessons,
-            'state_dict': [l.state_dict() for l in self.layers],
-        }
-        torch.save(state, path)
+        torch.save(self.state(), path)
 
     @classmethod
     def load(cls, path):
         """Reconstruct a brain from saved weights and architecture state."""
-        state = torch.load(path, weights_only=True)
+        return cls.from_state(torch.load(path, weights_only=True))
+
+    @classmethod
+    def from_state(cls, state):
         hidden = state['sizes'][1:-1]
         brain = cls(hidden=hidden, lr=state['lr'])
         brain.sizes = list(state['sizes'])
@@ -326,20 +333,20 @@ class Policy:
         self.updates += 1
         self.mean_reward += 0.05 * (r - self.mean_reward)
 
+    def state(self):
+        return {'state_dict': self.net.state_dict(), 'baseline': self.baseline, 'updates': self.updates, 'mean_reward': self.mean_reward}
+
     def save(self, path):
         """Save policy network weights and training statistics to disk."""
-        state = {
-            'state_dict': self.net.state_dict(),
-            'baseline': self.baseline,
-            'updates': self.updates,
-            'mean_reward': self.mean_reward,
-        }
-        torch.save(state, path)
+        torch.save(self.state(), path)
 
     @classmethod
     def load(cls, path):
         """Reconstruct a policy from saved weights and training statistics."""
-        state = torch.load(path, weights_only=True)
+        return cls.from_state(torch.load(path, weights_only=True))
+
+    @classmethod
+    def from_state(cls, state):
         policy = cls()
         policy.net.load_state_dict(state['state_dict'])
         policy.baseline = float(state.get('baseline', 0.0))
@@ -349,6 +356,63 @@ class Policy:
 
 
 BRAINS, POLICIES = {}, {}
+
+
+def _write(path, write):  # write to a temporary file first, so a crash mid-save never leaves a broken save behind
+    tmp = path.with_suffix(path.suffix + '.tmp')
+    write(tmp)
+    os.replace(tmp, path)
+
+
+def save_world(page):
+    """Keep everything between sessions: the page's world (students, subjects, news) as JSON, and every brain's weights."""
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    brains = {'brains': {i: b.state() for i, b in BRAINS.items()}, 'policies': {i: p.state() for i, p in POLICIES.items()},
+              'skills': {i: [tr, te] for i, (tr, te) in W.skills.items()}}
+    _write(SAVE_DIR / 'brains.pt', lambda f: torch.save(brains, f))
+    _write(SAVE_DIR / 'world.json', lambda f: f.write_text(json.dumps(page), encoding='utf-8'))
+    return {'ok': True}
+
+
+def load_world():
+    """Bring back the last save: the brains go back into memory, the page gets its world and the subjects' data."""
+    global W
+    if not (SAVE_DIR / 'world.json').exists():
+        return {'page': None}
+    page = json.loads((SAVE_DIR / 'world.json').read_text(encoding='utf-8'))
+    if not (SAVE_DIR / 'brains.pt').exists():
+        return {'page': page, 'brains': False}
+    saved = torch.load(SAVE_DIR / 'brains.pt', weights_only=True)
+    W = World()
+    for i, (tr, te) in saved['skills'].items():
+        W.skills[i] = (tr, te)
+    BRAINS.clear(), POLICIES.clear()
+    BRAINS.update({i: Brain.from_state(s) for i, s in saved['brains'].items()})
+    POLICIES.update({i: Policy.from_state(s) for i, s in saved['policies'].items()})
+    return {'page': page, 'brains': True, 'skills': {i: {'train': tr.tolist(), 'test': te.tolist()} for i, (tr, te) in saved['skills'].items()}}
+
+
+def log_day(row):
+    """One line per world day in saves/history.csv (plain numbers and short text from the page), for plotting a week of learning."""
+    SAVE_DIR.mkdir(parents=True, exist_ok=True)
+    path, keys = SAVE_DIR / 'history.csv', list(row)[:20]
+    new = not path.exists()
+    with open(path, 'a', newline='', encoding='utf-8') as f:
+        out = csv.writer(f)
+        if new:
+            out.writerow(keys)
+        out.writerow([str(row[k])[:200] for k in keys])
+    return {'ok': True}
+
+
+def new_world():
+    """Start over: the old save is moved aside (never deleted), so the next page load begins a fresh world."""
+    if SAVE_DIR.exists() and any(SAVE_DIR.glob('*.*')):
+        old = SAVE_DIR / f'old-{time.strftime("%Y%m%d-%H%M%S")}'
+        old.mkdir()
+        for f in SAVE_DIR.glob('*.*'):
+            f.rename(old / f.name)
+    return {'ok': True}
 
 
 def handle(path, data):
@@ -385,6 +449,14 @@ def handle(path, data):
             if 'policy_path' in data:
                 POLICIES[aid] = Policy.load(data['policy_path'])
             return {'ok': True}
+        if path == '/world/save':
+            return save_world(data['page'])
+        if path == '/world/load':
+            return load_world()
+        if path == '/world/log':
+            return log_day(dict(data['row']))
+        if path == '/world/new':
+            return new_world()
         if path == '/brain/study':
             return {'results': [{'id': j['id'], **BRAINS[j['id']].study(j['skill'], int(j['steps']), float(j['conf']))} for j in data['jobs']]}
         if path == '/brain/exam':
