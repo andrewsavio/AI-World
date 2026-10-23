@@ -1184,6 +1184,7 @@ function label(text, color = '#eaeefa', scale = 1, wide = false, bg = 'rgba(13,1
   const W = wide ? 512 : 256, {tex, draw} = canvasLabel(text, color, bg, W);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({map: tex, transparent: true, toneMapped: false}));
   s.scale.set(W / 256 * 2.4 * scale, 0.6 * scale, 1);
+  s.userData.base = s.scale.clone();
   s.userData.text = text;
   s.userData.set = t => { if (s.userData.text !== t) { s.userData.text = t; draw(t); } };
   return s;
@@ -1269,13 +1270,19 @@ function buildInternet() {
   return {g, spots, w, d, roof: part(box(w + 0.2, 0.12, d + 0.2), M.dark, 0, FLOOR + 1.2), dishAt: new THREE.Vector3(w / 2 - 0.4, FLOOR + 2.4, -d / 2 - 0.4)};
 }
 function buildDorm() {
-  const w = 5.4, d = 4, g = room(w, d, M.pastel, M.planks), spots = [], blankets = [0xe76f51, 0x2a9d8f, 0xe9c46a, 0x8ab17d, 0x9b5de5];
+  const w = 5.4, d = 4, g = room(w, d, M.pastel, M.planks), spots = [], blankets = [0xb5483a, 0x2a7d74, 0xc9a24a, 0x6f8f5e, 0x6b4f9a].map(c => mat(c, T.plaster));
+  const sheet = mat(0xf3efe6), pillowG = new THREE.CapsuleGeometry(0.055, 0.28, 4, 10).rotateZ(Math.PI / 2).scale(1, 0.7, 1.6);
   for (const [zc, yaw] of [[-1.3, 0], [1.0, Math.PI]]) for (const x of [-2, -1, 0, 1, 2]) {
     const dz = Math.cos(yaw); // +1: pillow at back, -1: pillow at front
-    g.add(part(box(0.55, 0.2, 1.1), M.wood, x, FLOOR, zc), part(box(0.52, 0.06, 0.72), mat(pick(blankets)), x, FLOOR + 0.2, zc + dz * 0.18),
-      part(box(0.35, 0.07, 0.2), M.white, x, FLOOR + 0.2, zc - dz * 0.4));
+    for (const [lx, lz] of [[-0.25, -0.52], [0.25, -0.52], [-0.25, 0.52], [0.25, 0.52]]) g.add(part(box(0.05, 0.14, 0.05), M.wood, x + lx, FLOOR, zc + lz));
+    g.add(part(box(0.58, 0.07, 1.12), M.wood, x, FLOOR + 0.12, zc), part(box(0.58, 0.44, 0.05), M.wood, x, FLOOR, zc - dz * 0.56), part(box(0.58, 0.26, 0.05), M.wood, x, FLOOR, zc + dz * 0.56),
+      part(box(0.52, 0.1, 1.04), sheet, x, FLOOR + 0.19, zc), part(box(0.545, 0.045, 0.7), blankets[(x + 2 + (zc > 0 ? 3 : 0)) % 5], x, FLOOR + 0.285, zc + dz * 0.16),
+      part(box(0.55, 0.05, 0.09), sheet, x, FLOOR + 0.285, zc - dz * 0.23), part(pillowG, sheet, x, FLOOR + 0.33, zc - dz * 0.4));
+    if (x < 2) g.add(part(box(0.26, 0.3, 0.26), M.wood, x + 0.5, FLOOR, zc - dz * 0.42), part(cyl(0.018, 0.028, 0.12, 8), M.dark, x + 0.5, FLOOR + 0.3, zc - dz * 0.42),
+      part(cyl(0.045, 0.07, 0.07, 10), M.lamp, x + 0.5, FLOOR + 0.41, zc - dz * 0.42));
     spots.push({x, z: zc + dz * 0.45, yaw});
   }
+  g.add(part(box(4.8, 0.012, 0.55), mat(0x7a4a3a, T.plaster), 0, FLOOR, -0.15));
   return {g, spots, w, d, roof: gableRoof(w, d, M.blueRoof)};
 }
 function buildPark() {
@@ -1630,13 +1637,21 @@ const SKIN = [0xf1c27d, 0xe0ac69, 0xc68642, 0x8d5524, 0xffdbac], HAIR = [0x2b1d1
 // with bending knees, sit on a chair with its shins down, swing its arms from the elbow and breathe while standing.
 const smoothMat = c => pbr({color: c, roughness: 0.7});
 const chestG = new THREE.CapsuleGeometry(0.15, 0.2, 6, 14), pelvisG = new THREE.CapsuleGeometry(0.13, 0.06, 4, 12), neckG = new THREE.CylinderGeometry(0.045, 0.05, 0.08, 10);
-const headG = new THREE.SphereGeometry(0.15, 20, 14).scale(1, 1.1, 1.02), eyeG = new THREE.SphereGeometry(0.022, 8, 6), noseG = new THREE.SphereGeometry(0.022, 8, 6).scale(1, 1, 1.3);
-const hairG = new THREE.SphereGeometry(0.162, 20, 10, 0, TAU, 0, Math.PI * 0.55).scale(1, 1.1, 1.05), handG = new THREE.SphereGeometry(0.036, 10, 8).scale(1, 1.2, 0.8);
+const headG = new THREE.SphereGeometry(0.125, 22, 16).scale(0.95, 1.12, 1), eyeG = new THREE.SphereGeometry(0.02, 10, 8).scale(1, 0.85, 0.6), pupilG = new THREE.SphereGeometry(0.011, 8, 6);
+const noseG = new THREE.SphereGeometry(0.018, 8, 6).scale(0.9, 1, 1.3), browG = new THREE.BoxGeometry(0.042, 0.008, 0.01), mouthG = new THREE.CapsuleGeometry(0.006, 0.03, 2, 6).rotateZ(Math.PI / 2);
+const earG = new THREE.SphereGeometry(0.026, 8, 6).scale(0.45, 1, 0.75), handG = new THREE.SphereGeometry(0.036, 10, 8).scale(1, 1.2, 0.8);
+const hairCapG = new THREE.SphereGeometry(0.133, 22, 12, 0, TAU, 0, Math.PI * 0.56).scale(0.97, 1.12, 1.04);
+const HAIRDO = [ // short, long, bun, curly: pieces beyond the cap, [geometry, x, y, z]
+  [], [[new THREE.CapsuleGeometry(0.1, 0.12, 4, 12).scale(1.15, 1, 0.55), 0, -0.07, -0.07]],
+  [[new THREE.SphereGeometry(0.05, 12, 8), 0, 0.1, -0.09]],
+  [[new THREE.SphereGeometry(0.045, 8, 6), -0.09, 0.07, -0.02], [new THREE.SphereGeometry(0.045, 8, 6), 0.09, 0.07, -0.02], [new THREE.SphereGeometry(0.05, 8, 6), 0, 0.12, -0.05], [new THREE.SphereGeometry(0.045, 8, 6), 0, 0.06, -0.11]]];
+const MOUTH = smoothMat(0x8a4a48), EYEWHITE = smoothMat(0xf6f3ee), DUVET = pbr({color: 0xece6da, roughness: 0.95});
+const duvetG = new THREE.CapsuleGeometry(0.2, 0.72, 4, 12).scale(1.35, 1, 0.55); // in bed, feet to chest under a duvet
 const thighG = new THREE.CapsuleGeometry(0.058, 0.13, 4, 10).translate(0, -0.1, 0), shinG = new THREE.CapsuleGeometry(0.046, 0.13, 4, 10).translate(0, -0.1, 0);
 const upperArmG = new THREE.CapsuleGeometry(0.04, 0.11, 4, 8).translate(0, -0.08, 0), foreArmG = new THREE.CapsuleGeometry(0.034, 0.1, 4, 8).translate(0, -0.07, 0);
 const shoeG = new THREE.CapsuleGeometry(0.045, 0.09, 4, 8).rotateX(Math.PI / 2).scale(1.05, 0.75, 1);
 const pants = smoothMat(0x2f3a4a), shoes = smoothMat(0x1d1d1d), avatarShadow = disc(0.3);
-function buildAvatar(color, skinHex, hairHex, name, scale = 0.6) {
+function buildAvatar(color, skinHex, hairHex, name, hairStyle = 0, scale = 0.6) {
   const shirt = smoothMat(new THREE.Color(color)), skin = smoothMat(skinHex), pants = smoothMat(new THREE.Color(color).lerp(new THREE.Color(0x1f2733), 0.78));
   const leg = x => { // hip pivot → thigh → knee pivot → shin → shoe
     const knee = group(part(shinG, pants), part(shoeG, shoes, 0, -0.21, 0.035)); knee.position.y = -0.2;
@@ -1647,22 +1662,29 @@ function buildAvatar(color, skinHex, hairHex, name, scale = 0.6) {
     const sh = group(part(upperArmG, shirt), elbow); sh.position.set(x, 0.86, 0); sh.userData.elbow = elbow; return sh;
   };
   const legL = leg(-0.075), legR = leg(0.075), armL = arm(-0.2), armR = arm(0.2);
-  const hat = group(part(box(0.38, 0.035, 0.38), M.dark), part(box(0.2, 0.09, 0.2), M.dark, 0, -0.07));
-  hat.position.y = 1.23; hat.visible = false;
-  const halo = part(new THREE.TorusGeometry(0.15, 0.022, 6, 20).rotateX(Math.PI / 2), M.gold, 0, 1.36); halo.visible = false;
-  const chest = part(chestG, shirt, 0, 0.7), head = group(part(headG, skin), part(hairG, smoothMat(hairHex), 0, 0.02, -0.012),
-    part(eyeG, M.dark, -0.052, 0.015, 0.135), part(eyeG, M.dark, 0.052, 0.015, 0.135), part(noseG, skin, 0, -0.02, 0.15));
-  head.position.y = 1.07;
-  const body = group(legL, legR, armL, armR, part(pelvisG, pants, 0, 0.47), chest, part(neckG, skin, 0, 0.94), head, hat, halo);
-  const tag = label(name, color, 0.8); tag.position.y = 1.7;
+  const hairM = smoothMat(hairHex), style = HAIRDO[hairStyle % HAIRDO.length];
+  const face = [-1, 1].flatMap(sx => [part(eyeG, EYEWHITE, sx * 0.044, 0.014, 0.108), part(pupilG, M.dark, sx * 0.044, 0.014, 0.118),
+    part(browG, hairM, sx * 0.045, 0.045, 0.112), part(earG, skin, sx * 0.118, 0, 0)]);
+  const head = group(part(headG, skin), part(hairCapG, hairM, 0, 0.012, -0.008), ...style.map(([g, x, y, z]) => part(g, hairM, x, y, z)),
+    ...face, part(noseG, skin, 0, -0.012, 0.122), part(mouthG, MOUTH, 0, -0.052, 0.108));
+  head.position.y = 1.1;
+  // mortarboard: a skull cap, the square board turned diagonally, and a gold tassel hanging from its button
+  const board = part(box(0.3, 0.02, 0.3), M.dark, 0, 0.07, 0); board.rotation.y = Math.PI / 4;
+  const hat = group(part(cyl(0.118, 0.122, 0.07, 14), M.dark), board, part(cyl(0.012, 0.012, 0.012, 6), M.gold, 0, 0.09, 0),
+    part(box(0.01, 0.1, 0.01), M.gold, 0.1, -0.01, 0.1));
+  hat.position.y = 1.19; hat.rotation.x = -0.12; hat.visible = false;
+  const chest = part(chestG, shirt, 0, 0.7);
+  const duvet = part(duvetG, DUVET, 0, 0.44, 0.06); duvet.visible = false;
+  const body = group(legL, legR, armL, armR, part(pelvisG, pants, 0, 0.47), chest, part(neckG, skin, 0, 0.95), head, hat, duvet);
+  const tag = label(name, color, 0.8); tag.position.y = 1.55;
   const g = group(part(avatarShadow, M.shadow, 0, 0.02), body, tag);
   g.scale.setScalar(scale);
   g.traverse(o => { if (o.isMesh && o.material !== M.shadow) o.castShadow = true; });
   world.add(g);
-  return {g, body, chest, head, legL, legR, armL, armR, kneeL: legL.userData.knee, kneeR: legR.userData.knee, elbowL: armL.userData.elbow, elbowR: armR.userData.elbow, hat, halo, tag};
+  return {g, body, chest, head, legL, legR, armL, armR, kneeL: legL.userData.knee, kneeR: legR.userData.knee, elbowL: armL.userData.elbow, elbowR: armR.userData.elbow, hat, duvet, tag};
 }
 for (const a of agents) {
-  const v = buildAvatar(a.color, SKIN[a.id % SKIN.length], HAIR[a.id % HAIR.length], a.name);
+  const v = buildAvatar(a.color, SKIN[a.id % SKIN.length], HAIR[a.id % HAIR.length], a.name, (a.id * 3) % 4);
   v.g.traverse(o => o.userData.id = a.id);
   const dorm = BUILD.Dorm; // born in the Dormitory
   a.place = 'Dorm'; a.spot = a.id; dorm.occ[a.id] = a.id; a.timer = 30 + a.id * 25;
@@ -1760,15 +1782,17 @@ function updateAvatar(a, t) {
     v.chest.scale.setScalar(1 + Math.sin(t * 0.002 + a.id) * 0.012);
     v.body.rotation.z = Math.sin(t * 0.0007 + a.id) * 0.02; v.head.rotation.y = Math.sin(t * 0.0005 + a.id * 2) * 0.25;
   }
-  v.hat.visible = a.level >= 4; // the graduation cap comes with Level 4
-  v.halo.visible = a.firsts > 0;
-  v.halo.rotation.y = t * 0.002;
+  v.hat.visible = a.level >= 4 && pose !== 'sleep'; // the graduation cap comes with Level 4 (and comes off in bed)
+  v.duvet.visible = pose === 'sleep';
   v.tag.userData.set(`${a.emoji} ${a.name}${a.firsts ? ' ★' + a.firsts : ''}`);
-  v.tag.visible = a.id === selected || camera.position.distanceTo(v.g.position) < 12; // no cloud of name tags in the overview
+  const camD = camera.position.distanceTo(v.g.position), near = Math.min(1, Math.max(0.3, camD / 10)); // shrink with the camera so close-ups stay readable
+  v.tag.visible = a.id === selected || camD < 12; // no cloud of name tags in the overview
+  v.tag.scale.copy(v.tag.userData.base).multiplyScalar(near);
   if (a.id === selected) {
     ring.position.copy(pos); ring.quaternion.setFromUnitVectors(Y, up);
     bubble.position.copy(pos).addScaledVector(up, 1.6);
     bubble.userData.set(`${a.emoji} ${a.thought}`);
+    bubble.scale.copy(bubble.userData.base).multiplyScalar(near);
   }
 }
 
